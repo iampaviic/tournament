@@ -77,14 +77,20 @@
 
 {#each data.stages as stage (stage.id)}
 	<h2>{stageLabel(stage.index, data.stageCount)}</h2>
+	<!-- Group, side and round headings go one level deeper each, skipping the ones not shown. -->
 	{#each stage.groups as group, groupIndex (groupIndex)}
 		{@const numbers = matchNumbers(group.matches.map((match) => match.template))}
-		{#if stage.groups.length > 1}<h3>{groupName(groupIndex)}</h3>{/if}
+		{@const groups = stage.groups.length > 1}
+		{#if groups}<h3>{groupName(groupIndex)}</h3>{/if}
 		{#each sections(group.matches) as section (section.side)}
-			{#if sideLabel(section.side)}<h4>{sideLabel(section.side)}</h4>{/if}
+			{@const side = sideLabel(section.side)}
+			{@const level = 3 + Number(groups)}
+			{#if side}<svelte:element this={`h${level}`} class="side">{side}</svelte:element>{/if}
 			{#each section.rounds as round (round.round)}
 				<div class="card round">
-					<h5>{m.round_name({ round: round.round })}</h5>
+					<svelte:element this={`h${level + Number(!!side)}`} class="round-title"
+						>{m.round_name({ round: round.round })}</svelte:element
+					>
 					<ul>
 						{#each round.matches as match (match.id)}
 							{@const editable =
@@ -109,7 +115,7 @@
 									{#if match.result}
 										<form method="POST" action="?/clear" use:enhance>
 											<input type="hidden" name="matchId" value={match.id} />
-											<button class="btn small" type="submit">{m.matches_clear()}</button>
+											<button class="btn small danger" type="submit">{m.matches_clear()}</button>
 										</form>
 									{/if}
 								{:else}
@@ -143,7 +149,7 @@
 		margin-top: 1rem;
 	}
 
-	h4 {
+	.side {
 		font-size: 0.95rem;
 		color: var(--text-muted);
 		margin: 1rem 0 0.5rem;
@@ -190,7 +196,7 @@
 		margin-bottom: 0.75rem;
 		padding: 0.75rem 1.25rem;
 
-		h5 {
+		.round-title {
 			font-size: 0.85rem;
 			color: var(--text-muted);
 			margin: 0 0 0.5rem;

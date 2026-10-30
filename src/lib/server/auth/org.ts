@@ -5,6 +5,7 @@ import {
 	getOrganizationBySlug,
 	hasRole
 } from '#lib/server/services/organizations.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { requireTrusted } from './guards';
 
 /**
@@ -18,10 +19,10 @@ export async function requireOrgRole(
 ) {
 	const user = requireTrusted(event);
 	const org = await getOrganizationBySlug(slug);
-	if (!org) error(404, 'Organization not found');
+	if (!org) error(404, m.error_org_not_found());
 
 	const role = await getMemberRole(org.id, user.id);
-	if (!role) error(403, "You aren't a member of this organization.");
-	if (!hasRole(role, required)) error(403, 'Only owners can do this.');
+	if (!role) error(403, m.error_not_member());
+	if (!hasRole(role, required)) error(403, m.error_owner_only());
 	return { user, org, role };
 }

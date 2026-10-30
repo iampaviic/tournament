@@ -1,8 +1,7 @@
 import { defineConfig } from '@playwright/test';
+import { E2E_DATABASE_URL } from './e2e/db';
 
 const port = 4173;
-const databaseUrl =
-	process.env.E2E_DATABASE_URL ?? 'postgres://root:mysecretpassword@localhost:5432/tournament_e2e';
 
 export default defineConfig({
 	testMatch: '**/*.e2e.{ts,js}',
@@ -17,12 +16,14 @@ export default defineConfig({
 		command: 'node scripts/migrate.js && pnpm build && node build',
 		port,
 		env: {
-			DATABASE_URL: databaseUrl,
+			DATABASE_URL: E2E_DATABASE_URL,
 			PORT: String(port),
 			PROTOCOL_HEADER: 'x-forwarded-proto',
 			AUTH_MODULES: 'dev',
 			TRUSTED_AUTH_MODULES: 'dev',
-			ALLOW_DEV_AUTH: 'true'
+			ALLOW_DEV_AUTH: 'true',
+			// Turns the game picker on. Tests seed a fresh cache, so it's never sent to Steam.
+			STEAM_API_KEY: 'e2e-dummy-key'
 		}
 	}
 });

@@ -14,16 +14,17 @@
 			label: m.settings_nav_identities
 		}
 	];
+	const current = $derived(tabs.find((tab) => tab.route === page.route.id));
 </script>
 
 <svelte:head>
-	<title>{m.settings_title()} · {m.app_name()}</title>
+	<title>{current ? `${current.label()} · ` : ''}{m.settings_title()} · {m.app_name()}</title>
 </svelte:head>
 
 <h1>{m.settings_title()}</h1>
 
 <div class="layout">
-	<nav>
+	<nav aria-label={m.settings_title()}>
 		{#each tabs as tab (tab.route)}
 			<a href={tab.href} aria-current={page.route.id === tab.route ? 'page' : undefined}>
 				{tab.label()}

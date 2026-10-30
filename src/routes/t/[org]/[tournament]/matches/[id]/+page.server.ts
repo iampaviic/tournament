@@ -22,7 +22,7 @@ export const load: PageServerLoad = async (event) => {
 	const { tournament, isMember } = await loadTournament(event);
 	const id = matchIdSchema.safeParse(event.params.id);
 	const match = id.success ? await getMatch(tournament.id, id.data) : undefined;
-	if (!match) error(404, 'Match not found');
+	if (!match) error(404, m.error_match_not_found());
 
 	const user = event.locals.user;
 	const participants = await listParticipants(tournament.id);
@@ -92,7 +92,10 @@ export const actions: Actions = {
 		act(event, async (matchId, form) => {
 			const { user, tournament } = await viewer(event);
 			const outcome = await reportResult(tournament, matchId, user.id, scores(form));
-			return { saved: m.room_saved, agreed: m.room_agreed, disputed: m.room_disputed }[outcome]();
+			// The result card already shows a dispute as a warning.
+			return outcome === 'disputed'
+				? undefined
+				: { saved: m.room_saved, agreed: m.room_agreed }[outcome]();
 		}),
 	help: (event) =>
 		act(event, async (matchId) => {

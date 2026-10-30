@@ -1,3 +1,4 @@
+import { m } from '#lib/paraglide/messages.js';
 import { createAuthorizationURL, exchangeCode, type OAuth2Provider } from '../oauth2';
 import {
 	AuthModuleError,
@@ -39,7 +40,7 @@ export async function fetchDiscordUser(
 	const response = await fetch('https://discord.com/api/users/@me', {
 		headers: { Authorization: `Bearer ${tokens.access_token}` }
 	});
-	if (!response.ok) throw new AuthModuleError('Could not load your Discord account.');
+	if (!response.ok) throw new AuthModuleError(m.discord_error_account());
 	return (await response.json()) as DiscordUser;
 }
 

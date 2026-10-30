@@ -16,7 +16,7 @@ export const load: PageServerLoad = async (event) => {
 			return {
 				id: module.id,
 				name: module.name,
-				fields: module.configFields ?? [],
+				fields: module.configFields?.() ?? [],
 				required: Boolean(requirement),
 				config: requirement?.config ?? {}
 			};

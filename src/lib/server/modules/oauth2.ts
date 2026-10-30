@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
+import { m } from '#lib/paraglide/messages.js';
 import { AuthModuleError, type AuthorizationRequest, type CallbackRequest } from './types';
 
 /** Authorization code flow with PKCE (RFC 6749 + RFC 7636). */
@@ -46,11 +47,11 @@ export async function exchangeCode(
 	fetch: typeof globalThis.fetch
 ): Promise<OAuth2Tokens> {
 	const error = request.url.searchParams.get('error');
-	if (error === 'access_denied') throw new AuthModuleError('Sign-in was cancelled.');
-	if (error) throw new AuthModuleError(`The provider returned an error: ${error}.`);
+	if (error === 'access_denied') throw new AuthModuleError(m.auth_error_cancelled());
+	if (error) throw new AuthModuleError(m.auth_error_provider({ error }));
 
 	const code = request.url.searchParams.get('code');
-	if (!code) throw new AuthModuleError('The provider did not return an authorization code.');
+	if (!code) throw new AuthModuleError(m.auth_error_no_code());
 
 	const response = await fetch(provider.tokenUrl, {
 		method: 'POST',
@@ -68,10 +69,9 @@ export async function exchangeCode(
 		})
 	});
 	if (!response.ok) {
-		throw new AuthModuleError(`Could not verify the sign-in (status ${response.status}).`);
+		throw new AuthModuleError(m.auth_error_verify({ status: response.status }));
 	}
 	const tokens = (await response.json()) as OAuth2Tokens;
-	if (!tokens.access_token)
-		throw new AuthModuleError('The provider did not return an access token.');
+	if (!tokens.access_token) throw new AuthModuleError(m.auth_error_no_token());
 	return tokens;
 }

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { seedSteamApps } from './db';
 import { createApiKey, createOrganization, playerPage, signIn, uniqueName } from './helpers';
 
 /** SvelteKit's CSRF check turns away POST and DELETE requests without a JSON content type. */
@@ -173,6 +174,41 @@ test('create → start → report via key', async ({ page, browser, request }) =
 	await expect(posted.getByText('Organizer', { exact: true })).toBeVisible();
 	await expect(posted.getByText('API key', { exact: true })).toBeVisible();
 	await expect(page.getByText('This result was set through the API.')).toBeVisible();
+});
+
+test('set and clear the Steam game via key', async ({ page, request }) => {
+	// A fresh cache, so the server doesn't ask Steam.
+	await seedSteamApps([{ appId: 990001, name: 'E2E Tetris Arena' }]);
+	await signIn(page, uniqueName('ag'));
+	const orgSlug = await createOrganization(page, `Api ${uniqueName('g')}`);
+	const headers = auth(await createApiKey(page, orgSlug, 'Game bot'));
+
+	const created = await request.post('/api/v1/tournaments', {
+		headers,
+		data: { name: 'Game Cup', slug: uniqueName('game-cup') }
+	});
+	const { id, game } = await created.json();
+	expect(game).toBeNull();
+	const api = `/api/v1/tournaments/${id}`;
+
+	const found = await request.get('/api/v1/steam/apps?q=E2E%20Tetris', { headers });
+	expect(found.status()).toBe(200);
+	expect((await found.json()).map((app: { appId: number }) => app.appId)).toContain(990001);
+	expect((await request.get('/api/v1/steam/apps', { headers })).status()).toBe(400);
+
+	const set = await request.patch(api, { headers, data: { game: { appId: 990001 } } });
+	expect(set.status()).toBe(200);
+	const picked = (await set.json()).game;
+	expect(picked.name).toBe('E2E Tetris Arena');
+	expect(picked.headerImage).toMatch(/\/990001\/header\.jpg$/);
+
+	const unknown = await request.patch(api, { headers, data: { game: { appId: 1 } } });
+	expect(unknown.status()).toBe(422);
+	expect((await unknown.json()).error.code).toBe('unprocessable');
+	expect((await (await request.get(api, { headers })).json()).game.appId).toBe(990001);
+
+	const cleared = await request.patch(api, { headers, data: { game: null } });
+	expect((await cleared.json()).game).toBeNull();
 });
 
 test('errors, spec and docs', async ({ page, request }) => {

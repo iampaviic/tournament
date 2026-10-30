@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { formatNumber } from '#lib/format.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { createAuthorizationURL } from '../oauth2';
 import {
 	AuthModuleError,
@@ -49,10 +51,10 @@ export const tetrioConfig = z
 		allowUnranked: z.boolean().default(false)
 	})
 	.refine((c) => !c.minRank || !c.maxRank || rankIndex(c.minRank) <= rankIndex(c.maxRank), {
-		message: 'Minimum rank must not be above maximum rank.'
+		error: () => m.tetrio_error_rank_order()
 	})
 	.refine((c) => c.minTr === undefined || c.maxTr === undefined || c.minTr <= c.maxTr, {
-		message: 'Minimum TR must not be above maximum TR.'
+		error: () => m.tetrio_error_tr_order()
 	});
 export type TetrioConfig = z.infer<typeof tetrioConfig>;
 
@@ -72,48 +74,50 @@ export function rankIndex(rank: string): number {
 }
 
 export function formatRank(rank: string): string {
-	return rank === 'z' ? 'Unranked' : rank.toUpperCase();
+	return rank === 'z' ? m.tetrio_unranked() : rank.toUpperCase();
 }
 
 export function checkTetrioEligibility(data: TetrioData, config: TetrioConfig) {
 	const ranked = data.rank !== 'z' && data.tr !== null;
 	if (!ranked) {
 		if (config.allowUnranked) return { ok: true } as const;
-		return { ok: false, reason: 'You need a TETRA LEAGUE rank to join.' } as const;
+		return { ok: false, reason: m.tetrio_need_rank() } as const;
 	}
 	const rank = rankIndex(data.rank);
 	if (config.minRank && rank < rankIndex(config.minRank)) {
-		return { ok: false, reason: `Requires rank ${formatRank(config.minRank)} or higher.` } as const;
+		return { ok: false, reason: m.tetrio_min_rank({ rank: formatRank(config.minRank) }) } as const;
 	}
 	if (config.maxRank && rank > rankIndex(config.maxRank)) {
-		return { ok: false, reason: `Requires rank ${formatRank(config.maxRank)} or lower.` } as const;
+		return { ok: false, reason: m.tetrio_max_rank({ rank: formatRank(config.maxRank) }) } as const;
 	}
 	if (config.minTr !== undefined && data.tr! < config.minTr) {
-		return { ok: false, reason: `Requires at least ${config.minTr} TR.` } as const;
+		return { ok: false, reason: m.tetrio_min_tr({ tr: config.minTr }) } as const;
 	}
 	if (config.maxTr !== undefined && data.tr! > config.maxTr) {
-		return { ok: false, reason: `Requires at most ${config.maxTr} TR.` } as const;
+		return { ok: false, reason: m.tetrio_max_tr({ tr: config.maxTr }) } as const;
 	}
 	return { ok: true } as const;
 }
 
-const rankOptions = [
-	{ value: '', label: 'Any' },
-	...[...TETRIO_RANKS].reverse().map((rank) => ({ value: rank, label: formatRank(rank) }))
-];
-
-export const tetrioConfigFields: ConfigField[] = [
-	{ key: 'minRank', label: 'Minimum rank', type: 'select', options: rankOptions },
-	{ key: 'maxRank', label: 'Maximum rank', type: 'select', options: rankOptions },
-	{ key: 'minTr', label: 'Minimum TR', type: 'number', min: 0, max: 25000 },
-	{ key: 'maxTr', label: 'Maximum TR', type: 'number', min: 0, max: 25000 },
-	{
-		key: 'allowUnranked',
-		label: 'Allow unranked players',
-		hint: 'They skip the rank and TR limits.',
-		type: 'checkbox'
-	}
-];
+/** The requirement form. A function, so its labels follow the request's locale. */
+export function tetrioConfigFields(): ConfigField[] {
+	const rankOptions = [
+		{ value: '', label: m.tetrio_any() },
+		...[...TETRIO_RANKS].reverse().map((rank) => ({ value: rank, label: formatRank(rank) }))
+	];
+	return [
+		{ key: 'minRank', label: m.tetrio_field_min_rank(), type: 'select', options: rankOptions },
+		{ key: 'maxRank', label: m.tetrio_field_max_rank(), type: 'select', options: rankOptions },
+		{ key: 'minTr', label: m.tetrio_field_min_tr(), type: 'number', min: 0, max: 25000 },
+		{ key: 'maxTr', label: m.tetrio_field_max_tr(), type: 'number', min: 0, max: 25000 },
+		{
+			key: 'allowUnranked',
+			label: m.tetrio_field_allow_unranked(),
+			hint: m.tetrio_field_allow_unranked_hint(),
+			type: 'checkbox'
+		}
+	];
+}
 
 interface Envelope<T> {
 	success: boolean;
@@ -148,7 +152,7 @@ export function tetrioModule(options: DiscordOptions): AuthModule<TetrioConfig> 
 			headers: { Accept: 'application/json', 'X-Session-ID': sessionId }
 		});
 		if (!response.ok && response.status !== 404) {
-			throw new AuthModuleError('TETR.IO is not responding right now. Try again later.');
+			throw new AuthModuleError(m.tetrio_error_down());
 		}
 		const body = (await response.json()) as Envelope<T>;
 		return body.success ? (body.data ?? null) : null;
@@ -160,7 +164,7 @@ export function tetrioModule(options: DiscordOptions): AuthModule<TetrioConfig> 
 			get<TetrioUser>(`/users/${encodeURIComponent(userId)}`, sessionId),
 			get<LeagueSummary>(`/users/${encodeURIComponent(userId)}/summaries/league`, sessionId)
 		]);
-		if (!user) throw new AuthModuleError('This TETR.IO account no longer exists.');
+		if (!user) throw new AuthModuleError(m.tetrio_error_gone());
 
 		const data: TetrioData = {
 			rank: (league?.rank ?? 'z') as TetrioData['rank'],
@@ -194,10 +198,7 @@ export function tetrioModule(options: DiscordOptions): AuthModule<TetrioConfig> 
 			);
 			const match = found?.users?.[0];
 			if (!match) {
-				throw new AuthModuleError(
-					`No TETR.IO account is connected to the Discord account "${discord.username}". ` +
-						'Connect Discord in your TETR.IO settings, make the connection public, and try again.'
-				);
+				throw new AuthModuleError(m.tetrio_error_no_account({ username: discord.username }));
 			}
 			return loadIdentity(match._id);
 		},
@@ -210,7 +211,7 @@ export function tetrioModule(options: DiscordOptions): AuthModule<TetrioConfig> 
 		bracketFields(identity: StoredIdentity) {
 			const data = identity.data as TetrioData;
 			const fields: Record<string, string> = { rank: formatRank(data.rank) };
-			if (data.tr !== null) fields.tr = Math.round(data.tr).toLocaleString('en');
+			if (data.tr !== null) fields.tr = formatNumber(Math.round(data.tr));
 			if (data.country) fields.country = data.country;
 			return fields;
 		}

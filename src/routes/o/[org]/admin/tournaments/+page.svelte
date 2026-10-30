@@ -48,8 +48,17 @@
 	<div class="row">
 		<div class="field grow">
 			<label for="t-name">{m.tournament_name()}</label>
-			<input id="t-name" name="name" type="text" bind:value={name} required maxlength="80" />
-			{#each errors.name ?? [] as error (error)}<span class="error">{error}</span>{/each}
+			<input
+				id="t-name"
+				name="name"
+				type="text"
+				bind:value={name}
+				required
+				maxlength="80"
+				aria-describedby="t-name-error"
+				aria-invalid={errors.name ? 'true' : undefined}
+			/>
+			{#if errors.name}<span class="error" id="t-name-error">{errors.name.join(' ')}</span>{/if}
 		</div>
 		<div class="field grow">
 			<label for="t-slug">{m.tournament_slug()}</label>
@@ -61,8 +70,10 @@
 				oninput={(event) => (customSlug = event.currentTarget.value)}
 				required
 				maxlength="40"
+				aria-describedby="t-slug-error"
+				aria-invalid={errors.slug ? 'true' : undefined}
 			/>
-			{#each errors.slug ?? [] as error (error)}<span class="error">{error}</span>{/each}
+			{#if errors.slug}<span class="error" id="t-slug-error">{errors.slug.join(' ')}</span>{/if}
 		</div>
 		<button class="btn primary" type="submit">{m.tournaments_create()}</button>
 	</div>

@@ -46,7 +46,7 @@ export const load: PageServerLoad = async (event) => {
 async function moduleFromForm(request: Request) {
 	const form = await request.formData();
 	const module = getModule(String(form.get('module')));
-	if (!module) error(400, 'Unknown sign-in method.');
+	if (!module) error(400, m.auth_error_unknown_module());
 	return module;
 }
 

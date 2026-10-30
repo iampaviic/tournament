@@ -1,0 +1,7 @@
+{
+	"task_id": "task-m7-rest-api",
+	"task_description": "Milestone M7 of Tournament Manager: the org-scoped REST API at /api/v1 (Bearer API key guard, one JSON error envelope, every tournament admin action reachable over REST through the same services), the OpenAPI 3.1 spec at /api/v1/openapi.json generated from the same Zod schemas with z.toJSONSchema, and an API docs page at /docs/api. Built uncommitted in the checkout on branch claude/cool-archimedes-iqm428 across three FEATs; one final step makes the single M7 commit (no push, never stage .agents/ or .env). Full plan: .agents/tasks/m7-rest-api/plan.md.",
+	"status": "pending",
+	"feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+	"blocked_reason": null
+}

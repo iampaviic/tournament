@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { db } from '#lib/server/db/index.ts';
 import { apiKeys, users } from '#lib/server/db/schema.ts';
 import { hashToken } from '#lib/server/auth/token.ts';
+import { m } from '#lib/paraglide/messages.js';
 
 /**
  * API keys look like `tm_<prefix>_<secret>`. The 8-character hex prefix identifies the key and is
@@ -14,8 +15,8 @@ const KEY_PATTERN = /^tm_([0-9a-f]{8})_([A-Za-z0-9_-]{43})$/;
 export const apiKeyNameSchema = z
 	.string()
 	.trim()
-	.min(1, 'Name is required.')
-	.max(64, 'Name must be at most 64 characters.');
+	.min(1, { error: () => m.validation_name_required() })
+	.max(64, { error: () => m.validation_name_max({ max: 64 }) });
 
 export function generateApiKey() {
 	const prefix = randomBytes(4).toString('hex');

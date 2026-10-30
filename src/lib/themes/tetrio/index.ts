@@ -1,3 +1,4 @@
+import { m } from '#lib/paraglide/messages.js';
 import type { BracketTheme } from '../types';
 import ParticipantLabel from './ParticipantLabel.svelte';
 
@@ -5,8 +6,9 @@ import ParticipantLabel from './ParticipantLabel.svelte';
 export const tetrioTheme: BracketTheme = {
 	id: 'tetrio',
 	name: 'TETR.IO',
-	description:
-		"Dark and bold, with each player's TETRA LEAGUE rank, TR and country from their linked TETR.IO account.",
+	get description() {
+		return m.theme_tetrio_description();
+	},
 	module: 'tetrio',
 	style: {
 		background: '#0c0e1d',

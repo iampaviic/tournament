@@ -2,6 +2,7 @@ import { and, asc, count, eq, ne } from 'drizzle-orm';
 import { z } from 'zod';
 import { db, type Transaction } from '#lib/server/db/index.ts';
 import { orgMembers, organizations, users, type OrgRole } from '#lib/server/db/schema.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { ServiceError } from './errors';
 
 const ROLE_RANK: Record<OrgRole, number> = { admin: 1, owner: 2 };
@@ -15,27 +16,25 @@ export const orgSlugSchema = z
 	.string()
 	.trim()
 	.toLowerCase()
-	.min(3, 'Address must be at least 3 characters.')
-	.max(40, 'Address must be at most 40 characters.')
-	.regex(
-		/^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-		'Address may only contain lowercase letters, digits and single dashes.'
-	);
+	.min(3, { error: () => m.validation_slug_min({ min: 3 }) })
+	.max(40, { error: () => m.validation_slug_max({ max: 40 }) })
+	.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { error: () => m.validation_slug_format() });
 
 export const organizationSchema = z.object({
 	name: z
 		.string()
 		.trim()
-		.min(1, 'Name is required.')
-		.max(64, 'Name must be at most 64 characters.'),
+		.min(1, { error: () => m.validation_name_required() })
+		.max(64, { error: () => m.validation_name_max({ max: 64 }) }),
 	slug: orgSlugSchema,
-	description: z.string().trim().max(2000, 'Description must be at most 2000 characters.')
+	description: z
+		.string()
+		.trim()
+		.max(2000, { error: () => m.validation_description_max({ max: 2000 }) })
 });
 export type OrganizationInput = z.infer<typeof organizationSchema>;
 
 export const roleSchema = z.enum(['owner', 'admin']);
-
-const SLUG_TAKEN = 'That address is taken.';
 
 async function slugTaken(slug: string, exceptId?: string) {
 	const [row] = await db
@@ -51,7 +50,7 @@ async function slugTaken(slug: string, exceptId?: string) {
 
 /** Creates an organization owned by `ownerId`. */
 export async function createOrganization(ownerId: string, input: OrganizationInput) {
-	if (await slugTaken(input.slug)) throw new ServiceError(SLUG_TAKEN);
+	if (await slugTaken(input.slug)) throw new ServiceError(m.validation_slug_taken());
 	return db.transaction(async (tx) => {
 		const [org] = await tx.insert(organizations).values(input).returning();
 		await tx.insert(orgMembers).values({ orgId: org.id, userId: ownerId, role: 'owner' });
@@ -60,7 +59,7 @@ export async function createOrganization(ownerId: string, input: OrganizationInp
 }
 
 export async function updateOrganization(orgId: string, input: OrganizationInput) {
-	if (await slugTaken(input.slug, orgId)) throw new ServiceError(SLUG_TAKEN);
+	if (await slugTaken(input.slug, orgId)) throw new ServiceError(m.validation_slug_taken());
 	const [org] = await db
 		.update(organizations)
 		.set(input)
@@ -124,9 +123,9 @@ export async function addMember(orgId: string, username: string, role: OrgRole) 
 		.select({ id: users.id })
 		.from(users)
 		.where(eq(users.username, username.trim().toLowerCase()));
-	if (!user) throw new ServiceError(`There is no user called "${username}".`);
+	if (!user) throw new ServiceError(m.user_error_unknown({ username }));
 	if (await getMemberRole(orgId, user.id)) {
-		throw new ServiceError(`${username} is already a member.`);
+		throw new ServiceError(m.members_error_already({ username }));
 	}
 	await db.insert(orgMembers).values({ orgId, userId: user.id, role });
 }
@@ -139,7 +138,7 @@ async function assertOtherOwner(tx: Transaction, orgId: string, userId: string) 
 		.where(
 			and(eq(orgMembers.orgId, orgId), eq(orgMembers.role, 'owner'), ne(orgMembers.userId, userId))
 		);
-	if (owners === 0) throw new ServiceError('An organization needs at least one owner.');
+	if (owners === 0) throw new ServiceError(m.members_error_last_owner());
 }
 
 export async function setMemberRole(orgId: string, userId: string, role: OrgRole) {

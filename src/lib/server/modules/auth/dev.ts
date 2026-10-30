@@ -1,3 +1,4 @@
+import { m } from '#lib/paraglide/messages.js';
 import { AuthModuleError, type AuthModule } from '../types';
 
 const USERNAME = /^[a-z0-9_-]{3,32}$/;
@@ -20,9 +21,7 @@ export function devModule(): AuthModule {
 		async handleCallback({ url }) {
 			const username = url.searchParams.get('username') ?? '';
 			if (!USERNAME.test(username)) {
-				throw new AuthModuleError(
-					'Username must be 3–32 characters: lowercase letters, digits, - or _.'
-				);
+				throw new AuthModuleError(m.auth_error_dev_username());
 			}
 			return { providerUserId: username, username, displayName: username, data: {} };
 		}

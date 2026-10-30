@@ -5,6 +5,7 @@ import {
 	checkInBody,
 	components,
 	createTournamentBody,
+	gameResource,
 	matchDetailResource,
 	matchParams,
 	matchQuery,
@@ -20,6 +21,7 @@ import {
 	resultBody,
 	seedsBody,
 	stageResource,
+	steamAppsQuery,
 	structureBody,
 	themeBody,
 	tournamentParams,
@@ -90,11 +92,12 @@ export const updateTournament = defineEndpoint({
 	path: '/tournaments/{tournamentId}',
 	tag: 'Tournaments',
 	summary: "Change a tournament's settings",
-	description: 'Fields left out keep their value. The address must be free in the organization.',
+	description:
+		'Fields left out keep their value. The address must be free in the organization, and `game` must be a Steam game this instance knows.',
 	params: tournamentParams,
 	body: updateTournamentBody,
 	response: tournament,
-	conflicts: [409]
+	conflicts: [409, 422]
 });
 
 export const deleteTournament = defineEndpoint({
@@ -430,6 +433,20 @@ export const postMessage = defineEndpoint({
 	response: { status: 201, description: 'The message.', schema: messageResource }
 });
 
+// Games
+
+export const searchSteamApps = defineEndpoint({
+	operationId: 'searchSteamApps',
+	method: 'GET',
+	path: '/steam/apps',
+	tag: 'Games',
+	summary: 'Search Steam games',
+	description:
+		"By name: exact and prefix matches first, at most 10. Empty when the instance has no Steam API key. Set one as a tournament's `game` by its `appId`.",
+	query: steamAppsQuery,
+	response: { status: 200, description: 'The games.', schema: z.array(gameResource) }
+});
+
 /** Every REST endpoint, in documentation order. */
 export const endpoints = [
 	listTournaments,
@@ -460,7 +477,8 @@ export const endpoints = [
 	reportMatch,
 	clearHelp,
 	listMessages,
-	postMessage
+	postMessage,
+	searchSteamApps
 ] as const;
 
 /** The OpenAPI document, built from the same definitions the routes validate with. */

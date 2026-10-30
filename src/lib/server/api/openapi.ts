@@ -13,7 +13,8 @@ export const TAGS = [
 	{ name: 'Stages', description: 'How the tournament is played: one or two stages.' },
 	{ name: 'Participants', description: 'Who plays, in which seed order, and check-in.' },
 	{ name: 'Matches', description: "Matches, their results and the players' reports." },
-	{ name: 'Messages', description: 'The chat of a match room.' }
+	{ name: 'Messages', description: 'The chat of a match room.' },
+	{ name: 'Games', description: 'Steam games, to set as the game a tournament is played in.' }
 ] as const;
 export type Tag = (typeof TAGS)[number]['name'];
 

@@ -43,6 +43,7 @@
 			label: m.tadmin_matches
 		}
 	]);
+	const current = $derived(tabs.find((tab) => tab.route === page.route.id));
 
 	const status = $derived(data.tournament.status);
 	const description = $derived(
@@ -94,7 +95,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.tournament.name} · {m.app_name()}</title>
+	<title>{current ? `${current.label()} · ` : ''}{data.tournament.name} · {m.app_name()}</title>
 </svelte:head>
 
 <div class="title">

@@ -17,10 +17,12 @@
 	<title>{m.app_name()}</title>
 </svelte:head>
 
+<a class="skip-link" href="#main">{m.skip_to_content()}</a>
+
 <header>
 	<div class="container bar">
 		<a class="brand" href={resolve('/')}>{m.app_name()}</a>
-		<nav>
+		<nav aria-label={m.nav_main()}>
 			{#if data.user}
 				<a href={resolve('/dashboard')}>{m.nav_dashboard()}</a>
 				<a class="me" href={resolve('/u/[username]', { username: data.user.username })}>
@@ -38,7 +40,7 @@
 	</div>
 </header>
 
-<main class="container">
+<main id="main" class="container" tabindex="-1">
 	{@render children()}
 </main>
 

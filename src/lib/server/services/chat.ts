@@ -3,14 +3,15 @@ import { z } from 'zod';
 import { db } from '#lib/server/db/index.ts';
 import { matchMessages, matches, stages, users, type Tournament } from '#lib/server/db/schema.ts';
 import { publish } from '#lib/server/events.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { ServiceError } from './errors';
 import { getParticipant } from './participants';
 
 export const messageSchema = z
-	.string('Write a message.')
+	.string({ error: () => m.chat_error_empty() })
 	.trim()
-	.min(1, 'Write a message.')
-	.max(1000, 'Messages can be at most 1000 characters.');
+	.min(1, { error: () => m.chat_error_empty() })
+	.max(1000, { error: () => m.chat_error_too_long({ max: 1000 }) });
 
 /** A message in a match room's chat. */
 export interface ChatMessage {
@@ -64,7 +65,7 @@ export async function postMessage(
 		.from(matches)
 		.innerJoin(stages, eq(matches.stageId, stages.id))
 		.where(and(eq(matches.id, matchId), eq(stages.tournamentId, tournament.id)));
-	if (!match) throw new ServiceError('Match not found.', 'not_found');
+	if (!match) throw new ServiceError(m.match_error_not_found(), 'not_found');
 
 	if ('apiKeyName' in author) {
 		const [row] = await db
@@ -88,7 +89,7 @@ export async function postMessage(
 		!!participant &&
 		(participant.id === match.participant1Id || participant.id === match.participant2Id);
 	if (!isPlayer && !author.organizer) {
-		throw new ServiceError('Only the players of this match and the organizers can write here.');
+		throw new ServiceError(m.chat_error_not_allowed());
 	}
 
 	const [row] = await db

@@ -30,8 +30,16 @@
 		<p class="muted">{m.org_delete_lead({ slug: data.settings.slug })}</p>
 		<div class="field">
 			<label for="confirm">{m.org_delete_confirm()}</label>
-			<input id="confirm" name="confirm" type="text" autocomplete="off" required />
-			{#if form?.deleteError}<span class="error">{form.deleteError}</span>{/if}
+			<input
+				id="confirm"
+				name="confirm"
+				type="text"
+				autocomplete="off"
+				required
+				aria-describedby="confirm-error"
+				aria-invalid={form?.deleteError ? 'true' : undefined}
+			/>
+			{#if form?.deleteError}<span class="error" id="confirm-error">{form.deleteError}</span>{/if}
 		</div>
 		<button class="btn danger" type="submit">{m.org_delete_submit()}</button>
 	</form>

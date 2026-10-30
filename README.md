@@ -90,6 +90,16 @@ Organizers pick a theme for each tournament's bracket in its admin Theme tab. In
 
 To add a theme, implement `BracketTheme` from `src/lib/themes/types.ts` (colors plus a `ParticipantLabel` component) and register it in `src/lib/themes/index.ts`.
 
+## Profiles
+
+Every user has a public profile at `/u/[username]`. Its results list the tournaments they play or played, with their final rank and match record (won–drawn–lost); its activity lists the tournaments they're registered for that haven't started, and the organizations they belong to. Users can hide either in Settings; they always see their own profile in full, with a note on what others don't see.
+
+## Steam games
+
+Organizers can set the Steam game a tournament is played in, on its admin General tab. It shows with its artwork on the tournament page and in tournament lists. The picker needs a Steam Web API key (https://steamcommunity.com/dev/apikey) in `STEAM_API_KEY`; without one it's hidden, and games picked earlier still show.
+
+The instance keeps Steam's list of games in its database (`steam_apps`). It is fetched on the first search and refreshed in the background when a search finds it older than a day; if Steam fails, the old list keeps working and the next attempt waits 10 minutes. Over the REST API, `GET /api/v1/steam/apps?q=` searches it, and `PATCH /api/v1/tournaments/{id}` sets `game: { "appId": … }` (or `null`).
+
 ## REST API
 
 Organizations can run their tournaments over a REST API at `/api/v1`, e.g. from a Discord bot. Create a key in the organization admin on the **API keys** tab (it's shown only once) and send it with every request:
@@ -99,6 +109,10 @@ curl -H "Authorization: Bearer tm_…" http://localhost:5173/api/v1/tournaments
 ```
 
 A key only sees its own organization's tournaments. Request and response bodies are JSON; send `Content-Type: application/json` on every POST, PUT, PATCH and DELETE, also without a body, or SvelteKit's CSRF check turns it away. The OpenAPI 3.1 document is at `/api/v1/openapi.json`, and `/docs/api` shows it as a reference.
+
+## Translations
+
+Every UI string, including error messages, is in `messages/en.json` and goes through [Paraglide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs). To add a language, copy that file to `messages/<locale>.json` (e.g. `messages/de.json`), translate the values, and add the locale to `locales` in `project.inlang/settings.json`. Browsers that prefer it get it (a `PARAGLIDE_LOCALE` cookie overrides that), dates and numbers follow through `src/lib/format.ts`, and so does `<html lang>`. The REST API answers in English.
 
 ## Deployment
 

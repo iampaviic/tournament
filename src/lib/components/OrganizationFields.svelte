@@ -20,8 +20,17 @@
 
 <div class="field">
 	<label for="org-name">{m.org_name()}</label>
-	<input id="org-name" name="name" type="text" bind:value={name} required maxlength="64" />
-	{#each errors.name ?? [] as error (error)}<span class="error">{error}</span>{/each}
+	<input
+		id="org-name"
+		name="name"
+		type="text"
+		bind:value={name}
+		required
+		maxlength="64"
+		aria-describedby="org-name-error"
+		aria-invalid={errors.name ? 'true' : undefined}
+	/>
+	{#if errors.name}<span class="error" id="org-name-error">{errors.name.join(' ')}</span>{/if}
 </div>
 
 <div class="field">
@@ -34,16 +43,25 @@
 		oninput={(event) => (customSlug = event.currentTarget.value)}
 		required
 		maxlength="40"
+		aria-describedby="org-slug-hint org-slug-error"
+		aria-invalid={errors.slug ? 'true' : undefined}
 	/>
-	<span class="hint">{m.org_slug_hint({ slug: slug || '…' })}</span>
-	{#each errors.slug ?? [] as error (error)}<span class="error">{error}</span>{/each}
+	<span class="hint" id="org-slug-hint">{m.org_slug_hint({ slug: slug || '…' })}</span>
+	{#if errors.slug}<span class="error" id="org-slug-error">{errors.slug.join(' ')}</span>{/if}
 </div>
 
 <div class="field">
 	<label for="org-description">{m.org_description()}</label>
-	<textarea id="org-description" name="description" rows="5" maxlength="2000"
-		>{values.description}</textarea
+	<textarea
+		id="org-description"
+		name="description"
+		rows="5"
+		maxlength="2000"
+		aria-describedby="org-description-hint org-description-error"
+		aria-invalid={errors.description ? 'true' : undefined}>{values.description}</textarea
 	>
-	<span class="hint">{m.org_description_hint()}</span>
-	{#each errors.description ?? [] as error (error)}<span class="error">{error}</span>{/each}
+	<span class="hint" id="org-description-hint">{m.org_description_hint()}</span>
+	{#if errors.description}<span class="error" id="org-description-error"
+			>{errors.description.join(' ')}</span
+		>{/if}
 </div>

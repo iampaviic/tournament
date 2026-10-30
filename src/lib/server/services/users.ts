@@ -3,15 +3,19 @@ import { z } from 'zod';
 import { db } from '#lib/server/db/index.ts';
 import { users } from '#lib/server/db/schema.ts';
 import { usernameSchema } from '#lib/server/auth/username.ts';
+import { m } from '#lib/paraglide/messages.js';
 
 export const profileSchema = z.object({
 	username: usernameSchema,
 	displayName: z
 		.string()
 		.trim()
-		.min(1, 'Display name is required.')
-		.max(48, 'Display name must be at most 48 characters.'),
-	bio: z.string().trim().max(500, 'Bio must be at most 500 characters.'),
+		.min(1, { error: () => m.validation_display_name_required() })
+		.max(48, { error: () => m.validation_display_name_max({ max: 48 }) }),
+	bio: z
+		.string()
+		.trim()
+		.max(500, { error: () => m.validation_bio_max({ max: 500 }) }),
 	showResults: z.boolean(),
 	showActivity: z.boolean()
 });

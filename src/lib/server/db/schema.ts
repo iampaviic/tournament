@@ -12,7 +12,7 @@ import {
 	uuid
 } from 'drizzle-orm/pg-core';
 import type { MatchResult, MatchTemplate } from '#lib/brackets/index.ts';
-import type { StageSettings } from '#lib/tournaments.ts';
+import type { Game, StageSettings } from '#lib/tournaments.ts';
 
 const createdAt = () => timestamp('created_at', { withTimezone: true }).notNull().defaultNow();
 
@@ -147,6 +147,8 @@ export const tournaments = pgTable(
 		status: tournamentStatus('status').notNull().default('draft'),
 		/** Bracket theme (M5). */
 		themeId: text('theme_id').notNull().default('default'),
+		/** The Steam game it is played in (M8). */
+		game: jsonb('game').$type<Game>(),
 		createdAt: createdAt()
 	},
 	(table) => [unique().on(table.orgId, table.slug)]
@@ -300,6 +302,25 @@ export const matchMessages = pgTable(
 	(table) => [index().on(table.matchId, table.createdAt)]
 );
 
+/** Steam's list of games, cached for the game picker (see `services/steam.ts`). */
+export const steamApps = pgTable('steam_apps', {
+	appId: integer('app_id').primaryKey(),
+	name: text('name').notNull()
+});
+
+/**
+ * When the Steam list was fetched. `attemptedAt` is claimed before each refresh, so only one
+ * process fetches at a time and a failed refresh isn't retried right away.
+ */
+export const steamAppList = pgTable('steam_app_list', {
+	/** `games`, the only list. */
+	id: text('id').primaryKey(),
+	/** `null` until a refresh succeeds. */
+	fetchedAt: timestamp('fetched_at', { withTimezone: true }),
+	attemptedAt: timestamp('attempted_at', { withTimezone: true }),
+	appCount: integer('app_count').notNull().default(0)
+});
+
 export type User = typeof users.$inferSelect;
 export type Identity = typeof identities.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
@@ -314,3 +335,4 @@ export type Match = typeof matches.$inferSelect;
 export type ReportSource = (typeof reportSource.enumValues)[number];
 export type MatchReport = typeof matchReports.$inferSelect;
 export type MatchMessage = typeof matchMessages.$inferSelect;
+export type SteamApp = typeof steamApps.$inferSelect;

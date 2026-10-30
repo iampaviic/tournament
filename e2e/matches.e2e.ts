@@ -108,6 +108,10 @@ test('conflicting reports are disputed and resolved from the organizer queue', a
 	await expect(
 		one.getByText("The reports don't match, so an organizer will decide the result.")
 	).toBeVisible();
+	// Only the result card says so, not a second alert after the report.
+	await expect(
+		four.getByText("The reports don't match, so an organizer will decide the result.")
+	).toHaveCount(1);
 
 	// The dispute comes first in the organizer's queue, then the help request.
 	await page.goto(`${path}/admin/matches`);
@@ -132,6 +136,8 @@ test('conflicting reports are disputed and resolved from the organizer queue', a
 	await page.getByRole('button', { name: 'Send' }).click();
 	const message = two.getByRole('log').getByRole('listitem').filter({ hasText: 'How can I help?' });
 	await expect(message.getByText('Organizer', { exact: true })).toBeVisible();
+	// Messages only reach the room of their match.
+	await expect(one.getByRole('log')).not.toContainText('How can I help?');
 
 	await page.goto(`${path}/admin/matches`);
 	await queue.nth(0).getByRole('button', { name: 'Mark help as handled' }).click();

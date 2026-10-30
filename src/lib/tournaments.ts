@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { StageType, Tiebreaker } from '#lib/brackets/index.ts';
+import { m } from '#lib/paraglide/messages.js';
 
 /** Shared between the server and the structure editor. */
 
@@ -52,8 +53,15 @@ export const structureSchema = z
 	.min(1)
 	.max(2)
 	.refine((stages) => stages.at(-1)!.settings.groupCount === 1, {
-		message: 'The final stage plays as a single group.'
+		error: () => m.structure_error_final_groups()
 	});
+
+/** A Steam game a tournament is played in, copied from the Steam cache when picked. */
+export interface Game {
+	appId: number;
+	name: string;
+	headerImage: string;
+}
 
 /** Tiebreakers for round robin and Swiss standings, in order. */
 export function tiebreakersFor(type: StageType): Tiebreaker[] {

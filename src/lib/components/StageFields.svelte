@@ -64,8 +64,9 @@
 					min="1"
 					max="30"
 					value={settings.swissRounds ?? ''}
+					aria-describedby={id('swissRounds-hint')}
 				/>
-				<span class="hint">{m.structure_swiss_rounds_hint()}</span>
+				<span class="hint" id={id('swissRounds-hint')}>{m.structure_swiss_rounds_hint()}</span>
 			</div>
 		{/if}
 	</div>

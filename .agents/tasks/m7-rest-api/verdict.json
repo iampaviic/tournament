@@ -1,0 +1,31 @@
+{
+	"verdict": "APPROVED",
+	"summary": "The uncommitted M7 diff (20 modified files plus the new api/, auth/apiKey, routes/api/v1, routes/docs/api, migration and e2e files; HEAD 07ff966, nothing staged) implements the brief and plan.md. Each of the 29 operations is defined once in api/endpoints.ts with its Zod schemas. The 21 route files are thin endpoint() wrappers that only call guards, services and serializers, plus a fallback for 405. The OpenAPI 3.1 document is built from the same definitions with z.toJSONSchema (no new dependency, choice recorded in PLAN.md). openapi.db.spec.ts proves the routes and endpoints match one-to-one and that every $ref resolves. requireApiKey gives 401 for missing, malformed, unknown, tampered and revoked keys before params are parsed. requireApiTournament gives the same 404 for other-org and missing tournaments. lastUsedAt is throttled to 60 s. One envelope covers Zod 400 with issues, ServiceError.kind 409/422/404, the [...path] 404 and 405. Results set with a key go through setMatchResult as api_key reports, and reports for a player go through the shared report() state machine. Key messages are organizer messages labelled with the copied key name, published over SSE and shown with badges. The migration is drizzle-generated and minimal (author_id nullable, api_key_name). /docs/api uses Paraglide strings, landmarks, headings, table headers and theme tokens, and is linked from the footer and the API keys tab. PLAN.md has M7 ✅ and its notes, and the README has a REST API section. I re-ran check (0 errors/0 warnings), lint, test:unit (29 files/332 tests) and the full e2e suite (11 passed). Only minor issues remain. SvelteKit's CSRF check answers mutating requests without a content type with a plain-text 403 that bypasses the envelope; this is documented, and the fix needs a CSRF config decision from the user. Three match routes act on bye ids that GET answers with 404. Option-less modules accept arbitrary requirement config. The spec lists a 'bye' status the API never returns. About half the route handlers are never executed by tests. Full review: .agents/tasks/m7-rest-api/2026-10-30-180413-review.md (also review.md).",
+	"findings": [
+		{
+			"severity": "minor",
+			"file": "svelte.config.js / src/hooks.server.ts",
+			"detail": "In production builds, SvelteKit's CSRF check (node_modules/@sveltejs/kit/src/runtime/server/csrf.js) runs before handle. It answers POST/PUT/PATCH/DELETE that have no content type (or a form type) and no matching Origin with a plain-text 403 'Cross-site POST form submissions are forbidden', not the error envelope. Body-less calls such as POST …/start or DELETE …/result from curl, fetch or requests hit it unless they send Content-Type: application/json. I reproduced this against the built server. It is documented in the docs page, OpenAPI info.description, README and PLAN.md. If the user wants the envelope everywhere: set kit.csrf.checkOrigin: false and re-apply the same origin check in hooks.server.ts for paths outside /api/v1/. The API is authenticated only by the Authorization header, so CSRF can't apply to it. This changes a framework security default, so it needs the user's go-ahead first."
+		},
+		{
+			"severity": "minor",
+			"file": "src/routes/api/v1/tournaments/[tournamentId]/matches/[matchId]/messages/+server.ts",
+			"detail": "Bye matches are stored as rows but getMatch returns undefined for them, so GET …/matches/{id} and GET …/messages answer a bye id with 404. POST …/messages only checks that the row belongs to the tournament, so it stores and publishes a message on a bye and returns 201. DELETE …/result (result/+server.ts) and DELETE …/help (help/+server.ts) call clearMatchResult/clearHelp before matchDetail returns 404, so they write and then answer 'not found'. Call getMatch (404 if undefined) before the service in these three handlers, as GET …/messages already does."
+		},
+		{
+			"severity": "minor",
+			"file": "src/lib/server/services/requirements.ts",
+			"detail": "parseModuleConfig returns the raw config unchanged when a module has no tournamentConfig. The admin form always produces {} for such modules, but PUT …/requirements stores whatever object the client sends (e.g. discord with arbitrary keys) as jsonb, and GET returns it. Return { ok: true, config: {} } in that case, or reject a non-empty config, so the API can't create state the admin page can't."
+		},
+		{
+			"severity": "minor",
+			"file": "src/lib/server/api/schemas.ts",
+			"detail": "MATCH_STATUSES includes 'bye', so Match.status and the listMatches ?status= filter document a value the API never returns: listMatches drops byes, so ?status=bye is always []. Drop 'bye' from the API enum (keep the satisfies check against MatchProgress) so the spec matches the 'byes are left out' description."
+		},
+		{
+			"severity": "minor",
+			"file": "src/lib/server/api/handler.db.spec.ts",
+			"detail": "About half the route handlers only pass the route coverage test and are never executed: PATCH /tournaments/{id} (merge with the current values plus the startsAt transform), PUT theme, GET/PUT requirements, unpublish, open-check-in, start-next-stage, shuffle, PUT check-in, DELETE participant, DELETE tournament, DELETE result, DELETE help and GET messages. Add a db spec that imports a few route modules and calls their exported handlers with a fake event, at least PATCH (partial update keeps the other fields; startsAt ISO → Date) and PUT requirements (422 for an unknown module, 409 after start). handler.db.spec.ts already has the pattern."
+		}
+	]
+}

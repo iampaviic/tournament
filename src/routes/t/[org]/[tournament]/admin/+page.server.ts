@@ -3,8 +3,10 @@ import { z } from 'zod';
 import { requireTournamentAdmin } from '#lib/server/auth/tournament.ts';
 import { ServiceError } from '#lib/server/services/errors.ts';
 import { startNextStage, startTournament } from '#lib/server/services/stages.ts';
+import { steamApps } from '#lib/server/services/steam.ts';
 import {
 	deleteTournament,
+	setGame,
 	setStatus,
 	tournamentSchema,
 	updateTournament
@@ -14,6 +16,8 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	const { tournament } = await requireTournamentAdmin(event);
+	// The game picker's search without JavaScript.
+	const query = event.url.searchParams.get('game')?.trim() ?? '';
 	return {
 		settings: {
 			name: tournament.name,
@@ -21,7 +25,9 @@ export const load: PageServerLoad = async (event) => {
 			description: tournament.description,
 			startsAt: tournament.startsAt,
 			participantLimit: tournament.participantLimit
-		}
+		},
+		game: tournament.game,
+		steam: steamApps.enabled ? { query, results: query ? await steamApps.search(query) : [] } : null
 	};
 };
 
@@ -64,6 +70,27 @@ export const actions: Actions = {
 		redirect(303, `/o/${org.slug}/admin/tournaments`);
 	},
 
+	setGame: async (event) => {
+		const { tournament } = await requireTournamentAdmin(event);
+		const appId = Number((await event.request.formData()).get('appId'));
+		if (!Number.isInteger(appId) || appId <= 0) {
+			return fail(400, { gameError: m.game_error_unknown() });
+		}
+		try {
+			await setGame(tournament, appId);
+		} catch (e) {
+			if (e instanceof ServiceError) return fail(400, { gameError: e.message });
+			throw e;
+		}
+		return { gameSaved: true };
+	},
+
+	clearGame: async (event) => {
+		const { tournament } = await requireTournamentAdmin(event);
+		await setGame(tournament, null);
+		return { gameSaved: true };
+	},
+
 	/** Moves the tournament to its next phase. Posted from the panel on every admin page. */
 	lifecycle: async (event) => {
 		const { tournament } = await requireTournamentAdmin(event);
@@ -73,7 +100,7 @@ export const actions: Actions = {
 			else if (to === 'next_stage') await startNextStage(tournament);
 			else if (to === 'draft' || to === 'registration' || to === 'check_in') {
 				await setStatus(tournament, to);
-			} else return fail(400, { lifecycleError: 'Unknown step.' });
+			} else return fail(400, { lifecycleError: m.lifecycle_error_unknown() });
 		} catch (e) {
 			if (e instanceof ServiceError) return fail(400, { lifecycleError: e.message });
 			throw e;

@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { z } from 'zod';
+import type { MatchProgress } from '#lib/matchReports.ts';
 import type { Tournament } from '#lib/server/db/schema.ts';
 import type { ChatMessage } from '#lib/server/services/chat.ts';
 import { getMatch, type MatchItem } from '#lib/server/services/matches.ts';
@@ -28,6 +29,7 @@ export function toTournament(row: Tournament): z.input<typeof tournamentResource
 		startsAt: row.startsAt?.toISOString() ?? null,
 		participantLimit: row.participantLimit,
 		themeId: row.themeId,
+		game: row.game,
 		createdAt: row.createdAt.toISOString()
 	};
 }
@@ -86,7 +88,8 @@ export function toMatch(item: MatchItem): z.input<typeof matchResource> {
 		stageIndex: item.stageIndex,
 		groupIndex: item.groupIndex,
 		side: item.side,
-		status: item.progress,
+		// `listMatches` and `getMatch` leave byes out.
+		status: item.progress as Exclude<MatchProgress, 'bye'>,
 		entrants: [item.entrants[0] ?? null, item.entrants[1] ?? null],
 		result: item.result && {
 			scores: item.result.scores ?? null,
@@ -106,11 +109,19 @@ export function toMatchDetail(
 	return { ...toMatch(detail), decidedBy: detail.decidedBy };
 }
 
-/** A match of the tournament as `MatchDetail`. Byes aren't shown, so they aren't found either. */
-export async function matchDetail(tournamentId: string, matchId: string) {
+/**
+ * A played match of the tournament. Byes aren't shown, so they aren't found either; write handlers
+ * check this before changing anything.
+ */
+export async function requireApiMatch(tournamentId: string, matchId: string) {
 	const match = await getMatch(tournamentId, matchId);
 	if (!match) error(404, 'Match not found.');
-	return toMatchDetail(match);
+	return match;
+}
+
+/** A match of the tournament as `MatchDetail`. */
+export async function matchDetail(tournamentId: string, matchId: string) {
+	return toMatchDetail(await requireApiMatch(tournamentId, matchId));
 }
 
 export function toMessage(message: ChatMessage): z.input<typeof messageResource> {

@@ -34,7 +34,7 @@ async function asOwner(
 
 function parseRole(form: FormData) {
 	const role = roleSchema.safeParse(form.get('role'));
-	if (!role.success) throw new ServiceError('Choose a valid role.');
+	if (!role.success) throw new ServiceError(m.members_error_role());
 	return role.data;
 }
 

@@ -1,0 +1,7 @@
+{
+	"task_id": "task-m8-profiles-steam-polish",
+	"task_description": "Milestone M8 of Tournament Manager: public profiles at /u/[username] with tournament history (rank, won-drawn-lost record) gated by showResults and activity (registered-for tournaments and organizations) gated by showActivity, the owner always seeing everything; the Steam game picker (IStoreService/GetAppList cached in steam_apps with a daily, guarded, background refresh; tournaments store { appId, name, headerImage }; admin General tab combobox that also works without JS; game shown on tournament pages and lists; REST `game` field and GET /api/v1/steam/apps); the M6 and M7 minor review findings (except CSRF); an i18n sweep with a guard test; an accessibility and consistency pass; docs. Built uncommitted in the checkout on branch claude/cool-archimedes-iqm428 across five FEATs; one final step makes the single M8 commit (no push, never stage .agents/ or .env). Full plan: .agents/tasks/m8-profiles-steam-polish/plan.md.",
+	"status": "pending",
+	"feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004", "FEAT-005"],
+	"blocked_reason": null
+}

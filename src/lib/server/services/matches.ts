@@ -23,16 +23,17 @@ import {
 } from '#lib/server/db/schema.ts';
 import { publish } from '#lib/server/events.ts';
 import { isElimination } from '#lib/tournaments.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { ServiceError } from './errors';
 import { getParticipant, getParticipantById } from './participants';
 import { getBracket, lockStage, refreshStage, type Bracket } from './stages';
 
-export const matchIdSchema = z.uuid('Match not found.');
+export const matchIdSchema = z.uuid({ error: () => m.match_error_not_found() });
 
 const scoreSchema = z
-	.string('Enter both scores.')
+	.string({ error: () => m.match_error_scores_missing() })
 	.trim()
-	.regex(/^\d{1,9}$/, 'Scores must be whole numbers, zero or more.')
+	.regex(/^\d{1,9}$/, { error: () => m.match_error_scores_invalid() })
 	.transform(Number);
 
 /** The `score1` and `score2` fields of a result form. */
@@ -47,10 +48,10 @@ async function loadMatch(tx: Transaction, tournament: Tournament, matchId: strin
 		.from(matches)
 		.innerJoin(stages, eq(matches.stageId, stages.id))
 		.where(and(eq(matches.id, matchId), eq(stages.tournamentId, tournament.id)));
-	if (!row) throw new ServiceError('Match not found.', 'not_found');
+	if (!row) throw new ServiceError(m.match_error_not_found(), 'not_found');
 	const stage = await lockStage(tx, row.stageId);
 	if (stage.status !== 'running') {
-		throw new ServiceError('Results can only change while the stage is being played.');
+		throw new ServiceError(m.match_error_stage_not_running());
 	}
 	// Read after locking, so changes made while waiting for the lock are seen.
 	const [match] = await tx.select().from(matches).where(eq(matches.id, matchId));
@@ -60,14 +61,11 @@ async function loadMatch(tx: Transaction, tournament: Tournament, matchId: strin
 /** The result the scores give, checked against the rules of the stage. */
 function resultFor(stage: Stage, match: Match, scores: Scores): MatchResult {
 	if (scores.some((score) => !Number.isInteger(score) || score < 0)) {
-		throw new ServiceError('Scores must be whole numbers, zero or more.', 'invalid');
+		throw new ServiceError(m.match_error_scores_invalid(), 'invalid');
 	}
 	const winner = scores[0] === scores[1] ? null : scores[0] > scores[1] ? 0 : 1;
 	if (winner === null && isElimination(stage.type)) {
-		throw new ServiceError(
-			'Elimination matches need a winner, so the scores must differ.',
-			'invalid'
-		);
+		throw new ServiceError(m.match_error_draw(), 'invalid');
 	}
 	return { entrants: [match.participant1Id!, match.participant2Id!], winner, scores };
 }
@@ -130,7 +128,7 @@ export async function setMatchResult(
 	const ids = await db.transaction(async (tx) => {
 		const { match, stage } = await loadMatch(tx, tournament, matchId);
 		if (match.status !== 'ready' && match.status !== 'completed') {
-			throw new ServiceError("This match isn't ready to be played.");
+			throw new ServiceError(m.match_error_not_ready());
 		}
 		const result = resultFor(stage, match, scores);
 		const source: ReportSource = 'userId' in by ? 'organizer' : 'api_key';
@@ -167,19 +165,19 @@ async function report(
 	scores: Scores
 ): Promise<'saved' | 'agreed' | 'disputed'> {
 	if (tournament.status !== 'running') {
-		throw new ServiceError('Results can only be reported while the tournament is running.');
+		throw new ServiceError(m.match_error_not_running());
 	}
 	const { outcome, ids } = await db.transaction(async (tx) => {
 		const { match, stage } = await loadMatch(tx, tournament, matchId);
-		if (match.status !== 'ready') throw new ServiceError("This match can't be reported now.");
+		if (match.status !== 'ready') throw new ServiceError(m.match_error_cannot_report());
 		const player = await sideOf(tournament, match, by);
 		if (!player) {
-			throw new ServiceError('Only the players of this match can report its result.', 'invalid');
+			throw new ServiceError(m.match_error_not_player(), 'invalid');
 		}
 		const result = resultFor(stage, match, scores);
 		const outcome = reportOutcome(await playerReports(tx, match), player.side, scores);
 		if (outcome === 'closed') {
-			throw new ServiceError("The reports don't match, so an organizer will decide the result.");
+			throw new ServiceError(m.room_disputed());
 		}
 
 		const row = {
@@ -234,15 +232,15 @@ export async function reportForParticipant(
 /** A player asks the organizers for help with their match. */
 export async function requestHelp(tournament: Tournament, matchId: string, userId: string) {
 	if (tournament.status !== 'running') {
-		throw new ServiceError('Help can only be requested while the match is being played.');
+		throw new ServiceError(m.match_error_help_closed());
 	}
 	await db.transaction(async (tx) => {
 		const { match } = await loadMatch(tx, tournament, matchId);
 		if (match.status !== 'ready') {
-			throw new ServiceError('Help can only be requested while the match is being played.');
+			throw new ServiceError(m.match_error_help_closed());
 		}
 		if (!(await sideOf(tournament, match, { userId }))) {
-			throw new ServiceError('Only the players of this match can ask for help.');
+			throw new ServiceError(m.match_error_help_not_player());
 		}
 		await tx.update(matches).set({ helpRequested: true }).where(eq(matches.id, match.id));
 	});
@@ -264,7 +262,7 @@ export async function clearHelp(tournament: Tournament, matchId: string) {
 			)
 		)
 		.returning({ id: matches.id });
-	if (!row) throw new ServiceError('Match not found.', 'not_found');
+	if (!row) throw new ServiceError(m.match_error_not_found(), 'not_found');
 	changed(tournament, [matchId]);
 }
 
