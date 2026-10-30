@@ -9,16 +9,23 @@
 		layout,
 		participants,
 		theme,
-		elimination
+		elimination,
+		me = null,
+		disputed = []
 	}: {
 		layout: BracketLayout<BracketMatch>;
 		participants: Record<string, ThemeParticipant>;
 		theme: BracketTheme;
 		elimination: boolean;
+		/** The viewer's participant id: their way through the bracket is always shown. */
+		me?: string | null;
+		/** Matches whose reports disagree. */
+		disputed?: string[];
 	} = $props();
 
-	/** Hovering a participant highlights their way through the bracket. */
-	let highlighted = $state<string | null>(null);
+	/** Hovering a participant highlights their way through the bracket; otherwise the viewer's. */
+	let hovered = $state<string | null>(null);
+	const highlighted = $derived(hovered ?? me);
 
 	const byId = $derived(new Map(layout.matches.map((p) => [p.match.template.id, p.match])));
 	const onPath = (from: string, to: string) =>
@@ -30,7 +37,7 @@
 
 	function onpointerover(event: PointerEvent) {
 		const slot = (event.target as Element).closest('[data-entrant]');
-		highlighted = slot?.getAttribute('data-entrant') ?? null;
+		hovered = slot?.getAttribute('data-entrant') ?? null;
 	}
 </script>
 
@@ -40,7 +47,7 @@
 	style:height="{layout.height}px"
 	role="presentation"
 	{onpointerover}
-	onpointerleave={() => (highlighted = null)}
+	onpointerleave={() => (hovered = null)}
 >
 	<svg class="lines" width={layout.width} height={layout.height} aria-hidden="true">
 		{#each layout.connectors as connector (`${connector.from}>${connector.to}`)}
@@ -65,7 +72,13 @@
 	{/each}
 
 	{#each layout.matches as placed (placed.match.id)}
-		<MatchCard {placed} {participants} {theme} {highlighted} />
+		<MatchCard
+			{placed}
+			{participants}
+			{theme}
+			{highlighted}
+			disputed={disputed.includes(placed.match.id)}
+		/>
 	{/each}
 </div>
 

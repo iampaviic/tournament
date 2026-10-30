@@ -127,7 +127,7 @@
 								: m.room_by_players()}
 					</p>
 				{:else if match.progress === 'disputed'}
-					<p class="alert warning">{m.room_disputed()}</p>
+					<p class="alert error">{m.room_disputed()}</p>
 					{@render reported()}
 				{:else if data.canReport && own}
 					<p>

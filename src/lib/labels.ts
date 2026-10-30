@@ -96,6 +96,6 @@ export const progressTone = (progress: MatchProgress): string =>
 
 /** The tag colour for a tournament's phase. */
 export const statusTone = (status: TournamentStatus): string =>
-	({ draft: '', registration: 'success', check_in: 'warning', running: 'accent', completed: '' })[
+	({ draft: '', registration: 'accent', check_in: 'accent', running: 'accent', completed: '' })[
 		status
 	];

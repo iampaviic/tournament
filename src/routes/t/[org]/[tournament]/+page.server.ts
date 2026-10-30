@@ -1,4 +1,5 @@
 import { fail } from '@sveltejs/kit';
+import { loadSheet } from '#lib/server/bracketSheet.ts';
 import { requireUser } from '#lib/server/auth/guards.ts';
 import { loadTournament } from '#lib/server/auth/tournament.ts';
 import { getModule } from '#lib/server/modules/registry.ts';
@@ -12,7 +13,6 @@ import {
 	unregister
 } from '#lib/server/services/participants.ts';
 import { listMatches } from '#lib/server/services/matches.ts';
-import { getBracket } from '#lib/server/services/stages.ts';
 import { getRequirements } from '#lib/server/services/tournaments.ts';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
@@ -30,10 +30,16 @@ export const load: PageServerLoad = async (event) => {
 				status: 'missing' as const
 			}));
 
+	// Once play starts the bracket sheet is the page.
+	const sheet =
+		tournament.status === 'running' || tournament.status === 'completed'
+			? await loadSheet(tournament, user?.id)
+			: null;
+
 	// The viewer's next match: one to play now, else the next one they wait for.
 	let next = null;
-	if (me && tournament.status === 'running') {
-		const mine = (await listMatches(await getBracket(tournament.id))).filter((match) =>
+	if (me && sheet && tournament.status === 'running') {
+		const mine = (await listMatches(sheet.stages)).filter((match) =>
 			match.entrants.includes(me.id)
 		);
 		const now = mine.find((match) => ['ready', 'reported', 'disputed'].includes(match.progress));
@@ -59,6 +65,7 @@ export const load: PageServerLoad = async (event) => {
 		description: tournament.description,
 		limit: tournament.participantLimit,
 		next,
+		sheet,
 		full:
 			tournament.participantLimit !== null && participants.length >= tournament.participantLimit,
 		me: me && { checkedIn: Boolean(me.checkedInAt), finalRank: me.finalRank },
@@ -67,7 +74,6 @@ export const load: PageServerLoad = async (event) => {
 			id: p.id,
 			username: p.username,
 			displayName: p.displayName,
-			avatarUrl: p.avatarUrl,
 			finalRank: p.finalRank
 		}))
 	};

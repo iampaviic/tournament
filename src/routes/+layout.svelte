@@ -55,6 +55,7 @@
 		</a>
 		<p class="muted">{m.footer_tagline()}</p>
 		<a href={resolve('/docs/api')}>{m.footer_api_docs()}</a>
+		<a href="https://github.com/iampaviic/tournament">{m.footer_source()}</a>
 	</div>
 </footer>
 

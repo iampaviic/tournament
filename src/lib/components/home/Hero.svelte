@@ -289,7 +289,12 @@
 		}
 	}
 
+	// On a phone the joint stacks, and the line that carries on stays between its two arms.
 	.run {
+		@media (max-width: $bp-md) {
+			order: 2;
+		}
+
 		@include up($bp-md) {
 			grid-row: run;
 		}
@@ -380,6 +385,10 @@
 	}
 
 	.carry {
+		@media (max-width: $bp-md) {
+			order: 1;
+		}
+
 		display: flex;
 		flex-direction: column;
 		justify-content: center;

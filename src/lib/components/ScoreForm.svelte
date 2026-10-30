@@ -9,6 +9,7 @@
 		names,
 		scores = null,
 		submit,
+		quiet = false,
 		children
 	}: {
 		action: string;
@@ -18,13 +19,17 @@
 		scores?: Scores | null;
 		/** The submit button's label. */
 		submit: string;
+		/** In a long list: the button only turns primary once a score is changed. */
+		quiet?: boolean;
 		/** Hidden inputs sent with the scores. */
 		children?: Snippet;
 	} = $props();
+
+	let edited = $state(false);
 </script>
 
 <!-- Scores are written where the draw sheet has them: at the end of each player's line. -->
-<form method="POST" {action} class="result" use:enhance>
+<form method="POST" {action} class="result" use:enhance oninput={() => (edited = true)}>
 	{@render children?.()}
 	<div class="lines">
 		{#each [0, 1] as const as i (i)}
@@ -41,7 +46,7 @@
 			</label>
 		{/each}
 	</div>
-	<button class="btn small primary" type="submit">{submit}</button>
+	<button class="btn small" class:primary={!quiet || edited} type="submit">{submit}</button>
 </form>
 
 <style lang="scss">
@@ -97,21 +102,15 @@
 		white-space: nowrap;
 	}
 
-	// The score cell at the line's end: a pale field that only shows its edge when it is in use.
+	// The score cell at the line's end.
 	input {
 		flex: none;
 		width: 3rem;
 		height: 28px;
 		min-height: 28px;
 		padding: 0 0.25rem;
-		border-color: transparent;
 		border-radius: var(--radius-tag);
-		background: var(--surface-2);
 		text-align: center;
 		font-variant-numeric: tabular-nums;
-
-		&:hover {
-			border-color: var(--control);
-		}
 	}
 </style>

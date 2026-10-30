@@ -93,6 +93,7 @@ export async function getMemberRole(orgId: string, userId: string): Promise<OrgR
 export async function listUserOrganizations(userId: string) {
 	return db
 		.select({
+			id: organizations.id,
 			slug: organizations.slug,
 			name: organizations.name,
 			role: orgMembers.role

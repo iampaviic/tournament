@@ -28,7 +28,7 @@ describe('organizations', () => {
 	it('makes the creator the owner', async () => {
 		const org = await createOrganization(owner.id, input('fertris'));
 		expect(await listUserOrganizations(owner.id)).toEqual([
-			{ slug: 'fertris', name: 'Org fertris', role: 'owner' }
+			{ id: org.id, slug: 'fertris', name: 'Org fertris', role: 'owner' }
 		]);
 		expect((await getOrganizationBySlug('FERTRIS'))?.id).toBe(org.id);
 	});

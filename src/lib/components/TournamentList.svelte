@@ -32,7 +32,7 @@
 					</div>
 				</div>
 				{#if item.finalRank}
-					<span class="badge accent">{m.participants_rank({ rank: item.finalRank })}</span>
+					<span class="badge accent">{m.tournament_placed({ rank: item.finalRank })}</span>
 				{:else}
 					<span class="badge {statusTone(item.status)}">{statusLabel(item.status)}</span>
 				{/if}

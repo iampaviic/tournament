@@ -8,13 +8,16 @@
 		placed,
 		participants,
 		theme,
-		highlighted
+		highlighted,
+		disputed = false
 	}: {
 		placed: PlacedMatch<BracketMatch>;
 		participants: Record<string, ThemeParticipant>;
 		theme: BracketTheme;
 		/** The participant whose matches are highlighted. */
 		highlighted: string | null;
+		/** The players' reports disagree; an organizer decides. */
+		disputed?: boolean;
 	} = $props();
 
 	const match = $derived(placed.match);
@@ -32,14 +35,17 @@
 
 <div
 	class="match"
-	class:ready={match.status === 'ready'}
+	class:ready={match.status === 'ready' && !disputed}
+	class:disputed
 	class:involved
 	style:left="{placed.x}px"
 	style:top="{placed.y}px"
 	style:width="{CARD_WIDTH}px"
 	style:height="{CARD_HEIGHT}px"
 	data-testid="bracket-match"
-	aria-label={m.bracket_match({ number: placed.number })}
+	aria-label={disputed
+		? `${m.bracket_match({ number: placed.number })}, ${m.match_status_disputed()}`
+		: m.bracket_match({ number: placed.number })}
 	role="group"
 >
 	<span class="number" aria-hidden="true">{placed.number}</span>
@@ -101,6 +107,26 @@
 		&.involved .slot.highlighted::after {
 			height: 2px;
 			background: var(--bracket-highlight);
+		}
+	}
+
+	// The organizer's red pen: the number circled and the joint drawn over in red.
+	.disputed {
+		&::after {
+			border-right: 2px solid var(--danger);
+		}
+
+		// Circled in the clear space between the incoming connector and the card.
+		.number {
+			right: calc(100% + 2px);
+			display: grid;
+			place-items: center;
+			min-width: 1.125rem;
+			height: 1.125rem;
+			border: 1.5px solid var(--danger);
+			border-radius: 50%;
+			color: var(--danger);
+			font-weight: 700;
 		}
 	}
 

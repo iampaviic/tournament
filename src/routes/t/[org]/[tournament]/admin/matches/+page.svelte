@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
+	import MatchLines from '#lib/components/MatchLines.svelte';
 	import ScoreForm from '#lib/components/ScoreForm.svelte';
 	import { matchNumbers } from '#lib/bracketLayout.ts';
 	import { sections } from '#lib/bracketView.ts';
@@ -24,6 +25,11 @@
 			: entrant === null
 				? m.match_bye()
 				: (data.names[entrant] ?? '?');
+	const side = (entrant: string | null | undefined, score?: number) => ({
+		name: name(entrant),
+		score,
+		placeholder: !entrant
+	});
 	const room = (id: string) =>
 		resolve('/t/[org]/[tournament]/matches/[id]', {
 			org: data.org.slug,
@@ -116,6 +122,7 @@
 										names={[name(match.entrants[0]), name(match.entrants[1])]}
 										scores={match.result?.scores}
 										submit={m.matches_save()}
+										quiet
 									>
 										<input type="hidden" name="matchId" value={match.id} />
 									</ScoreForm>
@@ -126,13 +133,15 @@
 										</form>
 									{/if}
 								{:else}
-									<span class="pair">
-										{name(match.entrants[0])}
-										{#if match.result?.scores}<strong
-												>{match.result.scores[0]} – {match.result.scores[1]}</strong
-											>{:else}–{/if}
-										{name(match.entrants[1])}
-									</span>
+									<div class="pair">
+										<MatchLines
+											sides={[
+												side(match.entrants[0], match.result?.scores?.[0]),
+												side(match.entrants[1], match.result?.scores?.[1])
+											]}
+											winner={match.status === 'completed' ? (match.result?.winner ?? null) : null}
+										/>
+									</div>
 								{/if}
 							</li>
 						{/each}
@@ -262,7 +271,8 @@
 		}
 	}
 
-	.pair strong {
-		margin: 0 0.5rem;
+	.pair {
+		flex: 0 1 18rem;
+		min-width: 9rem;
 	}
 </style>

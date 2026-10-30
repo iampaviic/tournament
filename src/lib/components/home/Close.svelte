@@ -33,10 +33,9 @@
 			<button class="btn" type="submit"><Mark size={16} />{m.home_start()}</button>
 		</form>
 	</div>
-	<div class="tile side plain" data-reveal style:--d="140ms" aria-hidden="true"></div>
 </section>
 
-<section class="mark" aria-label={m.home_open_source()}>
+<div class="mark" aria-hidden="true">
 	<!-- The joint, built large from flat blocks with 4px gaps. -->
 	<svg viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">
 		<rect class="ink arm" x="0" y="0" width="596" height="64" />
@@ -44,13 +43,7 @@
 		<rect class="ink bar" x="600" y="0" width="64" height="220" />
 		<rect class="blue carry" x="668" y="78" width="332" height="64" />
 	</svg>
-	<div class="links" data-reveal>
-		<p>{m.home_open_source()}</p>
-		<a href={resolve('/docs/api')}>{m.footer_api_docs()}</a>
-		<a href="https://github.com/iampaviic/tournament">{m.home_source()}</a>
-		<a href={resolve('/login')}>{m.nav_login()}</a>
-	</div>
-</section>
+</div>
 
 <style lang="scss">
 	@use 'tokens' as *;
@@ -64,7 +57,7 @@
 		margin-inline: calc(50% - 50vw);
 
 		@include up($bp-md) {
-			grid-template-columns: minmax(0, 2fr) minmax(0, 8fr) minmax(0, 2fr);
+			grid-template-columns: minmax(0, 2fr) minmax(0, 10fr);
 			height: 22.5rem;
 		}
 	}
@@ -83,7 +76,7 @@
 		}
 	}
 
-	.side:not(.plain) {
+	.side {
 		background: var(--surface);
 	}
 
@@ -97,12 +90,11 @@
 		}
 	}
 
-	.plain {
-		border-radius: var(--radius) 0 0 var(--radius);
-		background: var(--accent-track);
-	}
-
 	.main {
+		@include up($bp-md) {
+			border-radius: var(--radius) 0 0 var(--radius);
+		}
+
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -208,24 +200,6 @@
 	@keyframes drop {
 		from {
 			transform: scaleY(0.04);
-		}
-	}
-
-	.links {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 0.75rem 1.5rem;
-		font-size: 1rem;
-
-		p {
-			flex: 1 1 100%;
-			margin: 0;
-			font-weight: 600;
-
-			@include up($bp-sm) {
-				flex: 1;
-			}
 		}
 	}
 </style>

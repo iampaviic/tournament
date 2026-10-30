@@ -117,7 +117,6 @@
 		}
 
 		@media (max-width: $bp-md) {
-			order: 1;
 			padding-inline: 1rem;
 		}
 	}

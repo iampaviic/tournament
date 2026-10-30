@@ -342,10 +342,11 @@ legend {
 		color: var(--accent-ink);
 	}
 
+	// A caution in the organizer's red pen: ringed, not filled, so it reads apart from an error.
 	&.warning {
-		background: var(--warning-bg);
-		color: var(--warning-text);
-		border: 1px solid var(--warning-border);
+		background: var(--surface);
+		color: var(--text);
+		border: 1px solid var(--danger);
 	}
 }
 
@@ -367,11 +368,6 @@ legend {
 	&.success {
 		background: var(--success-soft);
 		color: var(--success-ink);
-	}
-
-	&.warning {
-		background: var(--warning-bg);
-		color: var(--warning-text);
 	}
 
 	&.danger {

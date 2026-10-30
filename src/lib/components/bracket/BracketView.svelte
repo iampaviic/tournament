@@ -12,20 +12,47 @@
 		participants,
 		theme,
 		type,
-		label
+		label,
+		me = null,
+		disputed = []
 	}: {
 		matches: BracketMatch[];
 		participants: Record<string, ThemeParticipant>;
 		theme: BracketTheme;
 		type: StageType;
 		label: string;
+		/** The viewer's participant id: their line is drawn in blue. */
+		me?: string | null;
+		/** Matches whose reports disagree, marked in the organizer's red. */
+		disputed?: string[];
 	} = $props();
 
 	const layout = $derived(layoutBracket(matches));
 </script>
 
-<div class="bracket" style={themeStyle(theme.style)} data-theme={theme.id}>
+<!-- A sheet wider than the column takes the window's width, so it can be read whole at once. -->
+<div
+	class="bracket"
+	style={themeStyle(theme.style)}
+	style:--sheet="{layout.width + 50}px"
+	data-theme={theme.id}
+>
 	<PanZoom width={layout.width} height={layout.height} {label}>
-		<BracketCanvas {layout} {participants} {theme} elimination={isElimination(type)} />
+		<BracketCanvas
+			{layout}
+			{participants}
+			{theme}
+			{me}
+			{disputed}
+			elimination={isElimination(type)}
+		/>
 	</PanZoom>
 </div>
+
+<style>
+	.bracket {
+		--width: min(calc(100vw - 2rem), max(100%, var(--sheet)));
+		width: var(--width);
+		margin-left: calc((100% - var(--width)) / 2);
+	}
+</style>

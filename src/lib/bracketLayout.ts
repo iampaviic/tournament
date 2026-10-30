@@ -7,11 +7,11 @@ import {
 } from '#lib/brackets/index.ts';
 
 /** Sizes of the bracket view in CSS pixels. The view renders cards with exactly these sizes. */
-export const CARD_WIDTH = 220;
+export const CARD_WIDTH = 184;
 export const SLOT_HEIGHT = 30;
 export const CARD_HEIGHT = SLOT_HEIGHT * 2;
 export const HEADER_HEIGHT = 36;
-const COLUMN_GAP = 56;
+const COLUMN_GAP = 44;
 const ROW_GAP = 16;
 const SECTION_GAP = 48;
 /** Room left of the first column for match numbers. */

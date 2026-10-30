@@ -12,16 +12,16 @@
 			id: 'requirements',
 			say: m.home_feature_requirements,
 			then: m.home_feature_requirements_on,
-			tint: '--success-soft'
+			tint: '--accent-track'
 		},
 		{
 			id: 'stages',
 			say: m.home_feature_stages,
 			then: m.home_feature_stages_on,
-			tint: '--warning-bg'
+			tint: '--accent-soft'
 		},
 		{ id: 'api', say: m.home_feature_api, then: m.home_feature_api_on, tint: '--accent-track' },
-		{ id: 'live', say: m.home_feature_live, then: m.home_feature_live_on, tint: '--danger-soft' }
+		{ id: 'live', say: m.home_feature_live, then: m.home_feature_live_on, tint: '--accent-track' }
 	];
 	let on = $state<Record<string, boolean>>({ reports: true, api: true });
 </script>

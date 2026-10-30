@@ -3,10 +3,17 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
-	import Avatar from '#lib/components/Avatar.svelte';
+	import BracketView from '#lib/components/bracket/BracketView.svelte';
 	import Icon from '#lib/components/Icon.svelte';
 	import MatchLines from '#lib/components/MatchLines.svelte';
-	import { matchStatusLabel, progressTone, stageLabel } from '#lib/labels.ts';
+	import {
+		formatLabel,
+		groupName,
+		matchStatusLabel,
+		progressTone,
+		stageLabel
+	} from '#lib/labels.ts';
+	import { themeById } from '#lib/themes/index.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -27,6 +34,14 @@
 			? { name: entrant }
 			: { name: entrant === null ? m.match_bye() : m.match_tbd(), placeholder: true };
 	const params = $derived({ org: data.org.slug, tournament: data.tournament.slug });
+
+	// The stage being played, or the last one once the tournament is over.
+	const stage = $derived(
+		data.sheet &&
+			(data.sheet.stages.find((s) => s.status === 'running') ??
+				data.sheet.stages.findLast((s) => s.status !== 'pending'))
+	);
+	const theme = $derived(data.sheet && themeById(data.sheet.themeId));
 </script>
 
 {#if data.next}
@@ -58,15 +73,48 @@
 	</section>
 {/if}
 
+{#if data.sheet && stage && theme}
+	{@const sheet = data.sheet}
+	<section class="sheet" aria-labelledby="sheet-title">
+		<header>
+			<h2 id="sheet-title">
+				{stageLabel(stage.index, sheet.stages.length)}
+				<span class="muted format">{formatLabel(stage.type)}</span>
+			</h2>
+			<a href={resolve('/t/[org]/[tournament]/bracket', params)}>{m.t_full_bracket()}</a>
+		</header>
+		{#each stage.groups as group, groupIndex (groupIndex)}
+			{#if group.matches.length}
+				{#if stage.groups.length > 1}<h3>{groupName(groupIndex)}</h3>{/if}
+				<BracketView
+					matches={group.matches}
+					participants={sheet.participants}
+					{theme}
+					type={stage.type}
+					me={sheet.me}
+					disputed={sheet.disputed}
+					label={m.bracket_label({
+						name:
+							stage.groups.length > 1
+								? `${stageLabel(stage.index, sheet.stages.length)}, ${groupName(groupIndex)}`
+								: stageLabel(stage.index, sheet.stages.length)
+					})}
+				/>
+			{/if}
+		{/each}
+	</section>
+{/if}
+
+<!-- The rest of the sheet's margin: ruled text, not boxes. -->
 <div class="layout">
 	{#if data.description}
-		<section class="card description" aria-labelledby="about">
+		<section class="description" aria-labelledby="about">
 			<h2 id="about">{m.t_about()}</h2>
 			<p>{data.description}</p>
 		</section>
 	{/if}
 
-	<aside class="card registration" aria-labelledby="registration">
+	<aside class="registration" aria-labelledby="registration">
 		<h2 id="registration">{m.t_registration()}</h2>
 		{#if data.limit !== null && (status === 'registration' || status === 'check_in')}
 			<div class="capacity">
@@ -150,14 +198,13 @@
 		{/if}
 	</aside>
 
-	<section class="card participants">
+	<section class="participants">
 		<h2>{m.t_participants({ count: data.participants.length })}</h2>
 		{#if participants.length}
 			<ol>
 				{#each participants as participant (participant.id)}
 					<li>
 						{#if ranked}<span class="rank">{participant.finalRank ?? '–'}</span>{/if}
-						<Avatar src={participant.avatarUrl} name={participant.displayName} size={28} />
 						<a class="name" href={resolve('/u/[username]', { username: participant.username })}>
 							{participant.displayName}
 						</a>
@@ -196,6 +243,7 @@
 
 		@include up($bp-sm) {
 			grid-template-columns: minmax(0, 28rem) auto;
+			justify-content: space-between;
 		}
 	}
 
@@ -206,10 +254,38 @@
 		gap: 0.75rem;
 	}
 
+	.sheet {
+		margin-bottom: 2.5rem;
+
+		header {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 0.25rem 1rem;
+			margin-bottom: 0.75rem;
+		}
+
+		h2 {
+			margin: 0;
+		}
+
+		h3 {
+			margin: 1rem 0 0.5rem;
+			font-size: 1rem;
+		}
+
+		.format {
+			margin-left: 0.5rem;
+			font-size: var(--fs-body);
+			font-weight: 400;
+		}
+	}
+
 	.layout {
 		display: grid;
-		gap: var(--gap);
-		align-items: stretch;
+		gap: 2rem var(--gap);
+		align-items: start;
 
 		@include up($bp-md) {
 			grid-template-columns: 2fr 1fr;
@@ -218,6 +294,17 @@
 				grid-column: 2;
 				grid-row: 1 / span 2;
 			}
+		}
+
+		// Each block starts on a printed rule, like a section in the sheet's margin.
+		> section,
+		> aside {
+			padding-top: 0.75rem;
+			border-top: 1px solid var(--line);
+		}
+
+		h2 {
+			margin: 0 0 0.75rem;
 		}
 	}
 

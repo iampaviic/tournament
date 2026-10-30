@@ -73,6 +73,8 @@
 							participants={data.participants}
 							{theme}
 							type={stage.type}
+							me={data.me}
+							disputed={data.disputed}
 							label={m.bracket_label({
 								name:
 									stage.groups.length > 1

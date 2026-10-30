@@ -12,7 +12,10 @@
 		round_robin: m.home_format_round_robin,
 		swiss: m.home_format_swiss
 	};
-	const tints = ['--accent-track', '--success-soft', '--warning-bg', '--danger-soft'];
+	// One hue at four strengths, one per format.
+	const tints = [12, 20, 28, 36].map(
+		(share) => `color-mix(in srgb, var(--accent) ${share}%, var(--bg))`
+	);
 	/** The sheet fits the stage; larger brackets are shown smaller. */
 	let stageWidth = $state(560);
 	const scale = (width: number) => Math.min(1, Math.min(stageWidth - 48, 560) / (width + 16));
@@ -46,7 +49,7 @@
 		class="stage"
 		data-reveal="settle"
 		style:--d="150ms"
-		style:--tint="var({tints[selected]})"
+		style:--tint={tints[selected]}
 		aria-live="polite"
 		bind:clientWidth={stageWidth}
 	>
