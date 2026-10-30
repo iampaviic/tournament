@@ -74,18 +74,26 @@ interface AuthModule<Cfg = unknown> {
 - `tournaments` (orgId, slug, name, description, startsAt, status: draft|registration|check_in|running|completed|cancelled, themeId, game jsonb, settings jsonb) · `tournament_auth_requirements` (moduleId, config jsonb)
 - `participants` (tournamentId, userId, seed, checkedInAt, status, finalRank)
 - `stages` (tournamentId, index 0|1, type, settings jsonb: groupCount, advancePerGroup, swissRounds, thirdPlace, grandFinalReset…, status) · `groups` · `rounds`
-- `matches` (stageId, groupId, roundId, number, p1/p2 participantId, score1/2, winnerId, status: pending|ready|running|reported|disputed|completed, winnerNext/loserNext matchId+slot, helpRequested) · `match_reports` (by participant/organizer/api key, scores) · `match_messages` (matchId, authorId, body, createdAt)
+- `matches` (stageId, groupId, the engine template: templateId, side, round, position, slot sources; result: entrants, scores, winner; cached p1/p2 participantId and status for queries; helpRequested) · `match_reports` (by participant/organizer/api key, scores) · `match_messages` (matchId, authorId, body, createdAt)
 
-### Bracket engine (`src/lib/brackets`, pure + exhaustively unit-tested)
+### Bracket engine (`src/lib/brackets`, pure + exhaustively unit-tested) ✅
 
-- `generate(type, seeds, opts)` → rounds + match specs with progression links (winner/loser → match+slot).
-- **SE:** pad to the next power of two, standard seed order (1v16, 8v9…), auto-advance byes, optional 3rd-place match.
-- **DE:** winners bracket + losers bracket. Losers drop in alternating/reversed order to avoid early rematches. Grand final with optional bracket reset.
-- **RR:** circle method (Berger tables), optional double round.
-- **Swiss:** `pairNextRound(standings, history)`. Pairs within score groups, avoids rematches with a backtracking fallback, gives the bye to the lowest-ranked player who hasn't had one. Default number of rounds is ⌈log₂ n⌉.
-- **Groups:** snake seeding into N groups, any type per group. Top K per group advance to stage 2 with cross-group seeding (A1–B2…).
-- `standings(type, matches, tiebreakers)`: wins, match points, head-to-head, Buchholz, Sonneborn-Berger, game diff.
-- In the services, a confirmed result propagates the winner/loser into the next matches, and Swiss generates the next round once the current one finishes.
+A stage is a list of **match templates**. Each slot is either a known entrant (`null` = bye) or the winner/loser of another match. The state of every match is **derived** from the templates plus the reported results, never stored by hand:
+
+- `generateStage(type, seeds, options)` builds the templates. Swiss only builds round 1; `pairSwissRound(entrants, history, round)` pairs each later round from the results so far.
+- `resolveStage(templates, results)` gives each match's entrants and status (`waiting`, `ready`, `completed`, `bye`, `skipped`). A result stores the entrants it was reported for, so correcting an earlier result makes later results stale (`staleResults`) instead of silently applying to new entrants.
+- `computeStandings(entrants, matches, { scoring, tiebreakers })` for round robin and Swiss: points (default 1 / ½ / 0), head-to-head (restarted within each smaller tie), Buchholz, Sonneborn-Berger, game difference, games won, wins. Remaining ties share a rank and are ordered by seed.
+- `eliminationStandings(entrants, matches)`: final places from each template's `placement` (final 1/2, semifinal losers 3, …; losers bracket rounds in double elimination).
+- `snakeGroups(seeds, n)` and `seedAdvancers(groupRankings, perGroup)` for two-stage tournaments. Advancers are seeded so group mates meet as late as possible.
+
+Formats:
+
+- **SE:** pad to the next power of two, standard seed order (1v8, 4v5, 2v7, 3v6), byes for the top seeds, optional third place match.
+- **DE:** losers of each winners round drop into the losers bracket in alternating reverse / reverse-half-shift order. This was chosen by simulating 8–256 entrants: no rematches before the losers final when favorites win (a rematch in the losers final can't be avoided). Grand final with optional reset (`GF2` is `skipped` if the winners bracket champion wins `GF1`).
+- **RR:** circle method, optional double round robin.
+- **Swiss:** Dutch-style pairing within score groups by backtracking search, no rematches unless unavoidable, the bye goes to the lowest-ranked entrant without one. Default rounds ⌈log₂ n⌉.
+
+`simulate(templates, pick)` plays a stage to the end; tests use it for property checks (everyone but the champion loses exactly once/twice, everyone meets once in RR, …), and M4 can use it for demo data.
 
 ### Match flow + chat
 
@@ -106,7 +114,7 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 | **M0** ✅ | Scaffold, tooling, Docker/compose, CI, docs/PLAN.md                                                                                                  | `pnpm check/lint/test` green in CI, image builds                     |
 | **M1** ✅ | Sessions, module interface/registry, dev + discord + tetrio modules, login/link identities, settings, basic profile                                  | Dev login e2e passes. Discord/tetrio callbacks pass with mocked HTTP |
 | M2 ✅     | Organizations: create, public page (about/upcoming/archive), admin (settings, members, API keys), trust guard                                        | Untrusted session blocked from admin                                 |
-| M3        | Bracket engine (pure lib), can run in parallel with M2                                                                                               | Property and fixture tests for all 4 types + groups                  |
+| M3 ✅     | Bracket engine (pure lib)                                                                                                                            | Property and fixture tests for all 4 types + groups                  |
 | M4        | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
 | M5        | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |
 | M6        | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                    |
