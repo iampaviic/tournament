@@ -27,6 +27,7 @@ import {
 import { publish } from '#lib/server/events.ts';
 import type { BracketMatch } from '#lib/bracketView.ts';
 import { isElimination, tiebreakersFor } from '#lib/tournaments.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { ServiceError } from './errors';
 import { playingParticipants, writeSeeds } from './participants';
 
@@ -74,20 +75,20 @@ export async function lockStage(tx: Transaction, stageId: string) {
 /** Inserts a stage's matches, splitting the entrants into groups, and starts it. */
 async function startStage(tx: Transaction, stage: Stage, entrants: string[], isLast: boolean) {
 	const { groupCount, advancePerGroup } = stage.settings;
-	if (entrants.length < 2) throw new ServiceError('At least two participants are needed.');
+	if (entrants.length < 2) throw new ServiceError(m.stage_error_too_few());
 	if (groupCount > 1 && entrants.length < groupCount * 2) {
-		throw new ServiceError(`${groupCount} groups need at least ${groupCount * 2} participants.`);
+		throw new ServiceError(m.stage_error_groups({ groups: groupCount, min: groupCount * 2 }));
 	}
 	const groups = groupCount > 1 ? snakeGroups(entrants, groupCount) : [entrants];
 	if (!isLast) {
 		const smallest = Math.min(...groups.map((g) => g.length));
 		if (advancePerGroup > smallest) {
 			throw new ServiceError(
-				`${advancePerGroup} can't advance from a group of ${smallest}. Lower the number advancing.`
+				m.stage_error_advance_group({ advance: advancePerGroup, size: smallest })
 			);
 		}
 		if (advancePerGroup * groups.length < 2) {
-			throw new ServiceError('At least two participants must advance to the next stage.');
+			throw new ServiceError(m.stage_error_advance_total());
 		}
 	}
 
@@ -222,7 +223,7 @@ async function onStageCompleted(tx: Transaction, stage: Stage) {
 /** Starts the tournament with everyone who will play (see `playingParticipants`). */
 export async function startTournament(tournament: Tournament) {
 	if (tournament.status !== 'registration' && tournament.status !== 'check_in') {
-		throw new ServiceError('Open registration before starting the tournament.');
+		throw new ServiceError(m.stage_error_not_open());
 	}
 	await db.transaction(async (tx) => {
 		const playing = (await playingParticipants(tx, tournament)).map((p) => p.id);
@@ -259,9 +260,9 @@ export async function startNextStage(tournament: Tournament) {
 			.orderBy(asc(stages.index));
 		const next = all.find((stage) => stage.status === 'pending');
 		const previous = next && all[next.index - 1];
-		if (!next || !previous) throw new ServiceError('There is no next stage to start.');
+		if (!next || !previous) throw new ServiceError(m.stage_error_no_next());
 		if (previous.status !== 'completed') {
-			throw new ServiceError('Finish every match of the current stage first.');
+			throw new ServiceError(m.stage_error_unfinished());
 		}
 
 		const perGroup = previous.settings.advancePerGroup;

@@ -28,10 +28,11 @@
 			label: m.org_admin_api_keys
 		}
 	]);
+	const current = $derived(tabs.find((tab) => tab.route === page.route.id));
 </script>
 
 <svelte:head>
-	<title>{data.org.name} · {m.app_name()}</title>
+	<title>{current ? `${current.label()} · ` : ''}{data.org.name} · {m.app_name()}</title>
 </svelte:head>
 
 <div class="title">

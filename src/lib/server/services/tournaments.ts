@@ -10,26 +10,37 @@ import {
 	type Tournament,
 	type TournamentStatus
 } from '#lib/server/db/schema.ts';
-import { DEFAULT_STAGE_SETTINGS, structureSchema, type StageConfig } from '#lib/tournaments.ts';
+import {
+	DEFAULT_STAGE_SETTINGS,
+	structureSchema,
+	type Game,
+	type StageConfig
+} from '#lib/tournaments.ts';
+import { statusLabel } from '#lib/labels.ts';
 import { isThemeEnabled } from '#lib/server/themes.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { ServiceError } from './errors';
 import { orgSlugSchema } from './organizations';
 import type { Requirement } from './requirements';
+import { steamApps, type SteamApps } from './steam';
 
 export const tournamentSchema = z.object({
 	name: z
 		.string()
 		.trim()
-		.min(1, 'Name is required.')
-		.max(80, 'Name must be at most 80 characters.'),
+		.min(1, { error: () => m.validation_name_required() })
+		.max(80, { error: () => m.validation_name_max({ max: 80 }) }),
 	slug: orgSlugSchema,
-	description: z.string().trim().max(5000, 'Description must be at most 5000 characters.'),
+	description: z
+		.string()
+		.trim()
+		.max(5000, { error: () => m.validation_description_max({ max: 5000 }) }),
 	startsAt: z.date().nullable(),
 	participantLimit: z
 		.number()
 		.int()
-		.min(2, 'Allow at least 2 participants.')
-		.max(1024, 'At most 1024 participants.')
+		.min(2, { error: () => m.tournament_error_limit_min({ min: 2 }) })
+		.max(1024, { error: () => m.tournament_error_limit_max({ max: 1024 }) })
 		.nullable()
 });
 export type TournamentInput = z.infer<typeof tournamentSchema>;
@@ -39,7 +50,7 @@ const EDITABLE: TournamentStatus[] = ['draft', 'registration', 'check_in'];
 
 export function assertEditable(tournament: Tournament) {
 	if (!EDITABLE.includes(tournament.status)) {
-		throw new ServiceError("This can't be changed after the tournament has started.");
+		throw new ServiceError(m.tournament_error_locked());
 	}
 }
 
@@ -62,7 +73,7 @@ export async function createTournament(
 	orgId: string,
 	input: Pick<TournamentInput, 'name' | 'slug'>
 ) {
-	if (await slugTaken(orgId, input.slug)) throw new ServiceError('That address is taken.');
+	if (await slugTaken(orgId, input.slug)) throw new ServiceError(m.validation_slug_taken());
 	return db.transaction(async (tx) => {
 		const [tournament] = await tx
 			.insert(tournaments)
@@ -78,9 +89,12 @@ export async function createTournament(
 	});
 }
 
-export async function updateTournament(tournament: Tournament, input: TournamentInput) {
+export async function updateTournament(
+	tournament: Tournament,
+	input: TournamentInput & { game?: Game | null }
+) {
 	if (await slugTaken(tournament.orgId, input.slug, tournament.id)) {
-		throw new ServiceError('That address is taken.');
+		throw new ServiceError(m.validation_slug_taken());
 	}
 	const [updated] = await db
 		.update(tournaments)
@@ -92,8 +106,40 @@ export async function updateTournament(tournament: Tournament, input: Tournament
 
 /** Picks the bracket theme. It can be changed at any time, even while the tournament is played. */
 export async function setTheme(tournament: Tournament, themeId: string) {
-	if (!isThemeEnabled(themeId)) throw new ServiceError('That theme is not available.', 'invalid');
+	if (!isThemeEnabled(themeId)) throw new ServiceError(m.theme_error_unavailable(), 'invalid');
 	await db.update(tournaments).set({ themeId }).where(eq(tournaments.id, tournament.id));
+}
+
+/**
+ * The game to store for a Steam app id: `null` clears it, the current game stays as it was (even
+ * when the cache no longer has it), and any other comes from the Steam cache.
+ */
+export async function resolveGame(
+	appId: number | null,
+	current: Game | null,
+	apps: SteamApps = steamApps
+): Promise<Game | null> {
+	if (appId === null) return null;
+	if (current?.appId === appId) return current;
+	if (!apps.enabled) throw new ServiceError(m.game_error_disabled(), 'invalid');
+	const game = await apps.find(appId);
+	if (!game) throw new ServiceError(m.game_error_unknown(), 'invalid');
+	return game;
+}
+
+/** Sets the Steam game it is played in, or clears it. It can change at any time, like the theme. */
+export async function setGame(
+	tournament: Tournament,
+	appId: number | null,
+	apps: SteamApps = steamApps
+) {
+	const game = await resolveGame(appId, tournament.game, apps);
+	const [updated] = await db
+		.update(tournaments)
+		.set({ game })
+		.where(eq(tournaments.id, tournament.id))
+		.returning();
+	return updated;
 }
 
 export async function deleteTournament(tournamentId: string) {
@@ -106,9 +152,7 @@ export async function deleteTournament(tournamentId: string) {
  */
 export async function deleteDraftTournament(tournament: Tournament) {
 	if (tournament.status !== 'draft') {
-		throw new ServiceError(
-			'Only draft tournaments can be deleted here. Delete published ones from the admin page.'
-		);
+		throw new ServiceError(m.tournament_error_delete_draft());
 	}
 	await deleteTournament(tournament.id);
 }
@@ -140,6 +184,7 @@ export async function listOrgTournaments(orgId: string, { includeDrafts = false 
 			name: tournaments.name,
 			status: tournaments.status,
 			startsAt: tournaments.startsAt,
+			game: tournaments.game,
 			participants: participantCount
 		})
 		.from(tournaments)
@@ -153,12 +198,15 @@ export async function listOrgTournaments(orgId: string, { includeDrafts = false 
 export async function listUserTournaments(userId: string) {
 	return db
 		.select({
+			participantId: participants.id,
 			slug: tournaments.slug,
 			orgSlug: organizations.slug,
 			name: tournaments.name,
 			orgName: organizations.name,
 			status: tournaments.status,
 			startsAt: tournaments.startsAt,
+			createdAt: tournaments.createdAt,
+			game: tournaments.game,
 			finalRank: participants.finalRank
 		})
 		.from(participants)
@@ -229,14 +277,16 @@ const TRANSITIONS: Partial<Record<TournamentStatus, TournamentStatus[]>> = {
  */
 export async function setStatus(tournament: Tournament, status: TournamentStatus) {
 	if (!TRANSITIONS[tournament.status]?.includes(status)) {
-		throw new ServiceError(`A tournament can't go from ${tournament.status} to ${status}.`);
+		throw new ServiceError(
+			m.tournament_error_status({ from: statusLabel(tournament.status), to: statusLabel(status) })
+		);
 	}
 	if (status === 'draft') {
 		const [{ count }] = await db
 			.select({ count: sql<number>`count(*)::int` })
 			.from(participants)
 			.where(eq(participants.tournamentId, tournament.id));
-		if (count > 0) throw new ServiceError('Participants have already signed up.');
+		if (count > 0) throw new ServiceError(m.tournament_error_signed_up());
 	}
 	await db.update(tournaments).set({ status }).where(eq(tournaments.id, tournament.id));
 }

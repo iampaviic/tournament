@@ -1,0 +1,36 @@
+{
+	"verdict": "APPROVED",
+	"summary": "The uncommitted M6 change (15 modified files plus 19 new ones; HEAD 98d079b, nothing staged) implements every user decision and binding plan decision. Reports are derived through the pure matchReports.ts and applied in services/matches.ts under the stage lock: save/edit until the opponent responds, agreement completing through refreshStage, a dispute closing reporting for both players, draws only outside elimination. The service checks phase: tournament running, stage running, match ready, reporter an entrant. match_reports has participant/organizer/api_key sources. An organizer override replaces the reports and clears the dispute and help. Admin result entry goes through the matches service with Zod. refreshStage removes stale reports and help on entrant changes, and reads also filter by entrants. The help flag is set by players and cleared by organizers, results and stale entrants. The queue on the admin Matches tab runs disputed > help > reported > ready above the unchanged result list. The room and the public list are live over SSE and the bracket isn't. The public list shows matchNumbers, entrants, score, status, room links and a 'Your matches' section. All strings are in en.json. No new dependencies. PLAN.md has M6 ✅ and its notes. Authorization sits at the edge (requireUser / requireTournamentAdmin, organizer = member with a trusted session), and chat bodies render as text. I re-ran check (0 errors/0 warnings), lint, test:unit (24 files/289 tests) and the full e2e suite (9 passed, including both two-browser match tests). Only minor issues remain: an appended chat message can be overwritten by an in-flight reload, EventSource doesn't recover from HTTP errors, a dispute message appears twice and styled as success, the live badge reads 'Reconnecting…' before the first connect, 'Your matches' rows lack stage/group context, and a few test gaps. Full review: .agents/tasks/m6-match-room/2026-10-30-162124-review.md.",
+	"findings": [
+		{
+			"severity": "minor",
+			"file": "src/routes/t/[org]/[tournament]/matches/[id]/+page.svelte",
+			"detail": "`let messages = $derived(data.messages)` is overwritten on every data reload. If an `invalidateAll()` (from `open` or `update`) is in flight when a `chat` event arrives, and the reload's listMessages query ran before that message was inserted, the appended message disappears until the next reload. That contradicts the M6 note 'nothing is missed'. Keep locally received messages in a separate list and merge them with data.messages by id (deduped, sorted by createdAt/id) instead of replacing them."
+		},
+		{
+			"severity": "minor",
+			"file": "src/lib/live.ts",
+			"detail": "Only network errors make EventSource retry. A non-200 or non-text/event-stream response, such as a proxy 502/503 while the app restarts behind Apache in M9, closes the source for good, and the badge stays on 'Reconnecting…' with no further updates. In the error handler, when `source.readyState === EventSource.CLOSED`, recreate the source after a delay (e.g. 3 s, matching `retry`) and keep the returned cleanup closing the current instance."
+		},
+		{
+			"severity": "minor",
+			"file": "src/routes/t/[org]/[tournament]/matches/[id]/+page.server.ts",
+			"detail": "The `report` action returns m.room_disputed() as `form.message` for a disputed outcome. The page renders it in the green `alert success` (role=status), and the result card shows the same sentence again in `alert warning`. Return no message (or a warning-styled one) for `disputed`, so the reporter sees the dispute once and not styled as a success."
+		},
+		{
+			"severity": "minor",
+			"file": "src/routes/t/[org]/[tournament]/matches/+page.svelte",
+			"detail": "`connected` starts as false here and in the room, so the first paint reads 'Reconnecting…' (live_off) before the first connection opens. Start in a neutral or 'connecting' state, or only show live_off after a connection has dropped."
+		},
+		{
+			"severity": "minor",
+			"file": "src/routes/t/[org]/[tournament]/matches/+page.svelte",
+			"detail": "The 'Your matches' section renders the same `#N` row as the per-stage lists, without stage or group headings. In a group-plus-playoff tournament or with several groups, a player can see two '#1' rows that look the same. Show `matchContext(match)` (already used in the room and the queue) in the rows of that section."
+		},
+		{
+			"severity": "minor",
+			"file": "src/lib/server/services/matches.db.spec.ts",
+			"detail": "Test gaps: requestHelp rejections on a waiting match and when the tournament isn't running; a draw reported by both players in round robin/Swiss (the positive side of 'draws only in RR/Swiss' via reportResult); postMessage for a match of another tournament. There is also no check that the room SSE endpoint (matches/[id]/events) drops other matches' chat and update events, or that an untrusted member doesn't count as an organizer. Add the service cases here, and an assertion in e2e/matches.e2e.ts (e.g. p1's room log doesn't receive the organizer's message in room #2)."
+		}
+	]
+}

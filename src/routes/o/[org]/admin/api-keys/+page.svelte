@@ -78,8 +78,16 @@
 	<div class="row">
 		<div class="field grow">
 			<label for="name">{m.api_keys_name()}</label>
-			<input id="name" name="name" type="text" required maxlength="64" autocomplete="off" />
-			<span class="hint">{m.api_keys_name_hint()}</span>
+			<input
+				id="name"
+				name="name"
+				type="text"
+				required
+				maxlength="64"
+				autocomplete="off"
+				aria-describedby="name-hint"
+			/>
+			<span class="hint" id="name-hint">{m.api_keys_name_hint()}</span>
 		</div>
 		<button class="btn primary" type="submit">{m.api_keys_create()}</button>
 	</div>

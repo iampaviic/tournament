@@ -6,17 +6,18 @@ import { setFlash } from '#lib/server/flash.ts';
 import { getModule } from '#lib/server/modules/registry.ts';
 import { AuthModuleError } from '#lib/server/modules/types.ts';
 import { IdentityError, linkIdentity, signIn } from '#lib/server/services/identities.ts';
+import { m } from '#lib/paraglide/messages.js';
 import type { RequestHandler } from './$types';
 
 /** Where the auth module's provider sends the user back to. */
 export const GET: RequestHandler = async ({ params, url, cookies, locals }) => {
 	const module = getModule(params.module);
-	if (!module) error(404, 'Unknown sign-in method.');
+	if (!module) error(404, m.auth_error_unknown_module());
 
 	const flow = takeFlow(cookies);
 	const state = url.searchParams.get('state');
 	if (!flow || flow.moduleId !== module.id || !state || state !== flow.state) {
-		setFlash(cookies, 'Your sign-in expired or was started in another tab. Please try again.');
+		setFlash(cookies, m.auth_error_expired());
 		redirect(303, '/login');
 	}
 

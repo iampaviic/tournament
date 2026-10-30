@@ -1,22 +1,43 @@
 import { describe, expect, it } from 'vitest';
-import { formatDate, formatScore } from './format';
+import { formatDate, formatDateTime, formatNumber, formatRecord, formatScore } from './format';
+
+const date = new Date('2030-05-01T18:00:00Z');
+
+describe('formatDateTime', () => {
+	it('shows the date and the time', () => {
+		const text = formatDateTime(date);
+		expect(text).toContain('2030');
+		expect(text).toContain(':00');
+	});
+});
 
 describe('formatDate', () => {
-	const date = new Date('2026-12-12T13:00:00Z');
-
-	it('formats a date', () => {
-		expect(formatDate(date, { dateStyle: 'medium', timeZone: 'UTC' })).toBe('Dec 12, 2026');
+	it('shows the date only by default', () => {
+		const text = formatDate(date);
+		expect(text).toContain('2030');
+		expect(text).not.toContain(':');
 	});
 
-	it('formats a date with its time', () => {
+	it('takes date options', () => {
+		expect(formatDate(date, { year: 'numeric', month: 'long', timeZone: 'UTC' })).toBe('May 2030');
+	});
+
+	it('takes a time style too', () => {
 		expect(formatDate(date, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' })).toBe(
-			'Dec 12, 2026, 1:00 PM'
+			'May 1, 2030, 6:00 PM'
 		);
 	});
 });
 
-describe('formatScore', () => {
-	it('joins the scores with an en dash', () => {
+describe('formatNumber', () => {
+	it('groups digits', () => {
+		expect(formatNumber(1234567)).toBe('1,234,567');
+	});
+});
+
+describe('formatScore and formatRecord', () => {
+	it('join with en dashes', () => {
 		expect(formatScore([2, 1])).toBe('2–1');
+		expect(formatRecord({ won: 2, drawn: 0, lost: 1 })).toBe('2–0–1');
 	});
 });

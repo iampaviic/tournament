@@ -1,4 +1,5 @@
 import { error, redirect, type RequestEvent } from '@sveltejs/kit';
+import { m } from '#lib/paraglide/messages.js';
 
 /** Returns the signed-in user, or redirects to the login page and back afterwards. */
 export function requireUser(event: Pick<RequestEvent, 'locals' | 'url'>) {
@@ -17,7 +18,7 @@ export function requireUser(event: Pick<RequestEvent, 'locals' | 'url'>) {
 export function requireTrusted(event: Pick<RequestEvent, 'locals' | 'url'>) {
 	const user = requireUser(event);
 	if (!event.locals.trusted) {
-		error(403, 'Sign in with a secure method to access admin pages.');
+		error(403, m.error_untrusted());
 	}
 	return user;
 }

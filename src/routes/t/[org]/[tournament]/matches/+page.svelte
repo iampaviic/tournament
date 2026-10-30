@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
+	import LiveStatus from '#lib/components/LiveStatus.svelte';
 	import MatchLines from '#lib/components/MatchLines.svelte';
 	import {
 		groupName,
@@ -18,7 +19,7 @@
 
 	type Item = PageProps['data']['matches'][number];
 
-	let connected = $state(false);
+	let connected = $state<boolean | null>(null);
 	// A string, so reloading the page data doesn't reconnect.
 	const events = $derived(`${page.url.pathname}/events`);
 	$effect(() => listen(events, { update: () => invalidateAll() }, (on) => (connected = on)));
@@ -64,7 +65,8 @@
 		});
 </script>
 
-{#snippet link(match: Item)}
+<!-- `context` adds where the match is played, for lists outside the stage and group headings. -->
+{#snippet link(match: Item, context = false)}
 	{@const winner = match.result?.winner ?? null}
 	{@const mySide = data.me ? match.entrants.indexOf(data.me) : -1}
 	<a href={room(match.id)}>
@@ -74,7 +76,10 @@
 			winner={match.status === 'completed' ? winner : null}
 			me={mySide === 0 || mySide === 1 ? mySide : null}
 		/>
-		<span class="context muted">{matchContext(match)}</span>
+		<!-- The cell stays when empty, so the state lines up on every row. -->
+		<span class="context muted"
+			>{#if context}{matchContext(match)}{/if}</span
+		>
 		<span class="status">
 			<span class="badge {progressTone(match.progress)}">{matchStatusLabel(match.progress)}</span>
 		</span>
@@ -82,9 +87,7 @@
 {/snippet}
 
 <div class="bar">
-	<span class="live" class:on={connected} data-testid="live"
-		>{connected ? m.live_on() : m.live_off()}</span
-	>
+	<LiveStatus {connected} />
 </div>
 
 {#if !data.matches.length}
@@ -95,7 +98,7 @@
 			<h2 id="your-matches">{m.t_your_matches()}</h2>
 			<ol class="card list">
 				{#each mine as match (match.id)}
-					<li>{@render link(match)}</li>
+					<li>{@render link(match, true)}</li>
 				{/each}
 			</ol>
 		</section>
@@ -106,7 +109,12 @@
 		{#if data.stageCount > 1}<h2>{stageLabel(stage.index, data.stageCount)}</h2>{/if}
 		{#each stage.groups as group, groupIndex (groupIndex)}
 			{#if group.length}
-				{#if stage.groups.length > 1}<h3>{groupName(groupIndex)}</h3>{/if}
+				{#if stage.groups.length > 1}
+					<!-- Under the stage's heading, or straight under the page's when there is one stage. -->
+					<svelte:element this={data.stageCount > 1 ? 'h3' : 'h2'} class="group"
+						>{groupName(groupIndex)}</svelte:element
+					>
+				{/if}
 				<ol class="card list">
 					{#each group as match (match.id)}
 						<li data-testid="match-{match.id}" class:mine={isMine(match)}>{@render link(match)}</li>
@@ -122,7 +130,7 @@
 		margin-top: 2rem;
 	}
 
-	h3 {
+	.group {
 		margin-top: 1.25rem;
 	}
 
@@ -130,26 +138,6 @@
 		display: flex;
 		justify-content: flex-end;
 		margin-bottom: 0.5rem;
-	}
-
-	.live {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-size: var(--fs-small);
-		color: var(--text-muted);
-
-		&::before {
-			content: '';
-			width: 0.5rem;
-			height: 0.5rem;
-			border-radius: 50%;
-			background: var(--control);
-		}
-
-		&.on::before {
-			background: var(--success);
-		}
 	}
 
 	.list {

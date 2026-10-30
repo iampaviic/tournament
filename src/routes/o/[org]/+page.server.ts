@@ -1,11 +1,12 @@
 import { error } from '@sveltejs/kit';
 import { getMemberRole, getOrganizationBySlug } from '#lib/server/services/organizations.ts';
 import { listOrgTournaments } from '#lib/server/services/tournaments.ts';
+import { m } from '#lib/paraglide/messages.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const org = await getOrganizationBySlug(params.org);
-	if (!org) error(404, 'Organization not found');
+	if (!org) error(404, m.error_org_not_found());
 
 	const tournaments = (await listOrgTournaments(org.id)).map((t) => ({ ...t, orgSlug: org.slug }));
 	return {

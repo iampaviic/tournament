@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { devModule } from '#lib/server/modules/auth/dev.ts';
 import { tetrioModule } from '#lib/server/modules/auth/tetrio.ts';
 import type { StoredIdentity } from '#lib/server/modules/types.ts';
 import {
@@ -87,6 +88,10 @@ describe('parseModuleConfig', () => {
 			ok: true,
 			config: { minRank: 'a', allowUnranked: false }
 		});
+	});
+
+	it('stores no options for modules without any', () => {
+		expect(parseModuleConfig(devModule(), { foo: 1 })).toEqual({ ok: true, config: {} });
 	});
 });
 

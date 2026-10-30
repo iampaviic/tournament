@@ -31,6 +31,7 @@ services:
       TRUSTED_AUTH_MODULES: ${TRUSTED_AUTH_MODULES:-discord}
       DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      STEAM_API_KEY: ${STEAM_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy

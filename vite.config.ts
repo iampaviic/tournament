@@ -10,10 +10,12 @@ const testDatabaseUrl =
 
 // SvelteKit fills in `$app/env/private` from the environment (and `.env`) when Vitest loads this
 // config, so `test.env` comes too late for it. Set the test values here instead; otherwise the
-// tests would run against the database in `.env`, or fail where there is none, as in CI.
+// tests would run against the database in `.env`, or fail where there is none, as in CI. No test
+// may reach Steam, so its key is blanked: the tests that need one build their own cache.
 if (process.env.VITEST) {
 	process.env.DATABASE_URL = testDatabaseUrl;
 	process.env.AUTH_MODULES = 'dev';
+	process.env.STEAM_API_KEY = '';
 }
 
 export default defineConfig({
@@ -31,7 +33,10 @@ export default defineConfig({
 		paraglideVitePlugin({
 			project: './project.inlang',
 			outdir: './src/lib/paraglide',
-			emitTsDeclarations: true
+			emitTsDeclarations: true,
+			// Browsers get their Accept-Language locale once messages exist for it; the cookie
+			// overrides it. Keep in sync with `paraglide-js compile` in package.json.
+			strategy: ['cookie', 'preferredLanguage', 'baseLocale']
 		})
 	],
 	css: {
@@ -66,6 +71,7 @@ export default defineConfig({
 					environment: 'node',
 					include: ['src/**/*.db.{test,spec}.{js,ts}'],
 					globalSetup: ['src/lib/server/testing/db-setup.ts'],
+					setupFiles: ['src/lib/server/testing/no-network.ts'],
 					fileParallelism: false,
 					// Read by the global setup, which recreates this database's schema.
 					env: { DATABASE_URL: testDatabaseUrl }

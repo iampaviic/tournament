@@ -2,7 +2,11 @@ import * as api from '#lib/server/api/endpoints.ts';
 import { endpoint, methodNotAllowed } from '#lib/server/api/handler.ts';
 import { toTournament } from '#lib/server/api/responses.ts';
 import { requireApiTournament } from '#lib/server/auth/apiKey.ts';
-import { deleteDraftTournament, updateTournament } from '#lib/server/services/tournaments.ts';
+import {
+	deleteDraftTournament,
+	resolveGame,
+	updateTournament
+} from '#lib/server/services/tournaments.ts';
 
 export const GET = endpoint(api.getTournament, async ({ key, params }) =>
 	toTournament(await requireApiTournament(key, params.tournamentId))
@@ -11,6 +15,10 @@ export const GET = endpoint(api.getTournament, async ({ key, params }) =>
 export const PATCH = endpoint(api.updateTournament, async ({ key, params, body }) => {
 	const tournament = await requireApiTournament(key, params.tournamentId);
 	const { name, slug, description, startsAt, participantLimit } = tournament;
+	const { game, ...settings } = body;
+	// Looked up first, so an unknown game changes nothing.
+	const resolved =
+		game === undefined ? tournament.game : await resolveGame(game?.appId ?? null, tournament.game);
 	return toTournament(
 		await updateTournament(tournament, {
 			name,
@@ -18,7 +26,8 @@ export const PATCH = endpoint(api.updateTournament, async ({ key, params, body }
 			description,
 			startsAt,
 			participantLimit,
-			...body
+			...settings,
+			game: resolved
 		})
 	);
 });

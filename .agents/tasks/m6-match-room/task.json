@@ -1,0 +1,7 @@
+{
+	"task_id": "task-m6-match-room",
+	"task_description": "Milestone M6 of Tournament Manager: public matches page, match room with live SSE chat, player reporting with disputes, help flag, and the organizer match queue on the admin Matches tab. Built uncommitted in the checkout across FEATs; one final step makes the single M6 commit on claude/cool-archimedes-iqm428 (no push, never stage .agents/). Full plan: .agents/tasks/m6-match-room/plan.md.",
+	"status": "pending",
+	"feature_order": ["FEAT-001", "FEAT-002"],
+	"blocked_reason": null
+}

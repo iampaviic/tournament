@@ -35,5 +35,10 @@ export const variables = defineEnvVars({
 	DISCORD_CLIENT_SECRET: {
 		schema: optional,
 		description: 'Discord OAuth2 application client secret.'
+	},
+	STEAM_API_KEY: {
+		schema: optional,
+		description:
+			'Steam Web API key (https://steamcommunity.com/dev/apikey) for the game picker. The picker is hidden without it.'
 	}
 });

@@ -9,7 +9,8 @@ export const load: LayoutServerLoad = async (event) => {
 			slug: tournament.slug,
 			name: tournament.name,
 			status: tournament.status,
-			startsAt: tournament.startsAt
+			startsAt: tournament.startsAt,
+			game: tournament.game
 		},
 		isMember
 	};

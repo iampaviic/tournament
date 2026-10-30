@@ -6,6 +6,7 @@ test('sign in, edit the profile and sign out', async ({ page }) => {
 
 	await page.goto('/dashboard');
 	await expect(page).toHaveURL('/login?next=%2Fdashboard');
+	await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 	await page.getByLabel('Username').fill(username);
 	await page.getByRole('button', { name: 'Sign in' }).click();
 	await expect(page).toHaveURL('/dashboard');
@@ -28,6 +29,14 @@ test('sign in, edit the profile and sign out', async ({ page }) => {
 	await expect(page).toHaveURL('/');
 	await page.goto('/settings');
 	await expect(page).toHaveURL('/login?next=%2Fsettings');
+});
+
+test('the first Tab focuses the skip link', async ({ page }) => {
+	await page.goto('/');
+	await page.keyboard.press('Tab');
+	await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+	await page.keyboard.press('Enter');
+	await expect(page.getByRole('main')).toBeFocused();
 });
 
 test('shows sign-in errors on the login page', async ({ page }) => {

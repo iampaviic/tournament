@@ -4,6 +4,7 @@ import { identities, participants, users, type Tournament } from '#lib/server/db
 import { getModule } from '#lib/server/modules/registry.ts';
 import type { AuthModule } from '#lib/server/modules/types.ts';
 import type { ThemeParticipant } from '#lib/themes/index.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { ServiceError } from './errors';
 import { refreshIdentity } from './identities';
 import { evaluateRequirements, type RequirementCheck } from './requirements';
@@ -131,25 +132,23 @@ async function count(tournamentId: string) {
 
 /** Signs a user up, if registration is open and they meet every requirement. */
 export async function register(tournament: Tournament, userId: string) {
-	if (tournament.status !== 'registration') throw new ServiceError('Registration is closed.');
+	if (tournament.status !== 'registration') throw new ServiceError(m.registration_error_closed());
 	if (await getParticipant(tournament.id, userId)) {
-		throw new ServiceError("You're already registered.");
+		throw new ServiceError(m.registration_error_already());
 	}
 	if (tournament.participantLimit && (await count(tournament.id)) >= tournament.participantLimit) {
-		throw new ServiceError('The tournament is full.');
+		throw new ServiceError(m.registration_error_full());
 	}
 
 	await refreshRequiredIdentities(tournament.id, userId);
 	const checks = (await checkRequirements(tournament.id, [userId])).get(userId)!;
 	for (const check of checks) {
 		if (check.status === 'missing') {
-			throw new ServiceError(`Link your ${check.moduleName} account to register.`);
+			throw new ServiceError(m.registration_error_link({ module: check.moduleName }));
 		}
 		if (check.status === 'ineligible') throw new ServiceError(check.reason);
 		if (check.status === 'unavailable') {
-			throw new ServiceError(
-				`This tournament requires ${check.moduleName}, which is no longer available.`
-			);
+			throw new ServiceError(m.registration_error_unavailable({ module: check.moduleName }));
 		}
 	}
 	await db.insert(participants).values({ tournamentId: tournament.id, userId });
@@ -157,7 +156,7 @@ export async function register(tournament: Tournament, userId: string) {
 
 export async function unregister(tournament: Tournament, userId: string) {
 	if (tournament.status !== 'registration' && tournament.status !== 'check_in') {
-		throw new ServiceError('You can no longer leave this tournament.');
+		throw new ServiceError(m.registration_error_leave());
 	}
 	await db
 		.delete(participants)
@@ -165,18 +164,18 @@ export async function unregister(tournament: Tournament, userId: string) {
 }
 
 export async function checkIn(tournament: Tournament, userId: string) {
-	if (tournament.status !== 'check_in') throw new ServiceError('Check-in is not open.');
+	if (tournament.status !== 'check_in') throw new ServiceError(m.check_in_error_closed());
 	const [row] = await db
 		.update(participants)
 		.set({ checkedInAt: new Date() })
 		.where(and(eq(participants.tournamentId, tournament.id), eq(participants.userId, userId)))
 		.returning({ id: participants.id });
-	if (!row) throw new ServiceError("You aren't registered for this tournament.");
+	if (!row) throw new ServiceError(m.check_in_error_not_registered());
 }
 
 function assertNotStarted(tournament: Tournament) {
 	if (tournament.status === 'running' || tournament.status === 'completed') {
-		throw new ServiceError('The tournament has already started.');
+		throw new ServiceError(m.participants_error_started());
 	}
 }
 
@@ -187,9 +186,9 @@ export async function addParticipant(tournament: Tournament, username: string) {
 		.select({ id: users.id })
 		.from(users)
 		.where(eq(users.username, username.trim().toLowerCase()));
-	if (!user) throw new ServiceError(`There is no user called "${username}".`, 'invalid');
+	if (!user) throw new ServiceError(m.user_error_unknown({ username }), 'invalid');
 	if (await getParticipant(tournament.id, user.id)) {
-		throw new ServiceError(`${username} is already registered.`);
+		throw new ServiceError(m.participants_error_already({ username }));
 	}
 	const [row] = await db
 		.insert(participants)
@@ -204,7 +203,7 @@ export async function removeParticipant(tournament: Tournament, participantId: s
 		.delete(participants)
 		.where(and(eq(participants.tournamentId, tournament.id), eq(participants.id, participantId)))
 		.returning({ id: participants.id });
-	if (!row) throw new ServiceError('Participant not found.', 'not_found');
+	if (!row) throw new ServiceError(m.participants_error_not_found(), 'not_found');
 }
 
 export async function setCheckedIn(
@@ -218,7 +217,7 @@ export async function setCheckedIn(
 		.set({ checkedInAt: checkedIn ? new Date() : null })
 		.where(and(eq(participants.tournamentId, tournament.id), eq(participants.id, participantId)))
 		.returning({ id: participants.id });
-	if (!row) throw new ServiceError('Participant not found.', 'not_found');
+	if (!row) throw new ServiceError(m.participants_error_not_found(), 'not_found');
 }
 
 /** Writes seeds 1…n in the given order. */
@@ -241,7 +240,7 @@ export async function setSeeds(tournament: Tournament, order: string[]) {
 			new Set(order).size !== order.length ||
 			order.some((id) => !ids.includes(id))
 		) {
-			throw new ServiceError('List every participant exactly once.', 'invalid');
+			throw new ServiceError(m.participants_error_seeds(), 'invalid');
 		}
 		await writeSeeds(tx, tournament.id, order);
 	});

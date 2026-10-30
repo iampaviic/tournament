@@ -60,8 +60,11 @@ export interface AuthModule<Config = unknown> {
 	refreshInterval?: number;
 	/** Options organizers can set when a tournament requires this module. */
 	tournamentConfig?: z.ZodType<Config>;
-	/** The form for `tournamentConfig`. Empty values are left out of the parsed object. */
-	configFields?: ConfigField[];
+	/**
+	 * The form for `tournamentConfig`. Empty values are left out of the parsed object. Built per
+	 * request, so labels follow the locale.
+	 */
+	configFields?(): ConfigField[];
 	/** Decides whether a participant may join a tournament configured with `config`. */
 	checkEligibility?(identity: StoredIdentity, config: Config): Eligibility;
 	/** Short labelled values bracket themes can show next to a participant. */

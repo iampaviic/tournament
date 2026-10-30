@@ -51,7 +51,12 @@
 								<div class="field">
 									<label for={id}>{field.label}</label>
 									{#if field.type === 'select'}
-										<select {id} name={id} value={configValue(module.config, field.key)}>
+										<select
+											{id}
+											name={id}
+											value={configValue(module.config, field.key)}
+											aria-describedby={field.hint ? `${id}-hint` : undefined}
+										>
 											{#each field.options as option (option.value)}
 												<option value={option.value}>{option.label}</option>
 											{/each}
@@ -64,9 +69,10 @@
 											min={field.min}
 											max={field.max}
 											value={configValue(module.config, field.key)}
+											aria-describedby={field.hint ? `${id}-hint` : undefined}
 										/>
 									{/if}
-									{#if field.hint}<span class="hint">{field.hint}</span>{/if}
+									{#if field.hint}<span class="hint" id="{id}-hint">{field.hint}</span>{/if}
 								</div>
 							{/if}
 						{/each}

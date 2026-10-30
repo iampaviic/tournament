@@ -1,4 +1,5 @@
 import type { AuthModule, StoredIdentity } from '#lib/server/modules/types.ts';
+import { m } from '#lib/paraglide/messages.js';
 
 export interface Requirement {
 	moduleId: string;
@@ -47,7 +48,7 @@ export function readModuleConfig(
 	prefix: string
 ): { ok: true; config: Record<string, unknown> } | { ok: false; error: string } {
 	const raw: Record<string, unknown> = {};
-	for (const field of module.configFields ?? []) {
+	for (const field of module.configFields?.() ?? []) {
 		const value = form.get(prefix + field.key);
 		if (field.type === 'checkbox') raw[field.key] = value !== null;
 		else if (typeof value === 'string' && value.trim() !== '') {
@@ -57,15 +58,24 @@ export function readModuleConfig(
 	return parseModuleConfig(module, raw);
 }
 
-/** Checks a module's tournament options with its `tournamentConfig`. */
+/**
+ * Checks a module's tournament options with its `tournamentConfig`. Modules without options
+ * store `{}`.
+ */
 export function parseModuleConfig(
 	module: AuthModule,
 	raw: Record<string, unknown>
 ): { ok: true; config: Record<string, unknown> } | { ok: false; error: string } {
-	if (!module.tournamentConfig) return { ok: true, config: raw };
+	if (!module.tournamentConfig) return { ok: true, config: {} };
 	const parsed = module.tournamentConfig.safeParse(raw);
 	if (!parsed.success) {
-		return { ok: false, error: `${module.name}: ${parsed.error.issues[0].message}` };
+		return {
+			ok: false,
+			error: m.requirements_error_config({
+				module: module.name,
+				error: parsed.error.issues[0].message
+			})
+		};
 	}
 	return { ok: true, config: parsed.data as Record<string, unknown> };
 }

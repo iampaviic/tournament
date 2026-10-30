@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { m } from '#lib/paraglide/messages.js';
 
 export const USERNAME_MIN = 3;
 export const USERNAME_MAX = 32;
@@ -7,9 +8,9 @@ export const usernameSchema = z
 	.string()
 	.trim()
 	.toLowerCase()
-	.min(USERNAME_MIN, `Username must be at least ${USERNAME_MIN} characters.`)
-	.max(USERNAME_MAX, `Username must be at most ${USERNAME_MAX} characters.`)
-	.regex(/^[a-z0-9_-]+$/, 'Username may only contain lowercase letters, digits, - and _.');
+	.min(USERNAME_MIN, { error: () => m.validation_username_min({ min: USERNAME_MIN }) })
+	.max(USERNAME_MAX, { error: () => m.validation_username_max({ max: USERNAME_MAX }) })
+	.regex(/^[a-z0-9_-]+$/, { error: () => m.validation_username_format() });
 
 /** Turns a provider username like "Jöhn.Doe" into a valid handle like "john-doe". */
 export function slugifyUsername(input: string): string {

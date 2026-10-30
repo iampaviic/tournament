@@ -4,9 +4,11 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
+	import LiveStatus from '#lib/components/LiveStatus.svelte';
 	import MatchChat from '#lib/components/MatchChat.svelte';
 	import MatchLines from '#lib/components/MatchLines.svelte';
 	import ScoreForm from '#lib/components/ScoreForm.svelte';
+	import { mergeMessages } from '#lib/chat.ts';
 	import { formatScore } from '#lib/format.ts';
 	import { matchContext, matchStatusLabel, progressTone } from '#lib/labels.ts';
 	import { listen } from '#lib/live.ts';
@@ -41,19 +43,20 @@
 			(data.side !== null && match.helpRequested)
 	);
 
-	let messages = $derived(data.messages);
-	let connected = $state(false);
+	/** Messages received live; merged by id, so a reload that missed one doesn't drop it. */
+	let received = $state<ChatMessage[]>([]);
+	const messages = $derived(mergeMessages(data.messages, received));
+	let connected = $state<boolean | null>(null);
 	// A string, so reloading the page data doesn't reconnect.
 	const events = $derived(`${page.url.pathname}/events`);
 	$effect(() =>
 		listen(
 			events,
 			{
-				chat: (received) => {
+				chat: (payload) => {
 					// Sent as JSON, so the date is a string.
-					const message = received as ChatMessage;
-					if (messages.some((existing) => existing.id === message.id)) return;
-					messages = [...messages, { ...message, createdAt: new Date(message.createdAt) }];
+					const message = payload as ChatMessage;
+					received = [...received, { ...message, createdAt: new Date(message.createdAt) }];
 				},
 				update: () => invalidateAll()
 			},
@@ -61,6 +64,11 @@
 		)
 	);
 </script>
+
+<svelte:head>
+	<title>{m.match_number({ number: match.number })} · {data.tournament.name} · {m.app_name()}</title
+	>
+</svelte:head>
 
 {#snippet reported()}
 	{#each match.reports as report (report.side)}
@@ -87,9 +95,7 @@
 			>{matchStatusLabel(match.progress)}</span
 		>
 		{#if match.helpRequested}<span class="badge danger">{m.match_help()}</span>{/if}
-		<span class="live" class:on={connected} data-testid="live"
-			>{connected ? m.live_on() : m.live_off()}</span
-		>
+		<LiveStatus {connected} />
 	</div>
 </div>
 
@@ -191,7 +197,7 @@
 						/>
 						{#if match.result}
 							<form method="POST" action="?/clear" use:enhance>
-								<button class="btn small" type="submit">{m.matches_clear()}</button>
+								<button class="btn small danger" type="submit">{m.matches_clear()}</button>
 							</form>
 						{/if}
 					</div>
@@ -238,26 +244,6 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 0.5rem;
-	}
-
-	.live {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-size: var(--fs-small);
-		color: var(--text-muted);
-
-		&::before {
-			content: '';
-			width: 0.5rem;
-			height: 0.5rem;
-			border-radius: 50%;
-			background: var(--control);
-		}
-
-		&.on::before {
-			background: var(--success);
-		}
 	}
 
 	.layout {

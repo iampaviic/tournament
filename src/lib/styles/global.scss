@@ -132,6 +132,28 @@ table,
 	font-variant-numeric: tabular-nums;
 }
 
+// Focused by the skip link or by script, not by the user tabbing to it.
+[tabindex='-1']:focus {
+	outline: none;
+}
+
+// Off-screen until a keyboard user tabs to it.
+.skip-link {
+	position: absolute;
+	top: 0.5rem;
+	left: 0.5rem;
+	z-index: 10;
+	padding: 0.5rem 1rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	background: var(--surface);
+	transform: translateY(-200%);
+
+	&:focus {
+		transform: none;
+	}
+}
+
 .container {
 	width: 100%;
 	max-width: calc(var(--content-width) + 2rem);

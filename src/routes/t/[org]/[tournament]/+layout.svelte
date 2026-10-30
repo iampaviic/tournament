@@ -2,8 +2,9 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
-	import { formatDate } from '#lib/format.ts';
+	import { formatDateTime } from '#lib/format.ts';
 	import { statusLabel, statusTone } from '#lib/labels.ts';
+	import SteamGame from '#lib/components/SteamGame.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -27,10 +28,16 @@
 			label: m.t_matches
 		}
 	]);
+	/** The Overview keeps the tournament's name as its title. */
+	const section = $derived(
+		tabs.find((tab) => tab.route === page.route.id && tab.route !== '/t/[org]/[tournament]')
+	);
 </script>
 
 <svelte:head>
-	{#if !isAdmin}<title>{data.tournament.name} · {m.app_name()}</title>{/if}
+	{#if !isAdmin}<title
+			>{section ? `${section.label()} · ` : ''}{data.tournament.name} · {m.app_name()}</title
+		>{/if}
 </svelte:head>
 
 {#if isAdmin}
@@ -46,10 +53,13 @@
 				>
 				{#if data.tournament.startsAt}
 					{m.t_starts({
-						date: formatDate(data.tournament.startsAt, { dateStyle: 'medium', timeStyle: 'short' })
+						date: formatDateTime(data.tournament.startsAt)
 					})}
 				{/if}
 			</p>
+			{#if data.tournament.game}
+				<div class="game"><SteamGame game={data.tournament.game} width={184} /></div>
+			{/if}
 		</div>
 		{#if data.isMember}
 			<a class="btn small" href={resolve('/t/[org]/[tournament]/admin', params)}>{m.t_manage()}</a>
@@ -100,6 +110,10 @@
 			align-items: center;
 			gap: 0.75rem;
 			margin: 0;
+		}
+
+		.game {
+			margin-top: 0.75rem;
 		}
 	}
 </style>

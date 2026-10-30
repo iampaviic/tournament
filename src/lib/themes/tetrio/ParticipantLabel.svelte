@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
 	import type { ParticipantLabelProps } from '../types';
 	import { flag, rankColor } from './ranks';
 
@@ -11,10 +12,10 @@
 <span class="label">
 	{#if countryFlag}<span class="flag" title={country}>{countryFlag}</span>{/if}
 	<span class="name">{participant.name}</span>
-	{#if tr}<span class="tr" title="{tr} TR">{tr}</span>{/if}
+	{#if tr}<span class="tr" title={m.tetrio_tr({ tr })}>{tr}</span>{/if}
 	{#if rank}
 		<span class="rank" style:--rank={rankColor(rank)} title={rank}>
-			{rank === 'Unranked' ? '?' : rank}
+			{rank === m.tetrio_unranked() ? '?' : rank}
 		</span>
 	{/if}
 </span>

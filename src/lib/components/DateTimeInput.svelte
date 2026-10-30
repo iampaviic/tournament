@@ -3,9 +3,12 @@
 		id: string;
 		name: string;
 		value: Date | null;
+		/** Ids of the hint and error shown with the field. */
+		describedby?: string;
+		invalid?: boolean;
 	}
 
-	let { id, name, value }: Props = $props();
+	let { id, name, value, describedby, invalid = false }: Props = $props();
 
 	/** `YYYY-MM-DDTHH:mm` in the browser's time zone, as `datetime-local` inputs expect. */
 	const toLocal = (date: Date) => {
@@ -18,5 +21,11 @@
 	const iso = $derived(local ? new Date(local).toISOString() : '');
 </script>
 
-<input {id} type="datetime-local" bind:value={local} />
+<input
+	{id}
+	type="datetime-local"
+	bind:value={local}
+	aria-describedby={describedby}
+	aria-invalid={invalid ? 'true' : undefined}
+/>
 <input type="hidden" {name} value={iso} />

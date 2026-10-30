@@ -29,7 +29,11 @@ export const updateTournamentBody = tournamentSchema
 			.datetime({ offset: true })
 			.transform((value) => new Date(value))
 			.nullable()
-			.describe('When it starts, e.g. `2030-05-01T18:00:00Z`, or `null`.')
+			.describe('When it starts, e.g. `2030-05-01T18:00:00Z`, or `null`.'),
+		game: z
+			.object({ appId: z.int().positive() })
+			.nullable()
+			.describe('The Steam game, by app id (see `searchSteamApps`); `null` clears it.')
 	})
 	.partial()
 	.describe(
@@ -113,6 +117,15 @@ export const messageBody = z
 
 // Responses. Dates are ISO 8601 strings.
 
+export const gameResource = z
+	.object({
+		appId: z.int().describe('Its Steam app id.'),
+		name: z.string(),
+		headerImage: z.url().describe('Its header image on the Steam CDN.')
+	})
+	.describe('A Steam game.')
+	.register(components, { id: 'Game' });
+
 export const tournamentResource = z
 	.object({
 		id: z.uuid(),
@@ -125,6 +138,7 @@ export const tournamentResource = z
 		startsAt: z.iso.datetime().nullable(),
 		participantLimit: z.int().nullable().describe('`null` for no limit.'),
 		themeId: z.string().describe('The bracket theme.'),
+		game: gameResource.nullable(),
 		createdAt: z.iso.datetime()
 	})
 	.describe('A tournament of the organization.')
@@ -137,6 +151,7 @@ export const tournamentSummaryResource = z
 		name: z.string(),
 		status: z.enum(tournamentStatus.enumValues),
 		startsAt: z.iso.datetime().nullable(),
+		game: gameResource.nullable(),
 		participants: z.int().describe('How many have signed up.')
 	})
 	.describe('A tournament in a list.')
@@ -192,14 +207,13 @@ export const participantResource = z
 	.describe('A participant of the tournament.')
 	.register(components, { id: 'Participant' });
 
-/** A match's status as players see it. */
+/** A match's status as players see it. Byes aren't listed, so they have no status here. */
 const MATCH_STATUSES = [
 	'waiting',
 	'ready',
 	'reported',
 	'disputed',
 	'completed',
-	'bye',
 	'skipped'
 ] as const satisfies readonly MatchProgress[];
 
@@ -291,4 +305,8 @@ export const matchQuery = z.object({
 		.optional()
 		.describe('Only matches of this stage: 0 is the first.'),
 	status: z.enum(MATCH_STATUSES).optional().describe('Only matches with this status.')
+});
+
+export const steamAppsQuery = z.object({
+	q: z.string().trim().min(1).max(100).describe("Part of the game's name.")
 });

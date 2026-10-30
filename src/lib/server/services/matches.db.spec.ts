@@ -10,6 +10,8 @@ import {
 } from '#lib/server/db/schema.ts';
 import { subscribe, type TournamentEvent } from '#lib/server/events.ts';
 import { createUser, resetDatabase } from '#lib/server/testing/factories.ts';
+import { DEFAULT_STAGE_SETTINGS } from '#lib/tournaments.ts';
+import { load as loadRoom } from '../../../routes/t/[org]/[tournament]/matches/[id]/+page.server';
 import { createApiKey, listApiKeys, revokeApiKey, verifyApiKey } from './apiKeys';
 import { listMessages, postMessage } from './chat';
 import {
@@ -25,7 +27,7 @@ import {
 import { createOrganization } from './organizations';
 import { addParticipant, listParticipants } from './participants';
 import { getBracket, startTournament } from './stages';
-import { createTournament, getTournamentById, setStatus } from './tournaments';
+import { createTournament, getTournamentById, setStatus, setStructure } from './tournaments';
 
 let owner: User;
 let org: Organization;
@@ -279,6 +281,46 @@ describe('help requests', () => {
 		await reportResult(tournament, semi.id, p4.userId, [2, 0]);
 		expect((await item(semi.id)).helpRequested).toBe(false);
 	});
+
+	it("can't be raised for a match that isn't being played", async () => {
+		const [p1] = await start();
+		const final = await match('M2-1');
+		await expect(requestHelp(tournament, final.id, p1.userId)).rejects.toThrow(
+			'Help can only be requested while the match is being played.'
+		);
+		expect((await item(final.id)).helpRequested).toBe(false);
+	});
+
+	it("can't be raised once the tournament is over", async () => {
+		const [p1, p2] = await start(2);
+		const final = await match('M1-1');
+		await reportResult(tournament, final.id, p1.userId, [2, 0]);
+		await reportResult(tournament, final.id, p2.userId, [2, 0]);
+		expect((await reload()).status).toBe('completed');
+
+		await expect(requestHelp(tournament, final.id, p1.userId)).rejects.toThrow(
+			'Help can only be requested while the match is being played.'
+		);
+		expect((await item(final.id)).helpRequested).toBe(false);
+	});
+});
+
+describe('draws', () => {
+	it('are agreed in round robin when both players report them', async () => {
+		await setStructure(tournament, [
+			{ type: 'round_robin', settings: { ...DEFAULT_STAGE_SETTINGS } }
+		]);
+		const [p1, p2] = await start(2);
+		const [stage] = await getBracket(tournament.id);
+		const [only] = stage.groups[0].matches;
+
+		expect(await reportResult(tournament, only.id, p1.userId, [1, 1])).toBe('saved');
+		expect(await reportResult(tournament, only.id, p2.userId, [1, 1])).toBe('agreed');
+		expect(await item(only.id)).toMatchObject({
+			status: 'completed',
+			result: { winner: null, scores: [1, 1] }
+		});
+	});
 });
 
 describe('match queue', () => {
@@ -350,6 +392,56 @@ describe('chat', () => {
 		const [{ id }] = await listApiKeys(org.id);
 		await revokeApiKey(org.id, id);
 		expect((await listMessages(semi.id)).map((m) => m.apiKey)).toEqual(['Bot']);
+	});
+
+	it("doesn't find a match of another tournament", async () => {
+		await start();
+		let other = await createTournament(org.id, { name: 'Other', slug: 'other' });
+		for (const name of ['q1', 'q2']) {
+			await createUser(name);
+			await addParticipant(other, name);
+		}
+		await setStatus(other, 'registration');
+		other = (await getTournamentById(other.id))!;
+		await startTournament(other);
+		const [otherStage] = await getBracket(other.id);
+		const foreign = otherStage.groups[0].matches[0];
+
+		await expect(
+			postMessage(tournament, foreign.id, { userId: owner.id, organizer: true }, 'hi')
+		).rejects.toMatchObject({ kind: 'not_found' });
+		expect(await listMessages(foreign.id)).toEqual([]);
+	});
+});
+
+describe('match room', () => {
+	/** The room's page data for the owner, a member who isn't playing. */
+	async function room(matchId: string, trusted: boolean) {
+		const event = {
+			params: { org: 'club', tournament: 'cup', id: matchId },
+			locals: { user: owner, session: null, trusted },
+			url: new URL(`http://localhost/t/club/cup/matches/${matchId}`)
+		};
+		return loadRoom(event as unknown as Parameters<typeof loadRoom>[0]);
+	}
+
+	it('only gives organizer tools to members with a trusted session', async () => {
+		await start();
+		const semi = await match('M1-1');
+
+		expect(await room(semi.id, false)).toMatchObject({
+			side: null,
+			organizer: false,
+			canSet: false,
+			canPost: false,
+			canReport: false
+		});
+		expect(await room(semi.id, true)).toMatchObject({
+			side: null,
+			organizer: true,
+			canSet: true,
+			canPost: true
+		});
 	});
 });
 

@@ -22,8 +22,15 @@
 		<div class="row">
 			<div class="field grow">
 				<label for="username">{m.participants_add()}</label>
-				<input id="username" name="username" type="text" required autocomplete="off" />
-				<span class="hint">{m.participants_add_hint()}</span>
+				<input
+					id="username"
+					name="username"
+					type="text"
+					required
+					autocomplete="off"
+					aria-describedby="username-hint"
+				/>
+				<span class="hint" id="username-hint">{m.participants_add_hint()}</span>
 			</div>
 			<button class="btn primary" type="submit">{m.participants_add_submit()}</button>
 		</div>

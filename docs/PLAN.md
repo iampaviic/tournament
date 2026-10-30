@@ -26,7 +26,7 @@ src/
       db/                # schema.ts, index.ts, migrations
       auth/              # session.ts (tokens, cookies), guards (requireUser, requireTrusted, requireOrgRole, requireApiKey)
       modules/           # AuthModule interface, registry, instance config; auth/{dev,discord,tetrio}
-      services/          # organizations, tournaments, participants, matches, chat, apiKeys
+      services/          # organizations, tournaments, participants, matches, chat, apiKeys, profiles, steam
       api/               # endpoint definitions, error envelope, zod schemas -> OpenAPI
       events.ts          # in-process pub/sub (match chat / match updates -> SSE)
     themes/              # bracket themes registry: default/, tetrio/
@@ -72,10 +72,11 @@ interface AuthModule<Cfg = unknown> {
 
 - `users` (username, displayName, bio, avatar, showResults, showActivity, isInstanceAdmin) · `identities` (userId, moduleId, providerUserId, data jsonb, fetchedAt; unique(moduleId, providerUserId)) · `sessions` (id = sha256(token), userId, authModuleId, expiresAt)
 - `organizations` (slug, name, description) · `org_members` (role: owner|admin) · `api_keys` (orgId, prefix, sha256 hash, name, createdBy, lastUsedAt; revoking deletes the row)
-- `tournaments` (orgId, slug unique per org, name, description, startsAt, participantLimit, status: draft|registration|check_in|running|completed, themeId) · `tournament_requirements` (moduleId, config jsonb)
+- `tournaments` (orgId, slug unique per org, name, description, startsAt, participantLimit, status: draft|registration|check_in|running|completed, themeId, game jsonb: { appId, name, headerImage }) · `tournament_requirements` (moduleId, config jsonb)
 - `participants` (tournamentId, userId, seed, checkedInAt, finalRank)
 - `stages` (tournamentId, index 0|1, type, settings jsonb: groupCount, advancePerGroup, thirdPlaceMatch, grandFinal, doubleRoundRobin, swissRounds, scoring; status; groups jsonb = participant ids per group)
 - `matches` (stageId, groupId, the engine template: templateId, side, round, position, slot sources; result: entrants, scores, winner; cached p1/p2 participantId and status for queries; helpRequested) · `match_reports` (by participant/organizer/api key, scores) · `match_messages` (matchId, authorId or apiKeyName, asOrganizer, body, createdAt)
+- `steam_apps` (appId, name: the cached Steam game list) · `steam_app_list` (one `games` row: fetchedAt, attemptedAt, appCount)
 
 ### Bracket engine (`src/lib/brackets`, pure + exhaustively unit-tested) ✅
 
@@ -106,22 +107,22 @@ Covers tournaments (CRUD, open/close registration, check-in, start/advance stage
 
 ### Integrations
 
-Steam game picker: search `IStoreService/GetAppList` with a server-side key and cache it in the DB, then store `{appId, name, header image}` on the tournament. It isn't an auth module.
+Steam game picker: search `IStoreService/GetAppList` with a server-side key and cache it in the DB, then store `{appId, name, header image}` on the tournament. It isn't an auth module. The cached list is refreshed by the first search after it is a day old; without `STEAM_API_KEY` the picker is hidden.
 
 ## Milestones
 
-| #         | Scope                                                                                                                                                | Done when                                                            |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| **M0** ✅ | Scaffold, tooling, Docker/compose, CI, docs/PLAN.md                                                                                                  | `pnpm check/lint/test` green in CI, image builds                     |
-| **M1** ✅ | Sessions, module interface/registry, dev + discord + tetrio modules, login/link identities, settings, basic profile                                  | Dev login e2e passes. Discord/tetrio callbacks pass with mocked HTTP |
-| M2 ✅     | Organizations: create, public page (about/upcoming/archive), admin (settings, members, API keys), trust guard                                        | Untrusted session blocked from admin                                 |
-| M3 ✅     | Bracket engine (pure lib)                                                                                                                            | Property and fixture tests for all 4 types + groups                  |
-| M4 ✅     | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
-| M5 ✅     | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |
-| M6 ✅     | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                    |
-| M7 ✅     | REST API + OpenAPI + docs page                                                                                                                       | API e2e: create → start → report via key                             |
-| M8        | Public profile with history/results + visibility, Steam game picker, polish/i18n audit                                                               |                                                                      |
-| M9        | Deploy: Podman on VPS, Apache vhost (SSE: `flushpackets=on`, long timeout), backups, e2e suite in CI                                                 | Live on VPS                                                          |
+| #         | Scope                                                                                                                                                | Done when                                                                                                                                                                                                                                                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **M0** ✅ | Scaffold, tooling, Docker/compose, CI, docs/PLAN.md                                                                                                  | `pnpm check/lint/test` green in CI, image builds                                                                                                                                                                                                                               |
+| **M1** ✅ | Sessions, module interface/registry, dev + discord + tetrio modules, login/link identities, settings, basic profile                                  | Dev login e2e passes. Discord/tetrio callbacks pass with mocked HTTP                                                                                                                                                                                                           |
+| M2 ✅     | Organizations: create, public page (about/upcoming/archive), admin (settings, members, API keys), trust guard                                        | Untrusted session blocked from admin                                                                                                                                                                                                                                           |
+| M3 ✅     | Bracket engine (pure lib)                                                                                                                            | Property and fixture tests for all 4 types + groups                                                                                                                                                                                                                            |
+| M4 ✅     | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                                                                                                                                                                                                                           |
+| M5 ✅     | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                                                                                                                                                                                                                                     |
+| M6 ✅     | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                                                                                                                                                                                                                              |
+| M7 ✅     | REST API + OpenAPI + docs page                                                                                                                       | API e2e: create → start → report via key                                                                                                                                                                                                                                       |
+| **M8** ✅ | Public profile with history/results + visibility, Steam game picker, polish/i18n audit                                                               | Profile e2e: history with final rank and record, hidden from others (not the owner) by showResults/showActivity. Steam cache tests with mocked fetch, picker e2e on a seeded cache, `game` set and cleared over REST. M6/M7 findings fixed, i18n guard and a11y checklist done |
+| M9        | Deploy: Podman on VPS, Apache vhost (SSE: `flushpackets=on`, long timeout), backups, e2e suite in CI                                                 | Live on VPS                                                                                                                                                                                                                                                                    |
 
 ## Implementation notes (M0 + M1)
 
@@ -164,6 +165,15 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 - Results set with a key are `api_key` reports through the organizer override; `POST …/reports` reports for a participant with the players' rules. Key messages are organizer messages labelled with the key's name, copied to `match_messages.api_key_name` so revoking the key keeps the label.
 - The API deletes drafts only; the admin page still deletes anything after typing the address.
 - `/docs/api` renders the generated document, linked from the footer and the API keys tab.
+
+## Implementation notes (M8)
+
+- Profiles: results are the tournaments a user plays or played (running or completed) with final rank and won–drawn–lost record; activity is what M1's setting said, the tournaments they're registered for, plus their organizations, which aren't public anywhere else. `services/profiles.ts` leaves hidden sections out of the page data; the owner sees everything with a note. Only completed matches count, so byes and unplayed matches don't. Profiles stay out of the REST API.
+- Steam: `IStoreService/GetAppList` (games only, paginated by `last_appid`, 15 s per request) is cached in `steam_apps`; `steam_app_list` records `fetched_at`. A search on a list older than a day refreshes it in the background (the very first one waits), one refresh at a time per process and, through a claim on `attempted_at`, across processes, which also backs off 10 minutes after a failure. A refresh replaces the list in one transaction, so a failed one keeps the old list. Errors are logged with the message only (the URL holds the key). Without `STEAM_API_KEY` the picker is hidden; tournaments store `{ appId, name, headerImage }`, so their game still shows.
+- `GET /api/v1/steam/apps` searches the same cache (empty without a key), and `game: { appId } | null` is set with PATCH (an unknown app is 422). No CSP is configured; one added in M9 needs `img-src https://shared.akamai.steamstatic.com data:` besides the avatar hosts.
+- i18n: service, guard and module messages go through Paraglide when the error is created, Zod messages lazily (`{ error: () => m.…() }`); API-only and operator messages stay English, and API clients get the base locale. The strategy adds `preferredLanguage`, so a new locale needs only `messages/<locale>.json` and a `locales` entry. `messages.spec.ts` checks every key is used and no `.svelte` markup has hardcoded text.
+- Accessibility: a skip link, labelled navs, a global `:focus-visible` outline, hints and errors tied to their fields with `aria-describedby`/`aria-invalid`, a page title per tab, no skipped heading levels. `contrast.spec.ts` checks the token pairs in both color modes (two tokens were nudged to pass 4.5:1).
+- M6/M7 follow-ups: live updates reconnect after HTTP errors (EventSource only retries network errors) and the badge starts at "Connecting…"; chat messages received live are merged by id with reloaded ones; API writes on a bye match are 404 before anything is written; `bye` isn't an API match status; option-less requirement configs are stored as `{}`.
 
 ## M0 + M1 in detail
 

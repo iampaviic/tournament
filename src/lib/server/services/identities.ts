@@ -3,6 +3,7 @@ import { db, type Transaction } from '#lib/server/db/index.ts';
 import { identities, users, type Identity } from '#lib/server/db/schema.ts';
 import type { AuthModule, ExternalIdentity } from '#lib/server/modules/types.ts';
 import { usernameCandidates } from '#lib/server/auth/username.ts';
+import { m } from '#lib/paraglide/messages.js';
 import { ServiceError } from './errors';
 
 /** A sign-in or account-linking failure whose message can be shown to the user. */
@@ -71,7 +72,7 @@ export async function linkIdentity(userId: string, module: AuthModule, external:
 	await db.transaction(async (tx) => {
 		const existing = await findIdentity(tx, module.id, external.providerUserId);
 		if (existing && existing.userId !== userId) {
-			throw new IdentityError(`This ${module.name} account is already linked to another user.`);
+			throw new IdentityError(m.identity_error_taken({ module: module.name }));
 		}
 		if (existing) {
 			await tx.update(identities).set(profile(external)).where(eq(identities.id, existing.id));
@@ -83,9 +84,7 @@ export async function linkIdentity(userId: string, module: AuthModule, external:
 			.from(identities)
 			.where(and(eq(identities.userId, userId), eq(identities.moduleId, module.id)));
 		if (other) {
-			throw new IdentityError(
-				`You already linked a different ${module.name} account. Unlink it first.`
-			);
+			throw new IdentityError(m.identity_error_other({ module: module.name }));
 		}
 		await tx.insert(identities).values({
 			userId,
@@ -111,7 +110,7 @@ export async function unlinkIdentity(userId: string, moduleId: string) {
 			.select({ total: count() })
 			.from(identities)
 			.where(eq(identities.userId, userId));
-		if (total <= 1) throw new IdentityError("You can't remove your only sign-in method.");
+		if (total <= 1) throw new IdentityError(m.identity_error_last());
 		await tx
 			.delete(identities)
 			.where(and(eq(identities.userId, userId), eq(identities.moduleId, moduleId)));
@@ -124,13 +123,13 @@ export async function unlinkIdentity(userId: string, moduleId: string) {
  */
 export async function refreshIdentity(userId: string, module: AuthModule, now = Date.now()) {
 	if (!module.refreshProfile) {
-		throw new IdentityError(`${module.name} data can only be updated by signing in again.`);
+		throw new IdentityError(m.identity_error_no_refresh({ module: module.name }));
 	}
 	const [identity] = await db
 		.select()
 		.from(identities)
 		.where(and(eq(identities.userId, userId), eq(identities.moduleId, module.id)));
-	if (!identity) throw new IdentityError(`No ${module.name} account is linked.`);
+	if (!identity) throw new IdentityError(m.identity_error_not_linked({ module: module.name }));
 	if (module.refreshInterval && now - identity.fetchedAt.getTime() < module.refreshInterval) {
 		return false;
 	}

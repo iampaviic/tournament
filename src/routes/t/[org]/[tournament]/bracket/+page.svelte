@@ -56,9 +56,10 @@
 						</table>
 					{:else if group.standings.some((s) => s.rank !== null)}
 						<div class="card placements">
-							<h4>
+							<!-- Under the group's heading, or the stage's when the stage has one group. -->
+							<svelte:element this={stage.groups.length > 1 ? 'h4' : 'h3'} class="placements-title">
 								{stage.status === 'completed' ? m.placements_title() : m.placements_current()}
-							</h4>
+							</svelte:element>
 							<ol>
 								{#each group.standings.filter((s) => s.rank !== null) as standing (standing.participantId)}
 									<li><span class="rank">{standing.rank}</span> {name(standing.participantId)}</li>
@@ -111,7 +112,7 @@
 			font-size: var(--fs-section);
 		}
 
-		h4 {
+		.placements-title {
 			font-size: var(--fs-body);
 			color: var(--text-muted);
 			margin: 1rem 0 0.5rem;
@@ -154,7 +155,7 @@
 		max-width: 24rem;
 		margin-bottom: 1rem;
 
-		h4 {
+		.placements-title {
 			margin-top: 0;
 		}
 

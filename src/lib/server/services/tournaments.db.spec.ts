@@ -5,12 +5,15 @@ import {
 	identities,
 	matches,
 	participants,
+	steamApps,
 	type Tournament,
 	type User
 } from '#lib/server/db/schema.ts';
 import { tetrioModule } from '#lib/server/modules/auth/tetrio.ts';
-import { createUser, resetDatabase } from '#lib/server/testing/factories.ts';
+import { mockFetch } from '#lib/server/testing/fetch.ts';
+import { createUser, resetDatabase, seedSteamApps } from '#lib/server/testing/factories.ts';
 import { DEFAULT_STAGE_SETTINGS, type StageConfig } from '#lib/tournaments.ts';
+import { load as loadGeneral } from '../../../routes/t/[org]/[tournament]/admin/+page.server';
 import { signIn } from './identities';
 import { createOrganization } from './organizations';
 import {
@@ -26,11 +29,15 @@ import {
 } from './participants';
 import { clearMatchResult, setMatchResult } from './matches';
 import { getBracket, startNextStage, startTournament } from './stages';
+import { createSteamApps, type SteamApps } from './steam';
 import {
 	createTournament,
 	deleteDraftTournament,
 	getStructure,
 	getTournamentById,
+	listOrgTournaments,
+	listUserTournaments,
+	setGame,
 	setRequirements,
 	setStatus,
 	setStructure,
@@ -428,5 +435,90 @@ describe('bracket themes', () => {
 		});
 		expect(shown[other.id].fields).toEqual({});
 		expect((await bracketParticipants(tournament.id))[ranked.id].fields).toEqual({});
+	});
+});
+
+describe('game', () => {
+	const portal = {
+		appId: 400,
+		name: 'Portal',
+		headerImage: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/400/header.jpg'
+	};
+	let apps: SteamApps;
+
+	beforeEach(async () => {
+		await seedSteamApps([
+			{ appId: 400, name: 'Portal' },
+			{ appId: 620, name: 'Portal 2' }
+		]);
+		apps = createSteamApps({ apiKey: 'test', fetch: mockFetch({}).fetch });
+	});
+
+	it('stores the picked game', async () => {
+		expect((await setGame(tournament, 400, apps)).game).toEqual(portal);
+		expect((await reload()).game).toEqual(portal);
+	});
+
+	it('keeps the current game without looking it up', async () => {
+		await setGame(tournament, 400, apps);
+		await reload();
+		await db.delete(steamApps);
+		expect((await setGame(tournament, 400, apps)).game).toEqual(portal);
+		expect((await setGame(tournament, 400, createSteamApps({ apiKey: undefined }))).game).toEqual(
+			portal
+		);
+		await expect(setGame(tournament, 620, apps)).rejects.toMatchObject({ kind: 'invalid' });
+	});
+
+	it('rejects unknown games, and any game without a Steam API key', async () => {
+		await expect(setGame(tournament, 999, apps)).rejects.toMatchObject({
+			kind: 'invalid',
+			message: "That Steam game wasn't found."
+		});
+		await expect(
+			setGame(tournament, 400, createSteamApps({ apiKey: undefined }))
+		).rejects.toMatchObject({
+			kind: 'invalid',
+			message: "Steam games aren't enabled on this instance."
+		});
+		expect((await reload()).game).toBeNull();
+	});
+
+	it('clears the game', async () => {
+		await setGame(tournament, 400, apps);
+		await reload();
+		expect((await setGame(tournament, null, apps)).game).toBeNull();
+		expect((await reload()).game).toBeNull();
+	});
+
+	it('hides the picker without a Steam API key, and still shows the stored game', async () => {
+		await setGame(tournament, 400, apps);
+		// The tests run without a key, so the General tab's own Steam cache is off.
+		const event = {
+			params: { org: 'club', tournament: 'cup' },
+			locals: { user: owner, session: null, trusted: true },
+			url: new URL('http://localhost/t/club/cup/admin?game=portal')
+		};
+		expect(await loadGeneral(event as unknown as Parameters<typeof loadGeneral>[0])).toMatchObject({
+			game: portal,
+			steam: null
+		});
+	});
+
+	it('shows the game in tournament lists', async () => {
+		await setGame(tournament, 620, apps);
+		await setStatus(tournament, 'registration');
+		await reload();
+		const fan = await createUser('fan');
+		await addParticipant(tournament, 'fan');
+
+		const [listed] = await listOrgTournaments(tournament.orgId);
+		expect(listed.game).toMatchObject({ appId: 620, name: 'Portal 2' });
+		const [joined] = await listUserTournaments(fan.id);
+		expect(joined).toMatchObject({
+			game: { appId: 620, name: 'Portal 2' },
+			participantId: expect.any(String),
+			createdAt: tournament.createdAt
+		});
 	});
 });

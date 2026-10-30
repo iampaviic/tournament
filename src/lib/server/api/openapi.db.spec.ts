@@ -78,7 +78,7 @@ describe('the API routes', () => {
 				served.add(endpoint!);
 			}
 		}
-		expect(served.size).toBe(29);
+		expect(served.size).toBe(30);
 		expect(served.size).toBe(endpoints.length);
 	});
 });
