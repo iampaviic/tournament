@@ -77,6 +77,14 @@ export async function getParticipant(tournamentId: string, userId: string) {
 	return row;
 }
 
+export async function getParticipantById(tournamentId: string, participantId: string) {
+	const [row] = await db
+		.select()
+		.from(participants)
+		.where(and(eq(participants.tournamentId, tournamentId), eq(participants.id, participantId)));
+	return row;
+}
+
 /** How a user's linked accounts measure up against each of the tournament's requirements. */
 export async function checkRequirements(
 	tournamentId: string,
@@ -179,18 +187,24 @@ export async function addParticipant(tournament: Tournament, username: string) {
 		.select({ id: users.id })
 		.from(users)
 		.where(eq(users.username, username.trim().toLowerCase()));
-	if (!user) throw new ServiceError(`There is no user called "${username}".`);
+	if (!user) throw new ServiceError(`There is no user called "${username}".`, 'invalid');
 	if (await getParticipant(tournament.id, user.id)) {
 		throw new ServiceError(`${username} is already registered.`);
 	}
-	await db.insert(participants).values({ tournamentId: tournament.id, userId: user.id });
+	const [row] = await db
+		.insert(participants)
+		.values({ tournamentId: tournament.id, userId: user.id })
+		.returning({ id: participants.id });
+	return row.id;
 }
 
 export async function removeParticipant(tournament: Tournament, participantId: string) {
 	assertNotStarted(tournament);
-	await db
+	const [row] = await db
 		.delete(participants)
-		.where(and(eq(participants.tournamentId, tournament.id), eq(participants.id, participantId)));
+		.where(and(eq(participants.tournamentId, tournament.id), eq(participants.id, participantId)))
+		.returning({ id: participants.id });
+	if (!row) throw new ServiceError('Participant not found.', 'not_found');
 }
 
 export async function setCheckedIn(
@@ -199,10 +213,12 @@ export async function setCheckedIn(
 	checkedIn: boolean
 ) {
 	assertNotStarted(tournament);
-	await db
+	const [row] = await db
 		.update(participants)
 		.set({ checkedInAt: checkedIn ? new Date() : null })
-		.where(and(eq(participants.tournamentId, tournament.id), eq(participants.id, participantId)));
+		.where(and(eq(participants.tournamentId, tournament.id), eq(participants.id, participantId)))
+		.returning({ id: participants.id });
+	if (!row) throw new ServiceError('Participant not found.', 'not_found');
 }
 
 /** Writes seeds 1…n in the given order. */
@@ -213,6 +229,22 @@ export async function writeSeeds(executor: Executor, tournamentId: string, order
 			.set({ seed: index + 1 })
 			.where(and(eq(participants.tournamentId, tournamentId), eq(participants.id, id)));
 	}
+}
+
+/** Organizer: seeds the participants in the given order, which must list each of them once. */
+export async function setSeeds(tournament: Tournament, order: string[]) {
+	assertNotStarted(tournament);
+	await db.transaction(async (tx) => {
+		const ids = (await listParticipants(tournament.id, tx)).map((p) => p.id);
+		if (
+			order.length !== ids.length ||
+			new Set(order).size !== order.length ||
+			order.some((id) => !ids.includes(id))
+		) {
+			throw new ServiceError('List every participant exactly once.', 'invalid');
+		}
+		await writeSeeds(tx, tournament.id, order);
+	});
 }
 
 /** Moves a participant one place up (-1) or down (+1) in the seeding. */

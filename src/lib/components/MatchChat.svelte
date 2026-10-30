@@ -20,8 +20,9 @@
 		{#each messages as message (message.id)}
 			<li>
 				<p class="meta">
-					<strong>{message.author.displayName}</strong>
+					<strong>{message.author?.displayName ?? message.apiKey}</strong>
 					{#if message.asOrganizer}<span class="badge">{m.chat_organizer()}</span>{/if}
+					{#if message.apiKey}<span class="badge">{m.chat_api_key()}</span>{/if}
 					<time class="muted" datetime={message.createdAt.toISOString()}
 						>{formatTime(message.createdAt)}</time
 					>

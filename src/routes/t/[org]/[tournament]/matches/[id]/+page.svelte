@@ -127,7 +127,13 @@
 				{#if match.status === 'waiting'}
 					<p class="muted">{m.room_waiting()}</p>
 				{:else if match.status === 'completed'}
-					<p>{match.decidedBy ? m.room_by_organizer() : m.room_by_players()}</p>
+					<p>
+						{match.decidedBy === 'api_key'
+							? m.room_by_api_key()
+							: match.decidedBy
+								? m.room_by_organizer()
+								: m.room_by_players()}
+					</p>
 				{:else if match.progress === 'disputed'}
 					<p class="alert warning">{m.room_disputed()}</p>
 					{@render reported()}

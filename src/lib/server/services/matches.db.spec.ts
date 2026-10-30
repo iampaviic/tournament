@@ -2,15 +2,22 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { matchQueue } from '#lib/matchReports.ts';
 import { db } from '#lib/server/db/index.ts';
-import { matchReports, type Tournament, type User } from '#lib/server/db/schema.ts';
+import {
+	matchReports,
+	type Organization,
+	type Tournament,
+	type User
+} from '#lib/server/db/schema.ts';
 import { subscribe, type TournamentEvent } from '#lib/server/events.ts';
 import { createUser, resetDatabase } from '#lib/server/testing/factories.ts';
+import { createApiKey, listApiKeys, revokeApiKey, verifyApiKey } from './apiKeys';
 import { listMessages, postMessage } from './chat';
 import {
 	clearHelp,
 	clearMatchResult,
 	getMatch,
 	listMatches,
+	reportForParticipant,
 	reportResult,
 	requestHelp,
 	setMatchResult
@@ -21,12 +28,13 @@ import { getBracket, startTournament } from './stages';
 import { createTournament, getTournamentById, setStatus } from './tournaments';
 
 let owner: User;
+let org: Organization;
 let tournament: Tournament;
 
 beforeEach(async () => {
 	await resetDatabase();
 	owner = await createUser('owner');
-	const org = await createOrganization(owner.id, { name: 'Club', slug: 'club', description: '' });
+	org = await createOrganization(owner.id, { name: 'Club', slug: 'club', description: '' });
 	tournament = await createTournament(org.id, { name: 'Cup', slug: 'cup' });
 });
 
@@ -57,6 +65,8 @@ const item = async (matchId: string) => (await getMatch(tournament.id, matchId))
 const storedReports = (matchId: string) =>
 	db.select().from(matchReports).where(eq(matchReports.matchId, matchId));
 const organizer = () => ({ userId: owner.id });
+const apiKeyId = async () =>
+	(await verifyApiKey((await createApiKey(org.id, 'Bot', owner.id)).key))!.id;
 
 describe('reporting', () => {
 	it('completes the match when both players report the same scores', async () => {
@@ -191,6 +201,65 @@ describe('reporting', () => {
 	});
 });
 
+describe('reporting with an API key', () => {
+	it('reports for both players with the same rules', async () => {
+		const [p1, , , p4] = await start();
+		const semi = await match('M1-1');
+		const keyId = await apiKeyId();
+
+		const by = (participantId: string) => ({ participantId, apiKeyId: keyId });
+		expect(await reportForParticipant(tournament, semi.id, by(p1.id), [2, 1])).toBe('saved');
+		expect(await reportForParticipant(tournament, semi.id, by(p4.id), [2, 1])).toBe('agreed');
+		expect(await item(semi.id)).toMatchObject({ status: 'completed', decidedBy: null });
+		expect(
+			(await storedReports(semi.id)).map((r) => [r.source, r.participantId, r.userId, r.apiKeyId])
+		).toEqual(
+			expect.arrayContaining([
+				['participant', p1.id, null, keyId],
+				['participant', p4.id, null, keyId]
+			])
+		);
+	});
+
+	it('disputes the match when a player and the key disagree', async () => {
+		const [p1, , , p4] = await start();
+		const semi = await match('M1-1');
+		const keyId = await apiKeyId();
+
+		await reportResult(tournament, semi.id, p1.userId, [2, 1]);
+		expect(
+			await reportForParticipant(
+				tournament,
+				semi.id,
+				{ participantId: p4.id, apiKeyId: keyId },
+				[1, 2]
+			)
+		).toBe('disputed');
+	});
+
+	it('only reports for the players of the match', async () => {
+		const [, p2] = await start();
+		const semi = await match('M1-1');
+		const keyId = await apiKeyId();
+
+		await expect(
+			reportForParticipant(tournament, semi.id, { participantId: p2.id, apiKeyId: keyId }, [2, 0])
+		).rejects.toMatchObject({ kind: 'invalid' });
+	});
+
+	it('sets results as the key', async () => {
+		await start();
+		const semi = await match('M1-1');
+		const keyId = await apiKeyId();
+
+		await setMatchResult(tournament, semi.id, [2, 0], { apiKeyId: keyId });
+		expect(await item(semi.id)).toMatchObject({ status: 'completed', decidedBy: 'api_key' });
+		expect((await storedReports(semi.id)).map((r) => [r.source, r.apiKeyId])).toEqual([
+			['api_key', keyId]
+		]);
+	});
+});
+
 describe('help requests', () => {
 	it('are raised by the players and cleared by organizers or a result', async () => {
 		const [p1, p2, , p4] = await start();
@@ -257,12 +326,30 @@ describe('chat', () => {
 		await postMessage(tournament, semi.id, { userId: p4.userId, organizer: true }, 'ok');
 
 		expect(
-			(await listMessages(semi.id)).map((m) => [m.author.username, m.body, m.asOrganizer])
+			(await listMessages(semi.id)).map((m) => [m.author?.username, m.body, m.asOrganizer])
 		).toEqual([
 			['p1', 'gl', false],
 			['owner', 'Play on', true],
 			['p4', 'ok', false]
 		]);
+	});
+
+	it("labels messages posted with an API key with the key's name", async () => {
+		await start();
+		const semi = await match('M1-1');
+		await createApiKey(org.id, 'Bot', owner.id);
+		const events: TournamentEvent[] = [];
+		const unsubscribe = subscribe(tournament.id, (event) => events.push(event));
+
+		const message = await postMessage(tournament, semi.id, { apiKeyName: 'Bot' }, 'Final is up');
+		unsubscribe();
+		expect(message).toMatchObject({ asOrganizer: true, author: null, apiKey: 'Bot' });
+		expect(events).toEqual([{ type: 'chat', matchId: semi.id, message }]);
+		expect(await listMessages(semi.id)).toEqual([message]);
+
+		const [{ id }] = await listApiKeys(org.id);
+		await revokeApiKey(org.id, id);
+		expect((await listMessages(semi.id)).map((m) => m.apiKey)).toEqual(['Bot']);
 	});
 });
 

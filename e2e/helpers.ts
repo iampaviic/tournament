@@ -28,6 +28,16 @@ export async function createTournament(page: Page, orgSlug: string, name: string
 	return new URL(page.url()).pathname.replace(/\/admin$/, '');
 }
 
+/** Creates an API key on the organization's API keys tab and returns it. */
+export async function createApiKey(page: Page, orgSlug: string, name: string) {
+	await page.goto(`/o/${orgSlug}/admin/api-keys`);
+	await page.getByLabel('Name', { exact: true }).fill(name);
+	await page.getByRole('button', { name: 'Create key' }).click();
+	const key = page.getByTestId('new-api-key');
+	await expect(key).toHaveText(/^tm_[0-9a-f]{8}_/);
+	return (await key.textContent())!;
+}
+
 /** A tab of the tournament admin. */
 export const adminTab = (page: Page, tab: string) =>
 	page.getByRole('navigation', { name: 'Tournament admin' }).getByRole('link', { name: tab });

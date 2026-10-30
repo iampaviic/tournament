@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
 	import { formatDate } from '#lib/format.ts';
 	import type { PageProps } from './$types';
@@ -14,7 +15,7 @@
 	}
 </script>
 
-<p class="muted">{m.api_keys_lead()}</p>
+<p class="muted">{m.api_keys_lead()} <a href={resolve('/docs/api')}>{m.api_keys_docs()}</a></p>
 
 {#if form?.error}
 	<p class="alert error" role="alert">{form.error}</p>

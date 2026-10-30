@@ -54,10 +54,37 @@ export function readModuleConfig(
 			raw[field.key] = field.type === 'number' ? Number(value) : value;
 		}
 	}
+	return parseModuleConfig(module, raw);
+}
+
+/** Checks a module's tournament options with its `tournamentConfig`. */
+export function parseModuleConfig(
+	module: AuthModule,
+	raw: Record<string, unknown>
+): { ok: true; config: Record<string, unknown> } | { ok: false; error: string } {
 	if (!module.tournamentConfig) return { ok: true, config: raw };
 	const parsed = module.tournamentConfig.safeParse(raw);
 	if (!parsed.success) {
 		return { ok: false, error: `${module.name}: ${parsed.error.issues[0].message}` };
 	}
 	return { ok: true, config: parsed.data as Record<string, unknown> };
+}
+
+/** Checks requirements sent to the REST API: enabled modules, each once, with valid options. */
+export function parseRequirements(
+	input: Requirement[],
+	modules: AuthModule[]
+): { ok: true; requirements: Requirement[] } | { ok: false; error: string } {
+	const requirements: Requirement[] = [];
+	for (const { moduleId, config } of input) {
+		const module = modules.find((m) => m.id === moduleId);
+		if (!module) return { ok: false, error: `There is no auth module called "${moduleId}".` };
+		if (requirements.some((r) => r.moduleId === moduleId)) {
+			return { ok: false, error: `${module.name} is required twice.` };
+		}
+		const parsed = parseModuleConfig(module, config);
+		if (!parsed.ok) return parsed;
+		requirements.push({ moduleId, config: parsed.config });
+	}
+	return { ok: true, requirements };
 }

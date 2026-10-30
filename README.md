@@ -90,6 +90,16 @@ Organizers pick a theme for each tournament's bracket in its admin Theme tab. In
 
 To add a theme, implement `BracketTheme` from `src/lib/themes/types.ts` (colors plus a `ParticipantLabel` component) and register it in `src/lib/themes/index.ts`.
 
+## REST API
+
+Organizations can run their tournaments over a REST API at `/api/v1`, e.g. from a Discord bot. Create a key in the organization admin on the **API keys** tab (it's shown only once) and send it with every request:
+
+```bash
+curl -H "Authorization: Bearer tm_…" http://localhost:5173/api/v1/tournaments
+```
+
+A key only sees its own organization's tournaments. Request and response bodies are JSON; send `Content-Type: application/json` on every POST, PUT, PATCH and DELETE, also without a body, or SvelteKit's CSRF check turns it away. The OpenAPI 3.1 document is at `/api/v1/openapi.json`, and `/docs/api` shows it as a reference.
+
 ## Deployment
 
 ```bash

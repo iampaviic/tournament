@@ -19,13 +19,16 @@ import {
 	checkIn,
 	listParticipants,
 	register,
+	removeParticipant,
 	setCheckedIn,
+	setSeeds,
 	unregister
 } from './participants';
 import { clearMatchResult, setMatchResult } from './matches';
 import { getBracket, startNextStage, startTournament } from './stages';
 import {
 	createTournament,
+	deleteDraftTournament,
 	getStructure,
 	getTournamentById,
 	setRequirements,
@@ -145,6 +148,55 @@ describe('tournament lifecycle', () => {
 		await expect(setRequirements(tournament, [])).rejects.toThrow(
 			'after the tournament has started'
 		);
+		await expect(setStructure(tournament, [stage('swiss')])).rejects.toMatchObject({
+			kind: 'conflict'
+		});
+	});
+
+	it('only deletes drafts without confirmation', async () => {
+		const draft = await createTournament(tournament.orgId, { name: 'Draft', slug: 'draft' });
+		await deleteDraftTournament(draft);
+		expect(await getTournamentById(draft.id)).toBeUndefined();
+
+		await setStatus(tournament, 'registration');
+		await reload();
+		await expect(deleteDraftTournament(tournament)).rejects.toMatchObject({ kind: 'conflict' });
+		expect(await getTournamentById(tournament.id)).toBeDefined();
+	});
+});
+
+describe('participants', () => {
+	it('seeds the participants in the given order', async () => {
+		const [p1, p2, p3] = await withPlayers(3);
+		await setSeeds(tournament, [p3.id, p1.id, p2.id]);
+		expect((await listParticipants(tournament.id)).map((p) => [p.displayName, p.seed])).toEqual([
+			['p3', 1],
+			['p1', 2],
+			['p2', 3]
+		]);
+
+		await expect(setSeeds(tournament, [p1.id, p2.id])).rejects.toMatchObject({ kind: 'invalid' });
+		await expect(setSeeds(tournament, [p1.id, p1.id, p2.id])).rejects.toMatchObject({
+			kind: 'invalid'
+		});
+
+		await setStatus(tournament, 'registration');
+		await reload();
+		await startTournament(tournament);
+		await reload();
+		await expect(setSeeds(tournament, [p1.id, p2.id, p3.id])).rejects.toThrow('already started');
+	});
+
+	it('tells unknown participants and users apart from phase errors', async () => {
+		await expect(removeParticipant(tournament, crypto.randomUUID())).rejects.toMatchObject({
+			kind: 'not_found'
+		});
+		await expect(setCheckedIn(tournament, crypto.randomUUID(), true)).rejects.toMatchObject({
+			kind: 'not_found'
+		});
+		await expect(addParticipant(tournament, 'nobody')).rejects.toMatchObject({
+			kind: 'invalid'
+		});
 	});
 });
 

@@ -10,7 +10,7 @@ FER "Programsko inženjerstvo" project. The team ran FERTRIS and found no flexib
 
 - Node 22, pnpm, SvelteKit 2 + Svelte 5 (runes), TypeScript (strict), SCSS (`sass-embedded`), `@sveltejs/adapter-node`
 - Drizzle ORM + `postgres` driver, drizzle-kit migrations
-- Zod v4 validates form actions and the REST API, and generates the OpenAPI spec (`zod-openapi`)
+- Zod v4 validates form actions and the REST API, and generates the OpenAPI spec (`z.toJSONSchema`)
 - A small in-house OAuth2 + PKCE client (no Arctic; it is deprecated on npm) and DB-backed sessions following the Lucia guide pattern
 - Paraglide JS (`en` only for now)
 - Vitest for unit/service tests, Playwright for e2e, ESLint + Prettier
@@ -24,10 +24,10 @@ src/
     brackets/            # PURE engine, no DB/IO: single-elim, double-elim, round-robin, swiss, groups, standings
     server/
       db/                # schema.ts, index.ts, migrations
-      auth/              # session.ts (tokens, cookies), guards (requireUser, requireTrusted, requireOrgRole)
+      auth/              # session.ts (tokens, cookies), guards (requireUser, requireTrusted, requireOrgRole, requireApiKey)
       modules/           # AuthModule interface, registry, instance config; auth/{dev,discord,tetrio}
       services/          # organizations, tournaments, participants, matches, chat, apiKeys
-      api/               # API-key auth, error envelope, zod schemas -> OpenAPI
+      api/               # endpoint definitions, error envelope, zod schemas -> OpenAPI
       events.ts          # in-process pub/sub (match chat / match updates -> SSE)
     themes/              # bracket themes registry: default/, tetrio/
     components/, styles/
@@ -38,6 +38,7 @@ src/
     t/[org]/[tournament]/       {home, bracket, matches, matches/[id], matches/[id]/events (SSE)}
     t/[org]/[tournament]/admin/ {general, auth, theme, structure, matches}
     api/v1/...                  # REST, Bearer API key
+    docs/api                    # API reference, built from the OpenAPI document
 ```
 
 **Core rule:** UI form actions and the REST endpoints both call the same `services/*` functions. This keeps the proposal's promise that everything in the admin UI is also reachable over REST. Authorization happens at the edge in guards (`requireOrgRole`, `requireTournamentAdmin`, and an API key guard in M7) that both UI and API use; services enforce the tournament's own rules (what can change in which phase).
@@ -74,7 +75,7 @@ interface AuthModule<Cfg = unknown> {
 - `tournaments` (orgId, slug unique per org, name, description, startsAt, participantLimit, status: draft|registration|check_in|running|completed, themeId) · `tournament_requirements` (moduleId, config jsonb)
 - `participants` (tournamentId, userId, seed, checkedInAt, finalRank)
 - `stages` (tournamentId, index 0|1, type, settings jsonb: groupCount, advancePerGroup, thirdPlaceMatch, grandFinal, doubleRoundRobin, swissRounds, scoring; status; groups jsonb = participant ids per group)
-- `matches` (stageId, groupId, the engine template: templateId, side, round, position, slot sources; result: entrants, scores, winner; cached p1/p2 participantId and status for queries; helpRequested) · `match_reports` (by participant/organizer/api key, scores) · `match_messages` (matchId, authorId, body, createdAt)
+- `matches` (stageId, groupId, the engine template: templateId, side, round, position, slot sources; result: entrants, scores, winner; cached p1/p2 participantId and status for queries; helpRequested) · `match_reports` (by participant/organizer/api key, scores) · `match_messages` (matchId, authorId or apiKeyName, asOrganizer, body, createdAt)
 
 ### Bracket engine (`src/lib/brackets`, pure + exhaustively unit-tested) ✅
 
@@ -118,7 +119,7 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 | M4 ✅     | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
 | M5 ✅     | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |
 | M6 ✅     | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                    |
-| M7        | REST API + OpenAPI + docs page                                                                                                                       | API e2e: create → start → report via key                             |
+| M7 ✅     | REST API + OpenAPI + docs page                                                                                                                       | API e2e: create → start → report via key                             |
 | M8        | Public profile with history/results + visibility, Steam game picker, polish/i18n audit                                                               |                                                                      |
 | M9        | Deploy: Podman on VPS, Apache vhost (SSE: `flushpackets=on`, long timeout), backups, e2e suite in CI                                                 | Live on VPS                                                          |
 
@@ -153,6 +154,16 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 - The admin Matches tab starts with the match queue: disputes, then help requests, then matches waiting for the second report, then ready ones; ties by stage, group and match number.
 - Match pages use `matchNumbers`, so byes have no page. Chat is readable by anyone who can see the tournament; the players and organizers (members with a trusted session) can write.
 - `scripts/migrate.js` uses `fileURLToPath`, so it also runs on Windows.
+
+## Implementation notes (M7)
+
+- Each operation is defined once in `api/endpoints.ts`: method, path, tag and the Zod schemas for params, query, body and response. Routes wrap their handlers in `endpoint()`, which checks the key, validates with those schemas and answers errors with the envelope. The OpenAPI document is built from the same list, and a db test matches every route file to a definition.
+- The spec uses Zod 4's `z.toJSONSchema` (OpenAPI 3.1 is JSON Schema 2020-12) with a small builder instead of `zod-openapi`. Named schemas are registered in one registry and become `components.schemas`.
+- Keys: `Authorization: Bearer tm_<prefix>_<secret>`, looked up by prefix and compared by hash in constant time; `lastUsedAt` is written at most once a minute. A key only sees its organization: other organizations' tournaments are 404 like missing ones. No CORS, since keys belong on servers. Rate limiting is still open.
+- Errors are `{ error: { code, message, issues? } }`: Zod 400 with issues, keys 401, unknown or other-org resources 404, `ServiceError.kind` conflict 409 / invalid 422 / not_found 404; unknown routes and methods use it too. Send `Content-Type: application/json`, also without a body: SvelteKit's CSRF check rejects POST/PUT/PATCH/DELETE with a form content type or none from other origins with a plain 403 before the API runs.
+- Results set with a key are `api_key` reports through the organizer override; `POST …/reports` reports for a participant with the players' rules. Key messages are organizer messages labelled with the key's name, copied to `match_messages.api_key_name` so revoking the key keeps the label.
+- The API deletes drafts only; the admin page still deletes anything after typing the address.
+- `/docs/api` renders the generated document, linked from the footer and the API keys tab.
 
 ## M0 + M1 in detail
 

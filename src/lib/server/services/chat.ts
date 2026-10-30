@@ -19,7 +19,10 @@ export interface ChatMessage {
 	createdAt: Date;
 	/** Written by an organizer who isn't playing the match. */
 	asOrganizer: boolean;
-	author: { username: string; displayName: string; avatarUrl: string | null };
+	/** The user who wrote it; `null` when an API key did. */
+	author: { username: string; displayName: string; avatarUrl: string | null } | null;
+	/** The name of the API key that wrote it. */
+	apiKey: string | null;
 }
 
 const authorColumns = {
@@ -36,10 +39,11 @@ export async function listMessages(matchId: string): Promise<ChatMessage[]> {
 			body: matchMessages.body,
 			createdAt: matchMessages.createdAt,
 			asOrganizer: matchMessages.asOrganizer,
-			author: authorColumns
+			author: authorColumns,
+			apiKey: matchMessages.apiKeyName
 		})
 		.from(matchMessages)
-		.innerJoin(users, eq(matchMessages.authorId, users.id))
+		.leftJoin(users, eq(matchMessages.authorId, users.id))
 		.where(eq(matchMessages.matchId, matchId))
 		.orderBy(asc(matchMessages.createdAt), asc(matchMessages.id));
 }
@@ -47,11 +51,12 @@ export async function listMessages(matchId: string): Promise<ChatMessage[]> {
 /**
  * Writes in a match's chat. The match's players can write, and so can organizers (members with a
  * trusted session, decided by the caller); organizers who aren't playing are marked as such.
+ * API keys write as organizers, labelled with the key's name.
  */
 export async function postMessage(
 	tournament: Tournament,
 	matchId: string,
-	author: { userId: string; organizer: boolean },
+	author: { userId: string; organizer: boolean } | { apiKeyName: string },
 	body: string
 ): Promise<ChatMessage> {
 	const [match] = await db
@@ -59,7 +64,25 @@ export async function postMessage(
 		.from(matches)
 		.innerJoin(stages, eq(matches.stageId, stages.id))
 		.where(and(eq(matches.id, matchId), eq(stages.tournamentId, tournament.id)));
-	if (!match) throw new ServiceError('Match not found.');
+	if (!match) throw new ServiceError('Match not found.', 'not_found');
+
+	if ('apiKeyName' in author) {
+		const [row] = await db
+			.insert(matchMessages)
+			.values({ matchId, authorId: null, apiKeyName: author.apiKeyName, asOrganizer: true, body })
+			.returning();
+		const message: ChatMessage = {
+			id: row.id,
+			body: row.body,
+			createdAt: row.createdAt,
+			asOrganizer: row.asOrganizer,
+			author: null,
+			apiKey: author.apiKeyName
+		};
+		publish(tournament.id, { type: 'chat', matchId, message });
+		return message;
+	}
+
 	const participant = await getParticipant(tournament.id, author.userId);
 	const isPlayer =
 		!!participant &&
@@ -78,7 +101,8 @@ export async function postMessage(
 		body: row.body,
 		createdAt: row.createdAt,
 		asOrganizer: row.asOrganizer,
-		author: user
+		author: user,
+		apiKey: null
 	};
 	publish(tournament.id, { type: 'chat', matchId, message });
 	return message;

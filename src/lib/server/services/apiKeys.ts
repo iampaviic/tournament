@@ -54,8 +54,14 @@ export async function revokeApiKey(orgId: string, keyId: string) {
 	await db.delete(apiKeys).where(and(eq(apiKeys.orgId, orgId), eq(apiKeys.id, keyId)));
 }
 
-/** Returns the key's id and organization if `key` is valid, and records that it was used. */
-export async function verifyApiKey(key: string) {
+/** `lastUsedAt` is written at most this often, so a busy key doesn't write on every request. */
+const LAST_USED_INTERVAL = 60_000;
+
+/**
+ * Returns the key's id, organization and name if `key` is valid, and records that it was used
+ * (at most once a minute).
+ */
+export async function verifyApiKey(key: string, now = new Date()) {
 	const parsed = parseApiKey(key);
 	if (!parsed) return null;
 	const [row] = await db.select().from(apiKeys).where(eq(apiKeys.prefix, parsed.prefix));
@@ -65,6 +71,8 @@ export async function verifyApiKey(key: string) {
 	const actual = Buffer.from(hashToken(key), 'hex');
 	if (!timingSafeEqual(expected, actual)) return null;
 
-	await db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, row.id));
-	return { id: row.id, orgId: row.orgId };
+	if (!row.lastUsedAt || now.getTime() - row.lastUsedAt.getTime() >= LAST_USED_INTERVAL) {
+		await db.update(apiKeys).set({ lastUsedAt: now }).where(eq(apiKeys.id, row.id));
+	}
+	return { id: row.id, orgId: row.orgId, name: row.name };
 }

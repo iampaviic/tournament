@@ -42,6 +42,12 @@
 	{@render children()}
 </main>
 
+<footer>
+	<div class="container">
+		<a href={resolve('/docs/api')}>{m.footer_api_docs()}</a>
+	</div>
+</footer>
+
 <div style="display:none">
 	{#each locales as locale (locale)}
 		<!-- The current pathname already includes the base path. -->
@@ -112,5 +118,20 @@
 
 	main {
 		padding-bottom: 3rem;
+	}
+
+	footer {
+		border-top: 1px solid var(--border);
+		padding: 1.25rem 0 2rem;
+		font-size: 0.9rem;
+
+		a {
+			color: var(--text-muted);
+			text-decoration: none;
+
+			&:hover {
+				color: var(--text);
+			}
+		}
 	}
 </style>

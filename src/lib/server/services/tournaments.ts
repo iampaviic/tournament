@@ -92,12 +92,25 @@ export async function updateTournament(tournament: Tournament, input: Tournament
 
 /** Picks the bracket theme. It can be changed at any time, even while the tournament is played. */
 export async function setTheme(tournament: Tournament, themeId: string) {
-	if (!isThemeEnabled(themeId)) throw new ServiceError('That theme is not available.');
+	if (!isThemeEnabled(themeId)) throw new ServiceError('That theme is not available.', 'invalid');
 	await db.update(tournaments).set({ themeId }).where(eq(tournaments.id, tournament.id));
 }
 
 export async function deleteTournament(tournamentId: string) {
 	await db.delete(tournaments).where(eq(tournaments.id, tournamentId));
+}
+
+/**
+ * Deletes a tournament that hasn't been published. The REST API uses it: unlike the admin page, it
+ * doesn't ask for the address to confirm.
+ */
+export async function deleteDraftTournament(tournament: Tournament) {
+	if (tournament.status !== 'draft') {
+		throw new ServiceError(
+			'Only draft tournaments can be deleted here. Delete published ones from the admin page.'
+		);
+	}
+	await deleteTournament(tournament.id);
 }
 
 export async function getTournament(orgSlug: string, slug: string) {
@@ -167,7 +180,7 @@ export async function getStructure(tournamentId: string) {
 export async function setStructure(tournament: Tournament, structure: StageConfig[]) {
 	assertEditable(tournament);
 	const parsed = structureSchema.safeParse(structure);
-	if (!parsed.success) throw new ServiceError(parsed.error.issues[0].message);
+	if (!parsed.success) throw new ServiceError(parsed.error.issues[0].message, 'invalid');
 	await db.transaction(async (tx) => {
 		await tx.delete(stages).where(eq(stages.tournamentId, tournament.id));
 		await tx.insert(stages).values(

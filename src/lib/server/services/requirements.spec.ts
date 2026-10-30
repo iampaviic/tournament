@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { tetrioModule } from '#lib/server/modules/auth/tetrio.ts';
 import type { StoredIdentity } from '#lib/server/modules/types.ts';
-import { evaluateRequirements, readModuleConfig } from './requirements';
+import {
+	evaluateRequirements,
+	parseModuleConfig,
+	parseRequirements,
+	readModuleConfig
+} from './requirements';
 
 const tetrio = tetrioModule({ clientId: 'x', clientSecret: 'y' });
 const getModule = (id: string) => (id === 'tetrio' ? tetrio : undefined);
@@ -69,5 +74,48 @@ describe('readModuleConfig', () => {
 		expect(
 			readModuleConfig(tetrio, form({ 'tetrio.minRank': 'x', 'tetrio.maxRank': 'a' }), 'tetrio.')
 		).toEqual({ ok: false, error: 'TETR.IO: Minimum rank must not be above maximum rank.' });
+	});
+});
+
+describe('parseModuleConfig', () => {
+	it("checks the options with the module's schema", () => {
+		expect(parseModuleConfig(tetrio, { minRank: 'x', maxRank: 'a' })).toEqual({
+			ok: false,
+			error: 'TETR.IO: Minimum rank must not be above maximum rank.'
+		});
+		expect(parseModuleConfig(tetrio, { minRank: 'a', allowUnranked: false })).toEqual({
+			ok: true,
+			config: { minRank: 'a', allowUnranked: false }
+		});
+	});
+});
+
+describe('parseRequirements', () => {
+	it('accepts enabled modules, each once, with valid options', () => {
+		expect(parseRequirements([{ moduleId: 'steam', config: {} }], [tetrio])).toEqual({
+			ok: false,
+			error: 'There is no auth module called "steam".'
+		});
+		expect(
+			parseRequirements(
+				[
+					{ moduleId: 'tetrio', config: {} },
+					{ moduleId: 'tetrio', config: {} }
+				],
+				[tetrio]
+			)
+		).toEqual({ ok: false, error: 'TETR.IO is required twice.' });
+		expect(
+			parseRequirements([{ moduleId: 'tetrio', config: { minRank: 'x', maxRank: 'a' } }], [tetrio])
+		).toEqual({ ok: false, error: 'TETR.IO: Minimum rank must not be above maximum rank.' });
+		expect(
+			parseRequirements(
+				[{ moduleId: 'tetrio', config: { maxTr: 18000, allowUnranked: true } }],
+				[tetrio]
+			)
+		).toEqual({
+			ok: true,
+			requirements: [{ moduleId: 'tetrio', config: { maxTr: 18000, allowUnranked: true } }]
+		});
 	});
 });

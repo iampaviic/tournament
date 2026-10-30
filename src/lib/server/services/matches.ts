@@ -24,7 +24,7 @@ import {
 import { publish } from '#lib/server/events.ts';
 import { isElimination } from '#lib/tournaments.ts';
 import { ServiceError } from './errors';
-import { getParticipant } from './participants';
+import { getParticipant, getParticipantById } from './participants';
 import { getBracket, lockStage, refreshStage, type Bracket } from './stages';
 
 export const matchIdSchema = z.uuid('Match not found.');
@@ -47,7 +47,7 @@ async function loadMatch(tx: Transaction, tournament: Tournament, matchId: strin
 		.from(matches)
 		.innerJoin(stages, eq(matches.stageId, stages.id))
 		.where(and(eq(matches.id, matchId), eq(stages.tournamentId, tournament.id)));
-	if (!row) throw new ServiceError('Match not found.');
+	if (!row) throw new ServiceError('Match not found.', 'not_found');
 	const stage = await lockStage(tx, row.stageId);
 	if (stage.status !== 'running') {
 		throw new ServiceError('Results can only change while the stage is being played.');
@@ -60,11 +60,14 @@ async function loadMatch(tx: Transaction, tournament: Tournament, matchId: strin
 /** The result the scores give, checked against the rules of the stage. */
 function resultFor(stage: Stage, match: Match, scores: Scores): MatchResult {
 	if (scores.some((score) => !Number.isInteger(score) || score < 0)) {
-		throw new ServiceError('Scores must be whole numbers, zero or more.');
+		throw new ServiceError('Scores must be whole numbers, zero or more.', 'invalid');
 	}
 	const winner = scores[0] === scores[1] ? null : scores[0] > scores[1] ? 0 : 1;
 	if (winner === null && isElimination(stage.type)) {
-		throw new ServiceError('Elimination matches need a winner, so the scores must differ.');
+		throw new ServiceError(
+			'Elimination matches need a winner, so the scores must differ.',
+			'invalid'
+		);
 	}
 	return { entrants: [match.participant1Id!, match.participant2Id!], winner, scores };
 }
@@ -95,9 +98,16 @@ async function playerReports(tx: Transaction, match: Match) {
 	return sideReports([match.participant1Id, match.participant2Id], rows);
 }
 
-/** The side the user plays on, or `null` if they aren't one of the match's players. */
-async function sideOf(tournament: Tournament, match: Match, userId: string) {
-	const participant = await getParticipant(tournament.id, userId);
+/** The side the player plays on, or `null` if they aren't one of the match's players. */
+async function sideOf(
+	tournament: Tournament,
+	match: Match,
+	by: { userId: string } | { participantId: string }
+) {
+	const participant =
+		'userId' in by
+			? await getParticipant(tournament.id, by.userId)
+			: await getParticipantById(tournament.id, by.participantId);
 	if (!participant) return null;
 	if (participant.id === match.participant1Id) return { side: 0 as const, participant };
 	if (participant.id === match.participant2Id) return { side: 1 as const, participant };
@@ -147,6 +157,57 @@ export async function clearMatchResult(tournament: Tournament, matchId: string) 
 	changed(tournament, ids);
 }
 
+/** Who reports for one side: the player, or an API key on behalf of a participant (M7). */
+type Reporter = { userId: string } | { participantId: string; apiKeyId: string };
+
+async function report(
+	tournament: Tournament,
+	matchId: string,
+	by: Reporter,
+	scores: Scores
+): Promise<'saved' | 'agreed' | 'disputed'> {
+	if (tournament.status !== 'running') {
+		throw new ServiceError('Results can only be reported while the tournament is running.');
+	}
+	const { outcome, ids } = await db.transaction(async (tx) => {
+		const { match, stage } = await loadMatch(tx, tournament, matchId);
+		if (match.status !== 'ready') throw new ServiceError("This match can't be reported now.");
+		const player = await sideOf(tournament, match, by);
+		if (!player) {
+			throw new ServiceError('Only the players of this match can report its result.', 'invalid');
+		}
+		const result = resultFor(stage, match, scores);
+		const outcome = reportOutcome(await playerReports(tx, match), player.side, scores);
+		if (outcome === 'closed') {
+			throw new ServiceError("The reports don't match, so an organizer will decide the result.");
+		}
+
+		const row = {
+			entrants: result.entrants,
+			scores,
+			userId: 'userId' in by ? by.userId : null,
+			apiKeyId: 'apiKeyId' in by ? by.apiKeyId : null,
+			updatedAt: new Date()
+		};
+		await tx
+			.insert(matchReports)
+			.values({
+				matchId: match.id,
+				source: 'participant',
+				participantId: player.participant.id,
+				...row
+			})
+			.onConflictDoUpdate({
+				target: [matchReports.matchId, matchReports.participantId],
+				set: row
+			});
+		const ids = outcome === 'agreed' ? await applyResult(tx, match, result) : [match.id];
+		return { outcome, ids };
+	});
+	changed(tournament, ids);
+	return outcome;
+}
+
 /**
  * A player reports the scores (see `reportOutcome`). When both players agree, the result is
  * recorded; when they don't, the match is disputed until an organizer sets the result.
@@ -156,39 +217,18 @@ export async function reportResult(
 	matchId: string,
 	userId: string,
 	scores: Scores
-): Promise<'saved' | 'agreed' | 'disputed'> {
-	if (tournament.status !== 'running') {
-		throw new ServiceError('Results can only be reported while the tournament is running.');
-	}
-	const { outcome, ids } = await db.transaction(async (tx) => {
-		const { match, stage } = await loadMatch(tx, tournament, matchId);
-		if (match.status !== 'ready') throw new ServiceError("This match can't be reported now.");
-		const player = await sideOf(tournament, match, userId);
-		if (!player) throw new ServiceError('Only the players of this match can report its result.');
-		const result = resultFor(stage, match, scores);
-		const outcome = reportOutcome(await playerReports(tx, match), player.side, scores);
-		if (outcome === 'closed') {
-			throw new ServiceError("The reports don't match, so an organizer will decide the result.");
-		}
+) {
+	return report(tournament, matchId, { userId }, scores);
+}
 
-		const report = { entrants: result.entrants, scores, userId, updatedAt: new Date() };
-		await tx
-			.insert(matchReports)
-			.values({
-				matchId: match.id,
-				source: 'participant',
-				participantId: player.participant.id,
-				...report
-			})
-			.onConflictDoUpdate({
-				target: [matchReports.matchId, matchReports.participantId],
-				set: report
-			});
-		const ids = outcome === 'agreed' ? await applyResult(tx, match, result) : [match.id];
-		return { outcome, ids };
-	});
-	changed(tournament, ids);
-	return outcome;
+/** An API key reports for one of the match's players, with the same rules as `reportResult`. */
+export async function reportForParticipant(
+	tournament: Tournament,
+	matchId: string,
+	by: { participantId: string; apiKeyId: string },
+	scores: Scores
+) {
+	return report(tournament, matchId, by, scores);
 }
 
 /** A player asks the organizers for help with their match. */
@@ -201,7 +241,7 @@ export async function requestHelp(tournament: Tournament, matchId: string, userI
 		if (match.status !== 'ready') {
 			throw new ServiceError('Help can only be requested while the match is being played.');
 		}
-		if (!(await sideOf(tournament, match, userId))) {
+		if (!(await sideOf(tournament, match, { userId }))) {
 			throw new ServiceError('Only the players of this match can ask for help.');
 		}
 		await tx.update(matches).set({ helpRequested: true }).where(eq(matches.id, match.id));
@@ -224,7 +264,7 @@ export async function clearHelp(tournament: Tournament, matchId: string) {
 			)
 		)
 		.returning({ id: matches.id });
-	if (!row) throw new ServiceError('Match not found.');
+	if (!row) throw new ServiceError('Match not found.', 'not_found');
 	changed(tournament, [matchId]);
 }
 

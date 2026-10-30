@@ -288,9 +288,10 @@ export const matchMessages = pgTable(
 		matchId: uuid('match_id')
 			.notNull()
 			.references(() => matches.id, { onDelete: 'cascade' }),
-		authorId: uuid('author_id')
-			.notNull()
-			.references(() => users.id, { onDelete: 'cascade' }),
+		/** `null` for messages posted with an API key. */
+		authorId: uuid('author_id').references(() => users.id, { onDelete: 'cascade' }),
+		/** The name of the API key that posted it, copied so the label stays when the key is revoked. */
+		apiKeyName: text('api_key_name'),
 		/** Written by an organizer who isn't playing the match. */
 		asOrganizer: boolean('as_organizer').notNull().default(false),
 		body: text('body').notNull(),
