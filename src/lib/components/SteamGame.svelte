@@ -47,7 +47,7 @@
 		aspect-ratio: 460 / 215;
 		object-fit: cover;
 		background: var(--surface-2);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-tag);
 	}
 
 	.name {

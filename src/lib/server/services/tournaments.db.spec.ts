@@ -514,6 +514,7 @@ describe('game', () => {
 
 		const [listed] = await listOrgTournaments(tournament.orgId);
 		expect(listed.game).toMatchObject({ appId: 620, name: 'Portal 2' });
+		expect(listed.participants).toBe(1);
 		const [joined] = await listUserTournaments(fan.id);
 		expect(joined).toMatchObject({
 			game: { appId: 620, name: 'Portal 2' },

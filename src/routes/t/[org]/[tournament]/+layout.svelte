@@ -52,14 +52,11 @@
 					>{statusLabel(data.tournament.status)}</span
 				>
 				{#if data.tournament.startsAt}
-					{m.t_starts({
-						date: formatDateTime(data.tournament.startsAt)
-					})}
+					<span>{m.t_starts({ date: formatDateTime(data.tournament.startsAt) })}</span>
 				{/if}
+				<!-- The game is a fact about the event, so it sits with the others, not above them. -->
+				{#if data.tournament.game}<SteamGame game={data.tournament.game} width={56} />{/if}
 			</p>
-			{#if data.tournament.game}
-				<div class="game"><SteamGame game={data.tournament.game} width={184} /></div>
-			{/if}
 		</div>
 		{#if data.isMember}
 			<a class="btn small" href={resolve('/t/[org]/[tournament]/admin', params)}>{m.t_manage()}</a>
@@ -107,13 +104,10 @@
 
 		.meta {
 			display: flex;
+			flex-wrap: wrap;
 			align-items: center;
-			gap: 0.75rem;
+			gap: 0.5rem 0.75rem;
 			margin: 0;
-		}
-
-		.game {
-			margin-top: 0.75rem;
 		}
 	}
 </style>

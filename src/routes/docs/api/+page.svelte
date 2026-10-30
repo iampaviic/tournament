@@ -249,7 +249,7 @@
 	code,
 	pre,
 	.method {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 		font-size: var(--fs-body);
 	}
 

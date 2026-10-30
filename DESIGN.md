@@ -298,6 +298,8 @@ The home page is full-bleed where the joint needs to run off the window edge, an
 
 Flat. Nothing at rest casts a shadow: depth comes from the sheet on the wall (white on cool grey), a 1px sheet edge, and tint steps (`sheet-fill`, ballpoint tint). In dark mode the same steps run from near-black wall to slightly lighter sheets.
 
+The one exception is a layer that opens over other content while it is used: the game picker's list of suggestions. It takes the sheet colour, a control-outline edge and `--shadow-float` (an 8px-offset, 24px-blur shadow at low opacity), and closes as soon as a game is picked or the field loses focus.
+
 ### Named Rules
 
 **The Taped Sheet Rule.** A sheet is edged, never shadowed. If something needs to read as separate, give it the sheet colour and a 1px edge on the wall, or a tint step inside a sheet.
@@ -375,7 +377,7 @@ Quick and exact under the hand (press 140ms, hover 180ms, UI 240ms, ease-out `cu
 
 ### Don't:
 
-- **Don't** put a shadow on anything at rest; there is no floating layer in the shipped system.
+- **Don't** put a shadow on anything at rest; only a layer that opens over content while in use (the game picker's suggestions) takes `--shadow-float`.
 - **Don't** box a match or a name; the printed line is the container.
 - **Don't** introduce a second accent hue on working screens, or use green beyond tags, dots and met-requirement marks.
 - **Don't** condense or embolden text that is not a name.

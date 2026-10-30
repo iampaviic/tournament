@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
 	import { formatDate } from '#lib/format.ts';
-	import { statusLabel } from '#lib/labels.ts';
+	import { statusLabel, statusTone } from '#lib/labels.ts';
 	import { slugify } from '#lib/slug.ts';
 	import type { PageProps } from './$types';
 
@@ -34,7 +34,8 @@
 							{m.tournaments_participants({ count: tournament.participants })}
 						</div>
 					</div>
-					<span class="badge">{statusLabel(tournament.status)}</span>
+					<span class="badge {statusTone(tournament.status)}">{statusLabel(tournament.status)}</span
+					>
 				</li>
 			{/each}
 		</ul>

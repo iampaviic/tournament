@@ -668,6 +668,11 @@
         "name": "none",
         "value": "none",
         "purpose": "Nothing at rest casts a shadow; depth is the sheet on the wall plus a 1px edge."
+      },
+      {
+        "name": "float",
+        "value": "0 8px 24px rgb(18 20 23 / 12%), 0 1px 3px rgb(18 20 23 / 8%)",
+        "purpose": "Only a layer that opens over content while in use: the game picker's suggestions."
       }
     ],
     "motion": [

@@ -173,7 +173,9 @@ export async function getTournamentById(id: string) {
 	return tournament;
 }
 
-const participantCount = sql<number>`(select count(*)::int from ${participants} where ${participants.tournamentId} = ${tournaments.id})`;
+// Qualified by hand: inside the subquery Drizzle leaves columns bare, and a bare "id" would be the
+// participant's own id, so every count came out 0.
+const participantCount = sql<number>`(select count(*)::int from ${participants} where ${participants}."tournament_id" = ${tournaments}."id")`;
 
 /** An organization's tournaments, newest first. Drafts only when `includeDrafts`. */
 export async function listOrgTournaments(orgId: string, { includeDrafts = false } = {}) {

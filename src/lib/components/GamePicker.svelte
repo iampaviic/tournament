@@ -229,9 +229,10 @@
 		margin: 0;
 		padding: 0.25rem;
 		background: var(--surface);
-		border: 1px solid var(--border);
+		border: 1px solid var(--control);
 		border-radius: var(--radius-sm);
-		box-shadow: var(--shadow);
+		// The one layer that floats: it opens over whatever is below the field.
+		box-shadow: var(--shadow-float);
 	}
 
 	[role='option'] {
@@ -263,7 +264,7 @@
 			padding: 0.5rem 0;
 
 			& + li {
-				border-top: 1px solid var(--border);
+				border-top: 1px solid var(--rule);
 			}
 		}
 	}
