@@ -1,0 +1,39 @@
+# Local development: `pnpm db:start` runs only the database.
+# Full stack (also works with `podman compose`): `docker compose up --build`.
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: local
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U root -d local']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    profiles: [app]
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: postgres://root:mysecretpassword@db:5432/local
+      PROTOCOL_HEADER: x-forwarded-proto
+      AUTH_MODULES: ${AUTH_MODULES:-discord}
+      TRUSTED_AUTH_MODULES: ${TRUSTED_AUTH_MODULES:-discord}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
