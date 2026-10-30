@@ -189,6 +189,15 @@ select {
 	&.success {
 		color: var(--success);
 	}
+
+	&.warning {
+		background: var(--warning-bg);
+		color: var(--warning-text);
+	}
+
+	&.danger {
+		color: var(--danger);
+	}
 }
 
 .tabs {

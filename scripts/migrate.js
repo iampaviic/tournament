@@ -1,4 +1,5 @@
 // Applies pending migrations from ./drizzle. Runs before the server starts in the container.
+import { fileURLToPath } from 'node:url';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
@@ -8,7 +9,7 @@ if (!url) throw new Error('DATABASE_URL is not set');
 
 const client = postgres(url, { max: 1, onnotice: () => {} });
 await migrate(drizzle(client), {
-	migrationsFolder: new URL('../drizzle', import.meta.url).pathname
+	migrationsFolder: fileURLToPath(new URL('../drizzle', import.meta.url))
 });
 await client.end();
 console.log('Migrations applied');

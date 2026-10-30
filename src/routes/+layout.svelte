@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '#lib/styles/global.scss';
-	import type { Path } from '$app/types';
+	import type { ResolvedPathname } from '$app/types';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { locales, localizeHref } from '#lib/paraglide/runtime.js';
@@ -44,7 +44,8 @@
 
 <div style="display:none">
 	{#each locales as locale (locale)}
-		<a href={resolve(localizeHref(page.url.pathname, { locale }) as Path)}>{locale}</a>
+		<!-- The current pathname already includes the base path. -->
+		<a href={localizeHref(page.url.pathname, { locale }) as ResolvedPathname}>{locale}</a>
 	{/each}
 </div>
 

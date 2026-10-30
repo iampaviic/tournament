@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
+	import ScoreForm from '#lib/components/ScoreForm.svelte';
 	import { matchNumbers } from '#lib/bracketLayout.ts';
 	import { sections } from '#lib/bracketView.ts';
-	import { groupName, matchStatusLabel, sideLabel, stageLabel } from '#lib/labels.ts';
+	import { formatScore } from '#lib/format.ts';
+	import { groupName, matchContext, matchStatusLabel, sideLabel, stageLabel } from '#lib/labels.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -14,12 +17,62 @@
 			: entrant === null
 				? m.match_bye()
 				: (data.names[entrant] ?? '?');
+	const room = (id: string) =>
+		resolve('/t/[org]/[tournament]/matches/[id]', {
+			org: data.org.slug,
+			tournament: data.tournament.slug,
+			id
+		});
 </script>
 
 {#if form?.error}
 	<p class="alert error" role="alert">{form.error}</p>
 {:else if form?.message}
 	<p class="alert success" role="status">{form.message}</p>
+{/if}
+
+{#if data.stages.length}
+	<section class="queue">
+		<h2>{m.queue_title()}</h2>
+		<p class="muted">{m.queue_lead()}</p>
+		{#if data.queue.length}
+			<ol>
+				{#each data.queue as item (item.id)}
+					{@const context = matchContext(item)}
+					{@const names = [name(item.entrants[0]), name(item.entrants[1])] as [string, string]}
+					<li class="card" data-testid="queue-{item.id}">
+						<div class="summary">
+							<a href={room(item.id)}>{m.match_number({ number: item.number })}</a>
+							{#if context}<span class="muted">{context}</span>{/if}
+							<span class="badge" class:danger={item.progress === 'disputed'}>
+								{matchStatusLabel(item.progress)}
+							</span>
+							{#if item.helpRequested}<span class="badge warning">{m.match_help()}</span>{/if}
+						</div>
+						{#each item.reports as report (report.side)}
+							<p class="report">
+								{m.room_reported({ name: names[report.side], score: formatScore(report.scores) })}
+							</p>
+						{/each}
+						<div class="actions">
+							<ScoreForm action="?/result" {names} submit={m.matches_save()}>
+								<input type="hidden" name="matchId" value={item.id} />
+							</ScoreForm>
+							{#if item.helpRequested}
+								<form method="POST" action="?/clearHelp" use:enhance>
+									<input type="hidden" name="matchId" value={item.id} />
+									<button class="btn small" type="submit">{m.room_help_clear()}</button>
+								</form>
+							{/if}
+							<a href={room(item.id)}>{m.queue_open()}</a>
+						</div>
+					</li>
+				{/each}
+			</ol>
+		{:else}
+			<p class="muted">{m.queue_empty()}</p>
+		{/if}
+	</section>
 {/if}
 
 {#each data.stages as stage (stage.id)}
@@ -45,32 +98,14 @@
 								>
 								<span class="badge">{matchStatusLabel(match.status)}</span>
 								{#if editable}
-									<form method="POST" action="?/result" class="result" use:enhance>
+									<ScoreForm
+										action="?/result"
+										names={[name(match.entrants[0]), name(match.entrants[1])]}
+										scores={match.result?.scores}
+										submit={m.matches_save()}
+									>
 										<input type="hidden" name="matchId" value={match.id} />
-										<label>
-											<span>{name(match.entrants[0])}</span>
-											<input
-												name="score1"
-												type="number"
-												min="0"
-												required
-												value={match.result?.scores?.[0] ?? ''}
-												aria-label={m.matches_score({ name: name(match.entrants[0]) })}
-											/>
-										</label>
-										<label>
-											<input
-												name="score2"
-												type="number"
-												min="0"
-												required
-												value={match.result?.scores?.[1] ?? ''}
-												aria-label={m.matches_score({ name: name(match.entrants[1]) })}
-											/>
-											<span>{name(match.entrants[1])}</span>
-										</label>
-										<button class="btn small primary" type="submit">{m.matches_save()}</button>
-									</form>
+									</ScoreForm>
 									{#if match.result}
 										<form method="POST" action="?/clear" use:enhance>
 											<input type="hidden" name="matchId" value={match.id} />
@@ -114,6 +149,43 @@
 		margin: 1rem 0 0.5rem;
 	}
 
+	.queue {
+		margin-bottom: 2rem;
+
+		ol {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+
+		li {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			padding: 0.75rem 1.25rem;
+		}
+
+		.summary,
+		.actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 0.5rem 0.75rem;
+		}
+
+		.summary a {
+			font-weight: 600;
+		}
+
+		.report {
+			margin: 0;
+			font-size: 0.9rem;
+		}
+	}
+
 	.round {
 		margin-bottom: 0.75rem;
 		padding: 0.75rem 1.25rem;
@@ -154,23 +226,6 @@
 		.badge {
 			min-width: 5rem;
 			text-align: center;
-		}
-	}
-
-	.result {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.5rem;
-
-		label {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-		}
-
-		input {
-			width: 4rem;
 		}
 	}
 

@@ -1,7 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.ts';
-import { identities, matches, participants, type Tournament } from '#lib/server/db/schema.ts';
+import {
+	identities,
+	matches,
+	participants,
+	type Tournament,
+	type User
+} from '#lib/server/db/schema.ts';
 import { tetrioModule } from '#lib/server/modules/auth/tetrio.ts';
 import { createUser, resetDatabase } from '#lib/server/testing/factories.ts';
 import { DEFAULT_STAGE_SETTINGS, type StageConfig } from '#lib/tournaments.ts';
@@ -16,13 +22,8 @@ import {
 	setCheckedIn,
 	unregister
 } from './participants';
-import {
-	clearMatchResult,
-	getBracket,
-	setMatchResult,
-	startNextStage,
-	startTournament
-} from './stages';
+import { clearMatchResult, setMatchResult } from './matches';
+import { getBracket, startNextStage, startTournament } from './stages';
 import {
 	createTournament,
 	getStructure,
@@ -33,11 +34,12 @@ import {
 	setTheme
 } from './tournaments';
 
+let owner: User;
 let tournament: Tournament;
 
 beforeEach(async () => {
 	await resetDatabase();
-	const owner = await createUser('owner');
+	owner = await createUser('owner');
 	const org = await createOrganization(owner.id, { name: 'Club', slug: 'club', description: '' });
 	tournament = await createTournament(org.id, { name: 'Cup', slug: 'cup' });
 });
@@ -69,7 +71,9 @@ async function playAll({ draws = false } = {}) {
 		if (!ready.length) return;
 		for (const match of ready) {
 			const better = seeds.get(match.participant1Id!)! < seeds.get(match.participant2Id!)!;
-			await setMatchResult(tournament, match.id, draws ? [1, 1] : better ? [2, 1] : [1, 2]);
+			await setMatchResult(tournament, match.id, draws ? [1, 1] : better ? [2, 1] : [1, 2], {
+				userId: owner.id
+			});
 		}
 	}
 }
@@ -238,34 +242,36 @@ describe('results', () => {
 	it('rejects draws in elimination matches', async () => {
 		const [stage0] = await startWith([stage('single_elimination')], 2);
 		await expect(
-			setMatchResult(tournament, stage0.groups[0].matches[0].id, [1, 1])
+			setMatchResult(tournament, stage0.groups[0].matches[0].id, [1, 1], { userId: owner.id })
 		).rejects.toThrow('need a winner');
 	});
 
 	it('discards later results when an earlier one is corrected', async () => {
 		const [stage0] = await startWith([stage('single_elimination')], 4);
 		const [semi1, semi2, final] = stage0.groups[0].matches;
-		await setMatchResult(tournament, semi1.id, [2, 0]);
-		await setMatchResult(tournament, semi2.id, [2, 0]);
-		await setMatchResult(tournament, final.id, [2, 1]);
+		await setMatchResult(tournament, semi1.id, [2, 0], { userId: owner.id });
+		await setMatchResult(tournament, semi2.id, [2, 0], { userId: owner.id });
+		await setMatchResult(tournament, final.id, [2, 1], { userId: owner.id });
 		await reload();
 		expect(tournament.status).toBe('completed');
 
 		// A completed tournament is final.
-		await expect(setMatchResult(tournament, semi1.id, [0, 2])).rejects.toThrow('while the stage');
+		await expect(
+			setMatchResult(tournament, semi1.id, [0, 2], { userId: owner.id })
+		).rejects.toThrow('while the stage');
 	});
 
 	it('clears a result and anything that depended on it', async () => {
 		const [stage0] = await startWith([stage('single_elimination')], 8);
 		const quarter = stage0.groups[0].matches[0];
-		await setMatchResult(tournament, quarter.id, [2, 0]);
-		await setMatchResult(tournament, stage0.groups[0].matches[1].id, [2, 0]);
+		await setMatchResult(tournament, quarter.id, [2, 0], { userId: owner.id });
+		await setMatchResult(tournament, stage0.groups[0].matches[1].id, [2, 0], { userId: owner.id });
 		const semi = (await getBracket(tournament.id))[0].groups[0].matches.find(
 			(m) => m.template.id === 'M2-1'
 		)!;
-		await setMatchResult(tournament, semi.id, [2, 0]);
+		await setMatchResult(tournament, semi.id, [2, 0], { userId: owner.id });
 
-		await setMatchResult(tournament, quarter.id, [0, 2]);
+		await setMatchResult(tournament, quarter.id, [0, 2], { userId: owner.id });
 		const after = (await getBracket(tournament.id))[0].groups[0].matches.find(
 			(m) => m.template.id === 'M2-1'
 		)!;
@@ -282,9 +288,9 @@ describe('results', () => {
 	it('ignores matches from other tournaments', async () => {
 		const [stage0] = await startWith([stage('single_elimination')], 2);
 		const other = await createTournament(tournament.orgId, { name: 'Other', slug: 'other' });
-		await expect(setMatchResult(other, stage0.groups[0].matches[0].id, [1, 0])).rejects.toThrow(
-			'Match not found'
-		);
+		await expect(
+			setMatchResult(other, stage0.groups[0].matches[0].id, [1, 0], { userId: owner.id })
+		).rejects.toThrow('Match not found');
 	});
 });
 

@@ -10,12 +10,12 @@ import {
 	resolveStage,
 	seedAdvancers,
 	snakeGroups,
-	type MatchResult,
 	type MatchState,
 	type StageOptions
 } from '#lib/brackets/index.ts';
 import { db, type Executor, type Transaction } from '#lib/server/db/index.ts';
 import {
+	matchReports,
 	matches,
 	participants,
 	stages,
@@ -24,6 +24,7 @@ import {
 	type Stage,
 	type Tournament
 } from '#lib/server/db/schema.ts';
+import { publish } from '#lib/server/events.ts';
 import type { BracketMatch } from '#lib/bracketView.ts';
 import { isElimination, tiebreakersFor } from '#lib/tournaments.ts';
 import { ServiceError } from './errors';
@@ -64,7 +65,8 @@ export function rankGroup(stage: Stage, entrants: string[], states: MatchState[]
 	}).map((row) => ({ participantId: row.entrant, rank: row.rank as number | null }));
 }
 
-async function lockStage(tx: Transaction, stageId: string) {
+/** Locks the stage row for the rest of the transaction, so its matches change one at a time. */
+export async function lockStage(tx: Transaction, stageId: string) {
 	const [stage] = await tx.select().from(stages).where(eq(stages.id, stageId)).for('update');
 	return stage;
 }
@@ -104,13 +106,16 @@ async function startStage(tx: Transaction, stage: Stage, entrants: string[], isL
 
 /**
  * Brings the stored match state in line with the templates and results: fills in entrants,
- * updates statuses, discards results that went stale after a correction, pairs the next Swiss
- * round, and completes the stage (and the tournament) when everything is decided.
+ * updates statuses, discards results that went stale after a correction (and the reports and help
+ * requests of matches whose entrants changed or that can't be played anymore), pairs the next
+ * Swiss round, and completes the stage (and the tournament) when everything is decided. Returns
+ * the ids of the matches that changed.
  */
-export async function refreshStage(tx: Transaction, stageId: string) {
+export async function refreshStage(tx: Transaction, stageId: string): Promise<string[]> {
 	const stage = await lockStage(tx, stageId);
-	if (stage.status !== 'running') return;
+	if (stage.status !== 'running') return [];
 
+	const changed: string[] = [];
 	let complete = true;
 	for (const [groupIndex, entrants] of stage.groups.entries()) {
 		for (;;) {
@@ -127,16 +132,16 @@ export async function refreshStage(tx: Transaction, stageId: string) {
 					status: state.status,
 					result: resolved.staleResults.includes(row.templateId) ? null : row.result
 				};
-				if (
-					next.participant1Id !== row.participant1Id ||
-					next.participant2Id !== row.participant2Id ||
-					next.status !== row.status ||
-					next.result !== row.result
-				) {
+				const entrantsChanged =
+					next.participant1Id !== row.participant1Id || next.participant2Id !== row.participant2Id;
+				if (entrantsChanged || next.status !== row.status || next.result !== row.result) {
+					const stale = entrantsChanged || (next.status !== 'ready' && next.status !== 'completed');
+					if (stale) await tx.delete(matchReports).where(eq(matchReports.matchId, row.id));
 					await tx
 						.update(matches)
-						.set({ ...next, updatedAt: new Date() })
+						.set({ ...next, ...(stale ? { helpRequested: false } : {}), updatedAt: new Date() })
 						.where(eq(matches.id, row.id));
+					changed.push(row.id);
 				}
 			}
 
@@ -165,6 +170,7 @@ export async function refreshStage(tx: Transaction, stageId: string) {
 		await tx.update(stages).set({ status: 'completed' }).where(eq(stages.id, stageId));
 		await onStageCompleted(tx, stage);
 	}
+	return changed;
 }
 
 async function stageRankings(executor: Executor, stage: Stage) {
@@ -240,6 +246,7 @@ export async function startTournament(tournament: Tournament) {
 			.where(eq(tournaments.id, tournament.id));
 		await startStage(tx, all[0], playing, all.length === 1);
 	});
+	publish(tournament.id, { type: 'matches', matchIds: [] });
 }
 
 /** Starts the final stage with the entrants advancing from the group stage. */
@@ -265,59 +272,7 @@ export async function startNextStage(tournament: Tournament) {
 		);
 		await startStage(tx, next, advancing, next.index === all.length - 1);
 	});
-}
-
-async function loadMatch(tx: Transaction, tournament: Tournament, matchId: string) {
-	const [row] = await tx
-		.select({ match: matches, stage: stages })
-		.from(matches)
-		.innerJoin(stages, eq(matches.stageId, stages.id))
-		.where(and(eq(matches.id, matchId), eq(stages.tournamentId, tournament.id)));
-	if (!row) throw new ServiceError('Match not found.');
-	await lockStage(tx, row.stage.id);
-	if (row.stage.status !== 'running') {
-		throw new ServiceError('Results can only change while the stage is being played.');
-	}
-	return row;
-}
-
-/** Records (or corrects) a match result from the scores of both sides. */
-export async function setMatchResult(
-	tournament: Tournament,
-	matchId: string,
-	scores: [number, number]
-) {
-	if (scores.some((score) => !Number.isInteger(score) || score < 0)) {
-		throw new ServiceError('Scores must be whole numbers, zero or more.');
-	}
-	await db.transaction(async (tx) => {
-		const { match, stage } = await loadMatch(tx, tournament, matchId);
-		if (match.status !== 'ready' && match.status !== 'completed') {
-			throw new ServiceError("This match isn't ready to be played.");
-		}
-		const winner = scores[0] === scores[1] ? null : scores[0] > scores[1] ? 0 : 1;
-		if (winner === null && isElimination(stage.type)) {
-			throw new ServiceError('Elimination matches need a winner, so the scores must differ.');
-		}
-		const result: MatchResult = {
-			entrants: [match.participant1Id!, match.participant2Id!],
-			winner,
-			scores
-		};
-		await tx.update(matches).set({ result, updatedAt: new Date() }).where(eq(matches.id, matchId));
-		await refreshStage(tx, stage.id);
-	});
-}
-
-export async function clearMatchResult(tournament: Tournament, matchId: string) {
-	await db.transaction(async (tx) => {
-		const { stage } = await loadMatch(tx, tournament, matchId);
-		await tx
-			.update(matches)
-			.set({ result: null, updatedAt: new Date() })
-			.where(eq(matches.id, matchId));
-		await refreshStage(tx, stage.id);
-	});
+	publish(tournament.id, { type: 'matches', matchIds: [] });
 }
 
 /** Everything needed to show a tournament's stages: matches by group and standings. */

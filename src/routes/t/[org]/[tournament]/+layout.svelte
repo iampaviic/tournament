@@ -20,6 +20,11 @@
 			route: '/t/[org]/[tournament]/bracket',
 			href: resolve('/t/[org]/[tournament]/bracket', params),
 			label: m.t_bracket
+		},
+		{
+			route: '/t/[org]/[tournament]/matches',
+			href: resolve('/t/[org]/[tournament]/matches', params),
+			label: m.t_matches
 		}
 	]);
 </script>

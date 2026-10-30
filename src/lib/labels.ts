@@ -1,4 +1,5 @@
-import type { BracketSide, MatchStatus, StageType } from '#lib/brackets/index.ts';
+import type { BracketSide, StageType } from '#lib/brackets/index.ts';
+import type { MatchProgress } from '#lib/matchReports.ts';
 import type { TournamentStatus } from '#lib/server/db/schema.ts';
 import { m } from '#lib/paraglide/messages.js';
 
@@ -21,10 +22,12 @@ export const formatLabel = (type: StageType): string =>
 		swiss: m.format_swiss
 	})[type]();
 
-export const matchStatusLabel = (status: MatchStatus): string =>
+export const matchStatusLabel = (status: MatchProgress): string =>
 	({
 		waiting: m.match_status_waiting,
 		ready: m.match_status_ready,
+		reported: m.match_status_reported,
+		disputed: m.match_status_disputed,
 		completed: m.match_status_completed,
 		bye: m.match_status_bye,
 		skipped: m.match_status_skipped
@@ -45,6 +48,22 @@ export const groupName = (index: number) => m.group_name({ name: String.fromChar
 
 export const stageLabel = (index: number, count: number) =>
 	count === 1 ? m.stage_only() : index === 0 ? m.stage_group() : m.stage_final();
+
+/** Where a match is played, e.g. "Final stage · Losers bracket"; empty when there's only one part. */
+export const matchContext = (match: {
+	stageIndex: number;
+	stageCount: number;
+	groupIndex: number;
+	groupCount: number;
+	side: BracketSide;
+}) =>
+	[
+		match.stageCount > 1 ? stageLabel(match.stageIndex, match.stageCount) : null,
+		match.groupCount > 1 ? groupName(match.groupIndex) : null,
+		sideLabel(match.side)
+	]
+		.filter(Boolean)
+		.join(' · ');
 
 /** Column heading in the bracket view. `rounds` is the number of rounds in that side. */
 export function roundTitle(

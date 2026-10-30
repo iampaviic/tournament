@@ -117,7 +117,7 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 | M3 ✅     | Bracket engine (pure lib)                                                                                                                            | Property and fixture tests for all 4 types + groups                  |
 | M4 ✅     | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
 | M5 ✅     | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |
-| M6        | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                    |
+| M6 ✅     | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                    |
 | M7        | REST API + OpenAPI + docs page                                                                                                                       | API e2e: create → start → report via key                             |
 | M8        | Public profile with history/results + visibility, Steam game picker, polish/i18n audit                                                               |                                                                      |
 | M9        | Deploy: Podman on VPS, Apache vhost (SSE: `flushpackets=on`, long timeout), backups, e2e suite in CI                                                 | Live on VPS                                                          |
@@ -143,6 +143,16 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 - Match numbers (`matchNumbers`) follow play order and skip byes. They depend only on the templates, so they never change mid-stage; M6 match pages can use them. Empty slots say "Winner of #3" / "Loser of #3".
 - The canvas is HTML cards over an SVG of connectors, moved with a CSS transform (`PanZoom.svelte`, math in `panZoom.ts`). Drag or arrow keys pan; Ctrl + scroll, pinch, +/− keys or the toolbar zoom; plain scrolling still scrolls the page. Full screen where supported. Hovering a participant highlights their path.
 - Round robin and Swiss show the standings table and the rounds as columns without connectors.
+
+## Implementation notes (M6)
+
+- Players report in the match room. Either one reports first and can edit until the opponent responds; the same scores record the result through `refreshStage`, different ones dispute the match until an organizer decides. "Reported" and "Disputed" are derived from `match_reports` (`matchReports.ts`, pure); `matches.status` stays what the engine says.
+- Reports store the entrants they were made for, like results. `refreshStage` deletes a match's reports and clears its help flag when its entrants change or it stops being ready/completed, and reads ignore reports for other entrants.
+- An organizer (or, in M7, an API key: `source` has `api_key`) setting a result replaces the reports with one `organizer`/`api_key` row, so the room can say who decided. Result writing lives in `services/matches.ts`.
+- Live updates: `events.ts` is an in-process pub/sub per tournament, published after commits. `matches/events` and `matches/[id]/events` are SSE endpoints that filter on the server. `update` reloads the page data, chat messages are appended, and every (re)connect reloads too, so nothing is missed. Single process only; several would need Postgres LISTEN/NOTIFY.
+- The admin Matches tab starts with the match queue: disputes, then help requests, then matches waiting for the second report, then ready ones; ties by stage, group and match number.
+- Match pages use `matchNumbers`, so byes have no page. Chat is readable by anyone who can see the tournament; the players and organizers (members with a trusted session) can write.
+- `scripts/migrate.js` uses `fileURLToPath`, so it also runs on Windows.
 
 ## M0 + M1 in detail
 

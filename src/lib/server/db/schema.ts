@@ -239,6 +239,8 @@ export const matches = pgTable(
 		participant1Id: uuid('participant1_id'),
 		participant2Id: uuid('participant2_id'),
 		status: matchStatus('status').notNull().default('waiting'),
+		/** Set by a player; cleared by an organizer or when the result changes. */
+		helpRequested: boolean('help_requested').notNull().default(false),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 	},
 	(table) => [
@@ -246,6 +248,55 @@ export const matches = pgTable(
 		index().on(table.participant1Id),
 		index().on(table.participant2Id)
 	]
+);
+
+/** Who reported a result: one of the match's players, an organizer, or an API key (M7). */
+export const reportSource = pgEnum('report_source', ['participant', 'organizer', 'api_key']);
+
+/**
+ * A reported score. Each player has at most one report per match; an organizer or API key result
+ * replaces all of them. Like `MatchResult`, it records the entrants it was made for, so it stops
+ * applying when different entrants end up in the match.
+ */
+export const matchReports = pgTable(
+	'match_reports',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		matchId: uuid('match_id')
+			.notNull()
+			.references(() => matches.id, { onDelete: 'cascade' }),
+		source: reportSource('source').notNull(),
+		/** The reporting player, for `participant` reports. */
+		participantId: uuid('participant_id').references(() => participants.id, {
+			onDelete: 'cascade'
+		}),
+		userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+		apiKeyId: uuid('api_key_id').references(() => apiKeys.id, { onDelete: 'set null' }),
+		entrants: jsonb('entrants').$type<[string, string]>().notNull(),
+		scores: jsonb('scores').$type<[number, number]>().notNull(),
+		createdAt: createdAt(),
+		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+	},
+	(table) => [unique().on(table.matchId, table.participantId)]
+);
+
+/** The chat of a match room. */
+export const matchMessages = pgTable(
+	'match_messages',
+	{
+		id: uuid('id').primaryKey().defaultRandom(),
+		matchId: uuid('match_id')
+			.notNull()
+			.references(() => matches.id, { onDelete: 'cascade' }),
+		authorId: uuid('author_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		/** Written by an organizer who isn't playing the match. */
+		asOrganizer: boolean('as_organizer').notNull().default(false),
+		body: text('body').notNull(),
+		createdAt: createdAt()
+	},
+	(table) => [index().on(table.matchId, table.createdAt)]
 );
 
 export type User = typeof users.$inferSelect;
@@ -259,3 +310,6 @@ export type TournamentStatus = (typeof tournamentStatus.enumValues)[number];
 export type Participant = typeof participants.$inferSelect;
 export type Stage = typeof stages.$inferSelect;
 export type Match = typeof matches.$inferSelect;
+export type ReportSource = (typeof reportSource.enumValues)[number];
+export type MatchReport = typeof matchReports.$inferSelect;
+export type MatchMessage = typeof matchMessages.$inferSelect;

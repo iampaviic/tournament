@@ -32,6 +32,14 @@ export async function createTournament(page: Page, orgSlug: string, name: string
 export const adminTab = (page: Page, tab: string) =>
 	page.getByRole('navigation', { name: 'Tournament admin' }).getByRole('link', { name: tab });
 
+/** A page in a new browser context, signed in as `username`. Close it with `page.context().close()`. */
+export async function playerPage(browser: Browser, username: string) {
+	const context = await browser.newContext({ extraHTTPHeaders: { 'X-Forwarded-Proto': 'http' } });
+	const page = await context.newPage();
+	await signIn(page, username);
+	return page;
+}
+
 /** Signs up new users and registers each of them for the tournament at `path`. */
 export async function registerPlayers(
 	browser: Browser,
@@ -41,13 +49,11 @@ export async function registerPlayers(
 ) {
 	const players = Array.from({ length: count }, (_, i) => uniqueName(`${prefix}${i + 1}`));
 	for (const player of players) {
-		const context = await browser.newContext({ extraHTTPHeaders: { 'X-Forwarded-Proto': 'http' } });
-		const page = await context.newPage();
-		await signIn(page, player);
+		const page = await playerPage(browser, player);
 		await page.goto(path);
 		await page.getByRole('button', { name: 'Register' }).click();
 		await expect(page.getByText("You're registered.")).toBeVisible();
-		await context.close();
+		await page.context().close();
 	}
 	return players;
 }
