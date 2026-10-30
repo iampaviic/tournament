@@ -65,7 +65,7 @@ interface AuthModule<Cfg = unknown> {
 
 ### Bracket themes
 
-`themes/registry.ts`. Each theme is a set of Svelte components (`ParticipantLabel`, `MatchCard`, optional `StageHeader`) and declares which `bracketFields` it reads (e.g. tetrio shows rank badge + TR). The instance admin chooses which themes are installed. The organizer picks one per tournament.
+`themes/index.ts`. A theme is a set of colors (`ThemeStyle`, applied as `--bracket-*` CSS custom properties) plus a `ParticipantLabel` component, and may name an auth module whose `bracketFields` it shows (tetrio shows rank badge, TR and flag). The match card, connectors and canvas are shared, so themes stay small. Themes are installed in the registry; `BRACKET_THEMES` limits which ones organizers can pick (all by default, `default` always). The organizer picks one per tournament, at any time.
 
 ### Data model (Drizzle, Postgres)
 
@@ -116,7 +116,7 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 | M2 ✅     | Organizations: create, public page (about/upcoming/archive), admin (settings, members, API keys), trust guard                                        | Untrusted session blocked from admin                                 |
 | M3 ✅     | Bracket engine (pure lib)                                                                                                                            | Property and fixture tests for all 4 types + groups                  |
 | M4 ✅     | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
-| M5        | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |
+| M5 ✅     | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |
 | M6        | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                    |
 | M7        | REST API + OpenAPI + docs page                                                                                                                       | API e2e: create → start → report via key                             |
 | M8        | Public profile with history/results + visibility, Steam game picker, polish/i18n audit                                                               |                                                                      |
@@ -134,8 +134,15 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 - Lifecycle: `draft` → `registration` (published) → optional `check_in` → `running` → `completed`. Starting from check-in removes participants who didn't check in. Requirements and structure are locked once running.
 - `refreshStage` (in `services/stages.ts`) is the single place that turns templates + results into stored match state. It runs after every result change inside a transaction that locks the stage row, pairs the next Swiss round, completes stages, and on the last stage writes final ranks (group stage leavers are ranked by group placing below the final stage) and completes the tournament.
 - The final stage is started by the organizer once the group stage is done, so they can review the standings first.
-- In M4 only organizers enter results (admin Matches tab). Player reporting, disputes and chat are M6. Theme selection is M5; the bracket page is a plain list until then.
+- In M4 only organizers enter results (admin Matches tab). Player reporting, disputes and chat are M6.
 - Auth modules describe their tournament options with `configFields`, which the Requirements tab renders as a form; tetr.io has rank and TR limits.
+
+## Implementation notes (M5)
+
+- `bracketLayout.ts` (pure, tested for every format and size 2–33) places matches: rounds are columns, a match sits level with the matches feeding it, the losers bracket goes below the winners bracket, the grand final to the right, the third place match under the final. Byes are hidden but keep their place so the tree stays regular; columns of only byes are dropped and the shown rounds renumbered.
+- Match numbers (`matchNumbers`) follow play order and skip byes. They depend only on the templates, so they never change mid-stage; M6 match pages can use them. Empty slots say "Winner of #3" / "Loser of #3".
+- The canvas is HTML cards over an SVG of connectors, moved with a CSS transform (`PanZoom.svelte`, math in `panZoom.ts`). Drag or arrow keys pan; Ctrl + scroll, pinch, +/− keys or the toolbar zoom; plain scrolling still scrolls the page. Full screen where supported. Hovering a participant highlights their path.
+- Round robin and Swiss show the standings table and the rounds as columns without connectors.
 
 ## M0 + M1 in detail
 

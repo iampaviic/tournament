@@ -2,6 +2,8 @@ import { and, asc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { db, type Executor } from '#lib/server/db/index.ts';
 import { identities, participants, users, type Tournament } from '#lib/server/db/schema.ts';
 import { getModule } from '#lib/server/modules/registry.ts';
+import type { AuthModule } from '#lib/server/modules/types.ts';
+import type { ThemeParticipant } from '#lib/themes/index.ts';
 import { ServiceError } from './errors';
 import { refreshIdentity } from './identities';
 import { evaluateRequirements, type RequirementCheck } from './requirements';
@@ -27,6 +29,44 @@ export async function listParticipants(tournamentId: string, executor: Executor 
 		.innerJoin(users, eq(participants.userId, users.id))
 		.where(eq(participants.tournamentId, tournamentId))
 		.orderBy(...seedOrder);
+}
+
+/**
+ * Participants as bracket themes see them, by participant id. `module` is the theme's auth module;
+ * participants who linked it get its `bracketFields`.
+ */
+export async function bracketParticipants(
+	tournamentId: string,
+	module?: AuthModule
+): Promise<Record<string, ThemeParticipant>> {
+	const list = await listParticipants(tournamentId);
+	const fields = new Map<string, Record<string, string>>();
+	if (module?.bracketFields && list.length) {
+		const rows = await db
+			.select()
+			.from(identities)
+			.where(
+				and(
+					eq(identities.moduleId, module.id),
+					inArray(
+						identities.userId,
+						list.map((p) => p.userId)
+					)
+				)
+			);
+		for (const row of rows) {
+			fields.set(
+				row.userId,
+				module.bracketFields({ ...row, avatarUrl: row.avatarUrl ?? undefined })
+			);
+		}
+	}
+	return Object.fromEntries(
+		list.map((p) => [
+			p.id,
+			{ id: p.id, name: p.displayName, avatarUrl: p.avatarUrl, fields: fields.get(p.userId) ?? {} }
+		])
+	);
 }
 
 export async function getParticipant(tournamentId: string, userId: string) {

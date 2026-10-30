@@ -1,17 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
-import { signIn, uniqueName } from './helpers';
-
-/** Enters 2–0 for the first slot of every ready match on the admin matches page. */
-async function playReadyMatches(page: Page) {
-	const ready = page.locator('li[data-testid^="match-"]', { hasText: 'Ready' });
-	while ((await ready.count()) > 0) {
-		const match = page.getByTestId((await ready.first().getAttribute('data-testid'))!);
-		await match.locator('input[name="score1"]').fill('2');
-		await match.locator('input[name="score2"]').fill('0');
-		await match.getByRole('button', { name: 'Save' }).click();
-		await expect(match).toContainText('Done');
-	}
-}
+import { expect, test } from '@playwright/test';
+import { adminTab, playReadyMatches, registerPlayers, signIn, uniqueName } from './helpers';
 
 test('run a two-stage tournament from sign-up to champion', async ({ page, browser }) => {
 	test.slow();
@@ -34,8 +22,7 @@ test('run a two-stage tournament from sign-up to champion', async ({ page, brows
 	await page.getByLabel('Name').fill(cup);
 	await page.getByRole('button', { name: 'Create tournament' }).click();
 	await expect(page).toHaveURL(`/t/${orgSlug}/autumn-cup/admin`);
-	const admin = (tab: string) =>
-		page.getByRole('navigation', { name: 'Tournament admin' }).getByRole('link', { name: tab });
+	const admin = (tab: string) => adminTab(page, tab);
 
 	// Two round robin groups of three, the top two of each into a single elimination final stage.
 	await admin('Structure').click();
@@ -51,16 +38,7 @@ test('run a two-stage tournament from sign-up to champion', async ({ page, brows
 	await page.getByRole('button', { name: 'Open registration' }).click();
 	await expect(page.getByText('Registration is open.')).toBeVisible();
 
-	const players = Array.from({ length: 6 }, (_, i) => uniqueName(`pl${i + 1}`));
-	for (const player of players) {
-		const context = await browser.newContext({ extraHTTPHeaders: { 'X-Forwarded-Proto': 'http' } });
-		const playerPage = await context.newPage();
-		await signIn(playerPage, player);
-		await playerPage.goto(`/t/${orgSlug}/autumn-cup`);
-		await playerPage.getByRole('button', { name: 'Register' }).click();
-		await expect(playerPage.getByText("You're registered.")).toBeVisible();
-		await context.close();
-	}
+	await registerPlayers(browser, `/t/${orgSlug}/autumn-cup`, 'pl', 6);
 
 	await admin('Participants').click();
 	await expect(page).toHaveURL(/participants$/);

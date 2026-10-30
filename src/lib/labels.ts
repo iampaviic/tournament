@@ -45,3 +45,24 @@ export const groupName = (index: number) => m.group_name({ name: String.fromChar
 
 export const stageLabel = (index: number, count: number) =>
 	count === 1 ? m.stage_only() : index === 0 ? m.stage_group() : m.stage_final();
+
+/** Column heading in the bracket view. `rounds` is the number of rounds in that side. */
+export function roundTitle(
+	{ side, round, rounds }: { side: BracketSide; round: number; rounds: number },
+	elimination: boolean
+): string {
+	const fromEnd = rounds - round;
+	switch (side) {
+		case 'main':
+			if (!elimination || fromEnd > 2) return m.round_name({ round });
+			return [m.round_final, m.round_semifinals, m.round_quarterfinals][fromEnd]();
+		case 'winners':
+			return fromEnd === 0 ? m.round_winners_final() : m.round_winners({ round });
+		case 'losers':
+			return fromEnd === 0 ? m.round_losers_final() : m.round_losers({ round });
+		case 'grand_final':
+			return round === 1 ? m.round_grand_final() : m.round_reset();
+		case 'third_place':
+			return m.side_third_place();
+	}
+}

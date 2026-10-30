@@ -1,13 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.ts';
-import { matches, participants, type Tournament } from '#lib/server/db/schema.ts';
+import { identities, matches, participants, type Tournament } from '#lib/server/db/schema.ts';
+import { tetrioModule } from '#lib/server/modules/auth/tetrio.ts';
 import { createUser, resetDatabase } from '#lib/server/testing/factories.ts';
 import { DEFAULT_STAGE_SETTINGS, type StageConfig } from '#lib/tournaments.ts';
 import { signIn } from './identities';
 import { createOrganization } from './organizations';
 import {
 	addParticipant,
+	bracketParticipants,
 	checkIn,
 	listParticipants,
 	register,
@@ -27,7 +29,8 @@ import {
 	getTournamentById,
 	setRequirements,
 	setStatus,
-	setStructure
+	setStructure,
+	setTheme
 } from './tournaments';
 
 let tournament: Tournament;
@@ -336,5 +339,36 @@ describe('registration', () => {
 		const { userId } = await signIn('dev', { providerUserId: 'f', username: 'f', data: {} });
 		await register(tournament, userId);
 		await expect(setStatus(tournament, 'draft')).rejects.toThrow('already signed up');
+	});
+});
+
+describe('bracket themes', () => {
+	it('switches themes, but only to installed ones', async () => {
+		await setTheme(tournament, 'tetrio');
+		expect((await reload()).themeId).toBe('tetrio');
+		await expect(setTheme(tournament, 'retro')).rejects.toThrow('not available');
+		expect((await reload()).themeId).toBe('tetrio');
+	});
+
+	it("gives themes the fields of their module's linked accounts", async () => {
+		const [ranked, other] = await withPlayers(2);
+		await db.insert(identities).values({
+			userId: ranked.userId,
+			moduleId: 'tetrio',
+			providerUserId: 't1',
+			username: 'osk',
+			data: { rank: 'x', tr: 24321.4, country: 'HR' }
+		});
+		const tetrio = tetrioModule({ clientId: 'x', clientSecret: 'y' });
+
+		const shown = await bracketParticipants(tournament.id, tetrio);
+		expect(shown[ranked.id]).toEqual({
+			id: ranked.id,
+			name: 'p1',
+			avatarUrl: null,
+			fields: { rank: 'X', tr: '24,321', country: 'HR' }
+		});
+		expect(shown[other.id].fields).toEqual({});
+		expect((await bracketParticipants(tournament.id))[ranked.id].fields).toEqual({});
 	});
 });

@@ -84,6 +84,12 @@ TETR.IO has no OAuth. The `tetrio` module signs the user in with Discord and fin
 
 To add a module, implement `AuthModule` from `src/lib/server/modules/types.ts` and register it in `src/lib/server/modules/registry.ts`.
 
+## Bracket themes
+
+Organizers pick a theme for each tournament's bracket in its admin Theme tab. Installed: `default` (the site's colors, light or dark) and `tetrio` (shows TETR.IO rank, TR and country from linked accounts). Set `BRACKET_THEMES=default,tetrio` to limit which ones can be picked; all are available when it's empty.
+
+To add a theme, implement `BracketTheme` from `src/lib/themes/types.ts` (colors plus a `ParticipantLabel` component) and register it in `src/lib/themes/index.ts`.
+
 ## Deployment
 
 ```bash

@@ -11,6 +11,7 @@ import {
 	type TournamentStatus
 } from '#lib/server/db/schema.ts';
 import { DEFAULT_STAGE_SETTINGS, structureSchema, type StageConfig } from '#lib/tournaments.ts';
+import { isThemeEnabled } from '#lib/server/themes.ts';
 import { ServiceError } from './errors';
 import { orgSlugSchema } from './organizations';
 import type { Requirement } from './requirements';
@@ -87,6 +88,12 @@ export async function updateTournament(tournament: Tournament, input: Tournament
 		.where(eq(tournaments.id, tournament.id))
 		.returning();
 	return updated;
+}
+
+/** Picks the bracket theme. It can be changed at any time, even while the tournament is played. */
+export async function setTheme(tournament: Tournament, themeId: string) {
+	if (!isThemeEnabled(themeId)) throw new ServiceError('That theme is not available.');
+	await db.update(tournaments).set({ themeId }).where(eq(tournaments.id, tournament.id));
 }
 
 export async function deleteTournament(tournamentId: string) {

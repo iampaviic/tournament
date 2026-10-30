@@ -1,4 +1,21 @@
-import { compareTemplates, type BracketSide, type MatchTemplate } from '#lib/brackets/index.ts';
+import {
+	compareTemplates,
+	type BracketSide,
+	type MatchResult,
+	type MatchState,
+	type MatchStatus,
+	type MatchTemplate
+} from '#lib/brackets/index.ts';
+
+/** A match as the bracket pages show it. */
+export interface BracketMatch {
+	id: string;
+	template: MatchTemplate;
+	status: MatchStatus;
+	/** Participant ids; `null` is a bye, `undefined` not known yet. */
+	entrants: MatchState['entrants'];
+	result: MatchResult | null;
+}
 
 /** Groups a stage's matches by bracket side and round, in bracket order, for display. */
 export function sections<T extends { template: MatchTemplate }>(matches: T[]) {

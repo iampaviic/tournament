@@ -26,6 +26,11 @@ export const variables = defineEnvVars({
 		description:
 			'Allow the insecure `dev` auth module in production builds. Only for e2e tests, never on a real instance.'
 	},
+	BRACKET_THEMES: {
+		schema: list,
+		description:
+			'Comma-separated ids of the bracket themes organizers can pick, e.g. `default,tetrio`. All installed themes when empty.'
+	},
 	DISCORD_CLIENT_ID: { schema: optional, description: 'Discord OAuth2 application client id.' },
 	DISCORD_CLIENT_SECRET: {
 		schema: optional,

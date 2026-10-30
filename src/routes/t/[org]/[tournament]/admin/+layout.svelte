@@ -28,6 +28,11 @@
 			label: m.tadmin_structure
 		},
 		{
+			route: '/t/[org]/[tournament]/admin/theme',
+			href: resolve('/t/[org]/[tournament]/admin/theme', params),
+			label: m.tadmin_theme
+		},
+		{
 			route: '/t/[org]/[tournament]/admin/participants',
 			href: resolve('/t/[org]/[tournament]/admin/participants', params),
 			label: m.tadmin_participants

@@ -66,6 +66,10 @@
 	}
 
 	.brand {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 		font-weight: 700;
 		color: var(--text);
 		text-decoration: none;
@@ -74,7 +78,12 @@
 	nav {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
+		white-space: nowrap;
+
+		@include up($bp-sm) {
+			gap: 1rem;
+		}
 
 		a:not(.btn) {
 			color: var(--text-muted);

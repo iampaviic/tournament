@@ -12,7 +12,6 @@ import {
 	snakeGroups,
 	type MatchResult,
 	type MatchState,
-	type MatchTemplate,
 	type StageOptions
 } from '#lib/brackets/index.ts';
 import { db, type Executor, type Transaction } from '#lib/server/db/index.ts';
@@ -25,6 +24,7 @@ import {
 	type Stage,
 	type Tournament
 } from '#lib/server/db/schema.ts';
+import type { BracketMatch } from '#lib/bracketView.ts';
 import { isElimination, tiebreakersFor } from '#lib/tournaments.ts';
 import { ServiceError } from './errors';
 import { playingParticipants, writeSeeds } from './participants';
@@ -318,15 +318,6 @@ export async function clearMatchResult(tournament: Tournament, matchId: string) 
 			.where(eq(matches.id, matchId));
 		await refreshStage(tx, stage.id);
 	});
-}
-
-export interface BracketMatch {
-	id: string;
-	template: MatchTemplate;
-	status: Match['status'];
-	/** Participant ids; `null` is a bye, `undefined` not known yet. */
-	entrants: MatchState['entrants'];
-	result: MatchResult | null;
 }
 
 /** Everything needed to show a tournament's stages: matches by group and standings. */

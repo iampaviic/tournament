@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { m } from '#lib/paraglide/messages.js';
+	import { matchNumbers } from '#lib/bracketLayout.ts';
 	import { sections } from '#lib/bracketView.ts';
 	import { groupName, matchStatusLabel, sideLabel, stageLabel } from '#lib/labels.ts';
 	import type { PageProps } from './$types';
@@ -24,6 +25,7 @@
 {#each data.stages as stage (stage.id)}
 	<h2>{stageLabel(stage.index, data.stageCount)}</h2>
 	{#each stage.groups as group, groupIndex (groupIndex)}
+		{@const numbers = matchNumbers(group.matches.map((match) => match.template))}
 		{#if stage.groups.length > 1}<h3>{groupName(groupIndex)}</h3>{/if}
 		{#each sections(group.matches) as section (section.side)}
 			{#if sideLabel(section.side)}<h4>{sideLabel(section.side)}</h4>{/if}
@@ -36,6 +38,11 @@
 								stage.status === 'running' &&
 								(match.status === 'ready' || match.status === 'completed')}
 							<li data-testid="match-{match.id}">
+								<span class="number"
+									>{numbers.has(match.template.id)
+										? `#${numbers.get(match.template.id)}`
+										: ''}</span
+								>
 								<span class="badge">{matchStatusLabel(match.status)}</span>
 								{#if editable}
 									<form method="POST" action="?/result" class="result" use:enhance>
@@ -135,6 +142,13 @@
 			& + li {
 				border-top: 1px solid var(--border);
 			}
+		}
+
+		.number {
+			min-width: 2rem;
+			color: var(--text-muted);
+			font-size: 0.85rem;
+			font-variant-numeric: tabular-nums;
 		}
 
 		.badge {
