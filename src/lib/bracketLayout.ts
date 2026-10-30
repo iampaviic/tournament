@@ -11,7 +11,7 @@ export const CARD_WIDTH = 184;
 export const SLOT_HEIGHT = 30;
 export const CARD_HEIGHT = SLOT_HEIGHT * 2;
 export const HEADER_HEIGHT = 36;
-const COLUMN_GAP = 44;
+const COLUMN_GAP = 48;
 const ROW_GAP = 16;
 const SECTION_GAP = 48;
 /** Room left of the first column for match numbers. */

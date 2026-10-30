@@ -130,10 +130,10 @@
 		}
 	}
 
-	// Level with the first name, clear of the connectors that arrive on the lines.
+	// Level with the first name, between the card and the connector that arrives half a gap away.
 	.number {
 		position: absolute;
-		right: calc(100% + 10px);
+		right: calc(100% + 4px);
 		top: 25%;
 		transform: translateY(-50%);
 		font-size: 0.6875rem;

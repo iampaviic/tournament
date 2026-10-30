@@ -1,0 +1,879 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T00:00:00Z",
+  "title": "Design System: Tournament Manager",
+  "extensions": {
+    "colorMeta": {
+      "wall": {
+        "role": "neutral",
+        "displayName": "The Wall",
+        "tonalRamp": [
+          "oklch(15% 0.001 255)",
+          "oklch(25% 0.003 255)",
+          "oklch(35% 0.006 255)",
+          "oklch(45% 0.008 255)",
+          "oklch(58% 0.008 255)",
+          "oklch(70% 0.008 255)",
+          "oklch(82% 0.005 255)",
+          "oklch(95% 0.001 255)"
+        ]
+      },
+      "dark-wall": {
+        "role": "neutral",
+        "displayName": "The Wall (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.001 255)",
+          "oklch(25% 0.003 255)",
+          "oklch(35% 0.006 255)",
+          "oklch(45% 0.008 255)",
+          "oklch(58% 0.008 255)",
+          "oklch(70% 0.008 255)",
+          "oklch(82% 0.005 255)",
+          "oklch(95% 0.001 255)"
+        ]
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "The Sheet",
+        "tonalRamp": [
+          "oklch(15% 0.000 255)",
+          "oklch(25% 0.000 255)",
+          "oklch(35% 0.000 255)",
+          "oklch(45% 0.000 255)",
+          "oklch(58% 0.000 255)",
+          "oklch(70% 0.000 255)",
+          "oklch(82% 0.000 255)",
+          "oklch(95% 0.000 255)"
+        ]
+      },
+      "dark-sheet": {
+        "role": "neutral",
+        "displayName": "The Sheet (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.000 255)",
+          "oklch(25% 0.000 255)",
+          "oklch(35% 0.000 255)",
+          "oklch(45% 0.000 255)",
+          "oklch(58% 0.000 255)",
+          "oklch(70% 0.000 255)",
+          "oklch(82% 0.000 255)",
+          "oklch(95% 0.000 255)"
+        ]
+      },
+      "sheet-fill": {
+        "role": "neutral",
+        "displayName": "Sheet Fill",
+        "tonalRamp": [
+          "oklch(15% 0.001 255)",
+          "oklch(25% 0.003 255)",
+          "oklch(35% 0.004 255)",
+          "oklch(45% 0.006 255)",
+          "oklch(58% 0.006 255)",
+          "oklch(70% 0.006 255)",
+          "oklch(82% 0.004 255)",
+          "oklch(95% 0.001 255)"
+        ]
+      },
+      "dark-sheet-fill": {
+        "role": "neutral",
+        "displayName": "Sheet Fill (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.001 255)",
+          "oklch(25% 0.003 255)",
+          "oklch(35% 0.004 255)",
+          "oklch(45% 0.006 255)",
+          "oklch(58% 0.006 255)",
+          "oklch(70% 0.006 255)",
+          "oklch(82% 0.004 255)",
+          "oklch(95% 0.001 255)"
+        ]
+      },
+      "sheet-edge": {
+        "role": "neutral",
+        "displayName": "Sheet Edge",
+        "tonalRamp": [
+          "oklch(15% 0.001 260)",
+          "oklch(25% 0.004 260)",
+          "oklch(35% 0.007 260)",
+          "oklch(45% 0.010 260)",
+          "oklch(58% 0.010 260)",
+          "oklch(70% 0.010 260)",
+          "oklch(82% 0.006 260)",
+          "oklch(95% 0.002 260)"
+        ]
+      },
+      "dark-sheet-edge": {
+        "role": "neutral",
+        "displayName": "Sheet Edge (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.001 260)",
+          "oklch(25% 0.004 260)",
+          "oklch(35% 0.007 260)",
+          "oklch(45% 0.010 260)",
+          "oklch(58% 0.010 260)",
+          "oklch(70% 0.010 260)",
+          "oklch(82% 0.006 260)",
+          "oklch(95% 0.002 260)"
+        ]
+      },
+      "row-rule": {
+        "role": "neutral",
+        "displayName": "Row Rule",
+        "tonalRamp": [
+          "oklch(15% 0.001 260)",
+          "oklch(25% 0.003 260)",
+          "oklch(35% 0.006 260)",
+          "oklch(45% 0.008 260)",
+          "oklch(58% 0.008 260)",
+          "oklch(70% 0.008 260)",
+          "oklch(82% 0.005 260)",
+          "oklch(95% 0.001 260)"
+        ]
+      },
+      "dark-row-rule": {
+        "role": "neutral",
+        "displayName": "Row Rule (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.001 260)",
+          "oklch(25% 0.003 260)",
+          "oklch(35% 0.006 260)",
+          "oklch(45% 0.008 260)",
+          "oklch(58% 0.008 260)",
+          "oklch(70% 0.008 260)",
+          "oklch(82% 0.005 260)",
+          "oklch(95% 0.001 260)"
+        ]
+      },
+      "control-outline": {
+        "role": "neutral",
+        "displayName": "Control Outline",
+        "tonalRamp": [
+          "oklch(15% 0.002 260)",
+          "oklch(25% 0.006 260)",
+          "oklch(35% 0.011 260)",
+          "oklch(45% 0.015 260)",
+          "oklch(58% 0.015 260)",
+          "oklch(70% 0.015 260)",
+          "oklch(82% 0.009 260)",
+          "oklch(95% 0.002 260)"
+        ]
+      },
+      "dark-control-outline": {
+        "role": "neutral",
+        "displayName": "Control Outline (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.002 260)",
+          "oklch(25% 0.006 260)",
+          "oklch(35% 0.011 260)",
+          "oklch(45% 0.015 260)",
+          "oklch(58% 0.015 260)",
+          "oklch(70% 0.015 260)",
+          "oklch(82% 0.009 260)",
+          "oklch(95% 0.002 260)"
+        ]
+      },
+      "printed-line": {
+        "role": "neutral",
+        "displayName": "Printed Line",
+        "tonalRamp": [
+          "oklch(15% 0.003 260)",
+          "oklch(25% 0.009 260)",
+          "oklch(35% 0.014 260)",
+          "oklch(45% 0.020 260)",
+          "oklch(58% 0.020 260)",
+          "oklch(70% 0.020 260)",
+          "oklch(82% 0.012 260)",
+          "oklch(95% 0.003 260)"
+        ]
+      },
+      "dark-printed-line": {
+        "role": "neutral",
+        "displayName": "Printed Line (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.003 260)",
+          "oklch(25% 0.009 260)",
+          "oklch(35% 0.014 260)",
+          "oklch(45% 0.020 260)",
+          "oklch(58% 0.020 260)",
+          "oklch(70% 0.020 260)",
+          "oklch(82% 0.012 260)",
+          "oklch(95% 0.003 260)"
+        ]
+      },
+      "print-ink": {
+        "role": "neutral",
+        "displayName": "Print Ink",
+        "tonalRamp": [
+          "oklch(15% 0.001 260)",
+          "oklch(25% 0.003 260)",
+          "oklch(35% 0.004 260)",
+          "oklch(45% 0.006 260)",
+          "oklch(58% 0.006 260)",
+          "oklch(70% 0.006 260)",
+          "oklch(82% 0.004 260)",
+          "oklch(95% 0.001 260)"
+        ]
+      },
+      "dark-print-ink": {
+        "role": "neutral",
+        "displayName": "Print Ink (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.001 260)",
+          "oklch(25% 0.003 260)",
+          "oklch(35% 0.004 260)",
+          "oklch(45% 0.006 260)",
+          "oklch(58% 0.006 260)",
+          "oklch(70% 0.006 260)",
+          "oklch(82% 0.004 260)",
+          "oklch(95% 0.001 260)"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "tonalRamp": [
+          "oklch(15% 0.003 260)",
+          "oklch(25% 0.009 260)",
+          "oklch(35% 0.014 260)",
+          "oklch(45% 0.020 260)",
+          "oklch(58% 0.020 260)",
+          "oklch(70% 0.020 260)",
+          "oklch(82% 0.012 260)",
+          "oklch(95% 0.003 260)"
+        ]
+      },
+      "dark-ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.003 260)",
+          "oklch(25% 0.009 260)",
+          "oklch(35% 0.014 260)",
+          "oklch(45% 0.020 260)",
+          "oklch(58% 0.020 260)",
+          "oklch(70% 0.020 260)",
+          "oklch(82% 0.012 260)",
+          "oklch(95% 0.003 260)"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "tonalRamp": [
+          "oklch(15% 0.004 260)",
+          "oklch(25% 0.011 260)",
+          "oklch(35% 0.018 260)",
+          "oklch(45% 0.025 260)",
+          "oklch(58% 0.025 260)",
+          "oklch(70% 0.025 260)",
+          "oklch(82% 0.015 260)",
+          "oklch(95% 0.004 260)"
+        ]
+      },
+      "dark-ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.004 260)",
+          "oklch(25% 0.011 260)",
+          "oklch(35% 0.018 260)",
+          "oklch(45% 0.025 260)",
+          "oklch(58% 0.025 260)",
+          "oklch(70% 0.025 260)",
+          "oklch(82% 0.015 260)",
+          "oklch(95% 0.004 260)"
+        ]
+      },
+      "ballpoint": {
+        "role": "primary",
+        "displayName": "Ballpoint Blue",
+        "tonalRamp": [
+          "#0f2363",
+          "#173a9e",
+          "#1f49c7",
+          "#3f65d8",
+          "#85a1f4",
+          "#b4c6f8",
+          "#d7e0f9",
+          "#eef2fd"
+        ]
+      },
+      "dark-ballpoint": {
+        "role": "primary",
+        "displayName": "Ballpoint Blue (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.027 264)",
+          "oklch(25% 0.081 264)",
+          "oklch(35% 0.136 264)",
+          "oklch(45% 0.190 264)",
+          "oklch(58% 0.190 264)",
+          "oklch(70% 0.190 264)",
+          "oklch(82% 0.114 264)",
+          "oklch(95% 0.032 264)"
+        ]
+      },
+      "ballpoint-pressed": {
+        "role": "primary",
+        "displayName": "Pressed Ballpoint",
+        "tonalRamp": [
+          "oklch(15% 0.023 264)",
+          "oklch(25% 0.069 264)",
+          "oklch(35% 0.114 264)",
+          "oklch(45% 0.160 264)",
+          "oklch(58% 0.160 264)",
+          "oklch(70% 0.160 264)",
+          "oklch(82% 0.096 264)",
+          "oklch(95% 0.027 264)"
+        ]
+      },
+      "dark-ballpoint-pressed": {
+        "role": "primary",
+        "displayName": "Pressed Ballpoint (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.023 264)",
+          "oklch(25% 0.069 264)",
+          "oklch(35% 0.114 264)",
+          "oklch(45% 0.160 264)",
+          "oklch(58% 0.160 264)",
+          "oklch(70% 0.160 264)",
+          "oklch(82% 0.096 264)",
+          "oklch(95% 0.027 264)"
+        ]
+      },
+      "ballpoint-on": {
+        "role": "primary",
+        "displayName": "On Ballpoint",
+        "tonalRamp": [
+          "oklch(15% 0.000 264)",
+          "oklch(25% 0.000 264)",
+          "oklch(35% 0.000 264)",
+          "oklch(45% 0.000 264)",
+          "oklch(58% 0.000 264)",
+          "oklch(70% 0.000 264)",
+          "oklch(82% 0.000 264)",
+          "oklch(95% 0.000 264)"
+        ]
+      },
+      "dark-ballpoint-on": {
+        "role": "primary",
+        "displayName": "On Ballpoint (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.000 264)",
+          "oklch(25% 0.000 264)",
+          "oklch(35% 0.000 264)",
+          "oklch(45% 0.000 264)",
+          "oklch(58% 0.000 264)",
+          "oklch(70% 0.000 264)",
+          "oklch(82% 0.000 264)",
+          "oklch(95% 0.000 264)"
+        ]
+      },
+      "ballpoint-tint": {
+        "role": "primary",
+        "displayName": "Ballpoint Tint",
+        "tonalRamp": [
+          "oklch(15% 0.004 264)",
+          "oklch(25% 0.013 264)",
+          "oklch(35% 0.021 264)",
+          "oklch(45% 0.030 264)",
+          "oklch(58% 0.030 264)",
+          "oklch(70% 0.030 264)",
+          "oklch(82% 0.018 264)",
+          "oklch(95% 0.005 264)"
+        ]
+      },
+      "dark-ballpoint-tint": {
+        "role": "primary",
+        "displayName": "Ballpoint Tint (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.004 264)",
+          "oklch(25% 0.013 264)",
+          "oklch(35% 0.021 264)",
+          "oklch(45% 0.030 264)",
+          "oklch(58% 0.030 264)",
+          "oklch(70% 0.030 264)",
+          "oklch(82% 0.018 264)",
+          "oklch(95% 0.005 264)"
+        ]
+      },
+      "ballpoint-track": {
+        "role": "primary",
+        "displayName": "Ballpoint Track",
+        "tonalRamp": [
+          "oklch(15% 0.009 264)",
+          "oklch(25% 0.026 264)",
+          "oklch(35% 0.043 264)",
+          "oklch(45% 0.060 264)",
+          "oklch(58% 0.060 264)",
+          "oklch(70% 0.060 264)",
+          "oklch(82% 0.036 264)",
+          "oklch(95% 0.010 264)"
+        ]
+      },
+      "dark-ballpoint-track": {
+        "role": "primary",
+        "displayName": "Ballpoint Track (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.009 264)",
+          "oklch(25% 0.026 264)",
+          "oklch(35% 0.043 264)",
+          "oklch(45% 0.060 264)",
+          "oklch(58% 0.060 264)",
+          "oklch(70% 0.060 264)",
+          "oklch(82% 0.036 264)",
+          "oklch(95% 0.010 264)"
+        ]
+      },
+      "ballpoint-ink": {
+        "role": "primary",
+        "displayName": "Ballpoint Ink",
+        "tonalRamp": [
+          "oklch(15% 0.023 264)",
+          "oklch(25% 0.069 264)",
+          "oklch(35% 0.114 264)",
+          "oklch(45% 0.160 264)",
+          "oklch(58% 0.160 264)",
+          "oklch(70% 0.160 264)",
+          "oklch(82% 0.096 264)",
+          "oklch(95% 0.027 264)"
+        ]
+      },
+      "dark-ballpoint-ink": {
+        "role": "primary",
+        "displayName": "Ballpoint Ink (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.023 264)",
+          "oklch(25% 0.069 264)",
+          "oklch(35% 0.114 264)",
+          "oklch(45% 0.160 264)",
+          "oklch(58% 0.160 264)",
+          "oklch(70% 0.160 264)",
+          "oklch(82% 0.096 264)",
+          "oklch(95% 0.027 264)"
+        ]
+      },
+      "red-pen": {
+        "role": "secondary",
+        "displayName": "Organizer's Red Pen",
+        "tonalRamp": [
+          "#4a0f11",
+          "#831c1e",
+          "#c4242a",
+          "#e0474c",
+          "#f0696d",
+          "#f6a7a9",
+          "#fbd3d2",
+          "#ffedea"
+        ]
+      },
+      "dark-red-pen": {
+        "role": "secondary",
+        "displayName": "Organizer's Red Pen (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.027 25)",
+          "oklch(25% 0.081 25)",
+          "oklch(35% 0.136 25)",
+          "oklch(45% 0.190 25)",
+          "oklch(58% 0.190 25)",
+          "oklch(70% 0.190 25)",
+          "oklch(82% 0.114 25)",
+          "oklch(95% 0.032 25)"
+        ]
+      },
+      "red-pen-tint": {
+        "role": "secondary",
+        "displayName": "Red Pen Tint",
+        "tonalRamp": [
+          "oklch(15% 0.006 25)",
+          "oklch(25% 0.017 25)",
+          "oklch(35% 0.029 25)",
+          "oklch(45% 0.040 25)",
+          "oklch(58% 0.040 25)",
+          "oklch(70% 0.040 25)",
+          "oklch(82% 0.024 25)",
+          "oklch(95% 0.007 25)"
+        ]
+      },
+      "dark-red-pen-tint": {
+        "role": "secondary",
+        "displayName": "Red Pen Tint (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.006 25)",
+          "oklch(25% 0.017 25)",
+          "oklch(35% 0.029 25)",
+          "oklch(45% 0.040 25)",
+          "oklch(58% 0.040 25)",
+          "oklch(70% 0.040 25)",
+          "oklch(82% 0.024 25)",
+          "oklch(95% 0.007 25)"
+        ]
+      },
+      "red-pen-ink": {
+        "role": "secondary",
+        "displayName": "Red Pen Ink",
+        "tonalRamp": [
+          "oklch(15% 0.019 25)",
+          "oklch(25% 0.056 25)",
+          "oklch(35% 0.093 25)",
+          "oklch(45% 0.130 25)",
+          "oklch(58% 0.130 25)",
+          "oklch(70% 0.130 25)",
+          "oklch(82% 0.078 25)",
+          "oklch(95% 0.022 25)"
+        ]
+      },
+      "dark-red-pen-ink": {
+        "role": "secondary",
+        "displayName": "Red Pen Ink (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.019 25)",
+          "oklch(25% 0.056 25)",
+          "oklch(35% 0.093 25)",
+          "oklch(45% 0.130 25)",
+          "oklch(58% 0.130 25)",
+          "oklch(70% 0.130 25)",
+          "oklch(82% 0.078 25)",
+          "oklch(95% 0.022 25)"
+        ]
+      },
+      "done-green": {
+        "role": "tertiary",
+        "displayName": "Done Green",
+        "tonalRamp": [
+          "#04250e",
+          "#0f4a2b",
+          "#247b50",
+          "#3aa56e",
+          "#4cc285",
+          "#8fe0b5",
+          "#bff0d3",
+          "#dcfae5"
+        ]
+      },
+      "dark-done-green": {
+        "role": "tertiary",
+        "displayName": "Done Green (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.017 155)",
+          "oklch(25% 0.051 155)",
+          "oklch(35% 0.086 155)",
+          "oklch(45% 0.120 155)",
+          "oklch(58% 0.120 155)",
+          "oklch(70% 0.120 155)",
+          "oklch(82% 0.072 155)",
+          "oklch(95% 0.020 155)"
+        ]
+      },
+      "done-green-tint": {
+        "role": "tertiary",
+        "displayName": "Done Green Tint",
+        "tonalRamp": [
+          "oklch(15% 0.007 155)",
+          "oklch(25% 0.021 155)",
+          "oklch(35% 0.036 155)",
+          "oklch(45% 0.050 155)",
+          "oklch(58% 0.050 155)",
+          "oklch(70% 0.050 155)",
+          "oklch(82% 0.030 155)",
+          "oklch(95% 0.008 155)"
+        ]
+      },
+      "dark-done-green-tint": {
+        "role": "tertiary",
+        "displayName": "Done Green Tint (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.007 155)",
+          "oklch(25% 0.021 155)",
+          "oklch(35% 0.036 155)",
+          "oklch(45% 0.050 155)",
+          "oklch(58% 0.050 155)",
+          "oklch(70% 0.050 155)",
+          "oklch(82% 0.030 155)",
+          "oklch(95% 0.008 155)"
+        ]
+      },
+      "done-green-ink": {
+        "role": "tertiary",
+        "displayName": "Done Green Ink",
+        "tonalRamp": [
+          "oklch(15% 0.010 155)",
+          "oklch(25% 0.030 155)",
+          "oklch(35% 0.050 155)",
+          "oklch(45% 0.070 155)",
+          "oklch(58% 0.070 155)",
+          "oklch(70% 0.070 155)",
+          "oklch(82% 0.042 155)",
+          "oklch(95% 0.012 155)"
+        ]
+      },
+      "dark-done-green-ink": {
+        "role": "tertiary",
+        "displayName": "Done Green Ink (dark)",
+        "tonalRamp": [
+          "oklch(15% 0.010 155)",
+          "oklch(25% 0.030 155)",
+          "oklch(35% 0.050 155)",
+          "oklch(45% 0.070 155)",
+          "oklch(58% 0.070 155)",
+          "oklch(70% 0.070 155)",
+          "oklch(82% 0.042 155)",
+          "oklch(95% 0.012 155)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home hero headline only; Archivo at 72% width (font-stretch)."
+      },
+      "statement": {
+        "displayName": "Statement",
+        "purpose": "Home section statements, formats index and feature rows; 80% width."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Page h1; 1.5rem under 640px."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "h2 headings on working screens."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The one introductory sentence on the home page."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All working-screen text; 1rem in fields on coarse pointers."
+      },
+      "name": {
+        "displayName": "Name",
+        "purpose": "Player and entrant names and the wordmark, set via font-stretch: var(--name-stretch) 88%."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, tabs, field labels, tags."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Hints, errors, tags, toolbar hints."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Code and the API reference only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "none",
+        "value": "none",
+        "purpose": "Nothing at rest casts a shadow; depth is the sheet on the wall plus a 1px edge."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Presses, hovers and UI state changes."
+      },
+      {
+        "name": "ease-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Arrivals: reveal rise, headline lines."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.76, 0, 0.24, 1)",
+        "purpose": "Colour fields opening and the hero joint drawing."
+      },
+      {
+        "name": "t-press",
+        "value": "140ms",
+        "purpose": "Button press (1px sink)."
+      },
+      {
+        "name": "t-hover",
+        "value": "180ms",
+        "purpose": "Link and hover colour."
+      },
+      {
+        "name": "t-ui",
+        "value": "240ms",
+        "purpose": "UI state changes."
+      },
+      {
+        "name": "t-reveal",
+        "value": "800ms",
+        "purpose": "Scroll reveal (rise 24px, settle from 0.96, or clip open from the foot); reduced motion collapses all motion to 1ms."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "900px"
+      }
+    ],
+    "bracketGeometry": {
+      "cardWidth": "184px",
+      "slotHeight": "30px",
+      "headerHeight": "36px",
+      "columnGap": "48px",
+      "rowGap": "16px",
+      "sectionGap": "48px",
+      "gutter": "36px",
+      "numberOffset": "4px"
+    },
+    "bracketThemeTokens": [
+      "background",
+      "card",
+      "border",
+      "text",
+      "muted",
+      "line",
+      "ink",
+      "ready",
+      "highlight",
+      "font"
+    ]
+  },
+  "components": [
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Every secondary action: sheet stock, control outline, sinks 1px on press.",
+      "html": "<button class=\"ds-btn\">Sign out</button>",
+      "css": ".ds-btn{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:32px;padding:0 .85rem;border-radius:6px;border:1px solid var(--control,#c3c9d3);background:var(--surface,#fff);color:var(--text,#121417);font-size:.875rem;font-weight:550;line-height:1.2;cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,transform 140ms cubic-bezier(.22,1,.36,1)}.ds-btn:hover{background:var(--surface-2,#f3f5f8)}.ds-btn:active{transform:translateY(1px)}.ds-btn:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one primary action in a view, in full ballpoint.",
+      "html": "<button class=\"ds-btn-primary\">Open match room</button>",
+      "css": ".ds-btn-primary{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 .85rem;border-radius:6px;border:1px solid var(--accent,#1f49c7);background:var(--accent,#1f49c7);color:var(--accent-text,#fff);font-size:.875rem;font-weight:550;line-height:1.2;cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,transform 140ms cubic-bezier(.22,1,.36,1)}.ds-btn-primary:hover{background:var(--accent-hover,#173a9e);border-color:var(--accent-hover,#173a9e)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "A destructive or deciding organizer action, in red pen.",
+      "html": "<button class=\"ds-btn-danger\">Remove participant</button>",
+      "css": ".ds-btn-danger{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;min-height:32px;padding:0 .85rem;border-radius:6px;border:1px solid color-mix(in srgb,var(--danger,#c4242a) 40%,var(--control,#c3c9d3));background:var(--surface,#fff);color:var(--danger,#c4242a);font-size:.875rem;font-weight:550;cursor:pointer;transition:background-color 120ms ease-out}.ds-btn-danger:hover{background:var(--danger-soft,#ffedea)}.ds-btn-danger:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Label above, 40px field, ballpoint focus.",
+      "html": "<label class=\"ds-field\"><span>Your club or community</span><input class=\"ds-input\" type=\"text\" placeholder=\"Kvart Gaming Club\"></label>",
+      "css": ".ds-field{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:flex;flex-direction:column;gap:.5rem;font-size:.875rem;color:var(--text,#121417)}.ds-field span{font-weight:550}.ds-input{min-height:40px;padding:.5rem .75rem;border:1px solid var(--control,#c3c9d3);border-radius:6px;background:var(--surface,#fff);color:var(--text,#121417);font:inherit;transition:border-color 120ms ease-out}.ds-input::placeholder{color:var(--text-faint,#626c7c)}.ds-input:hover{border-color:var(--line,#8a93a2)}.ds-input:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:-1px;border-color:var(--accent,#1f49c7)}"
+    },
+    {
+      "name": "Status Tags",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "A pale tint with dark ink of the same hue; tone follows the match or tournament state.",
+      "html": "<span class=\"ds-badge\">Draft</span> <span class=\"ds-badge ds-accent\">In progress</span> <span class=\"ds-badge ds-danger\">Disputed</span> <span class=\"ds-badge ds-success\">Checked in</span>",
+      "css": ".ds-badge{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;min-height:20px;padding:0 .4rem;border-radius:4px;font-size:.75rem;font-weight:550;line-height:1;background:var(--surface-2,#f3f5f8);color:var(--text-muted,#535b68)}.ds-accent{background:var(--accent-soft,#eef2fd);color:var(--accent-ink,#173a9e)}.ds-danger{background:var(--danger-soft,#ffedea);color:var(--danger-ink,#831c1e)}.ds-success{background:var(--success-soft,#dcfae5);color:var(--success-ink,#04250e)}"
+    },
+    {
+      "name": "Sheet",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White stock on the wall, edged, never shadowed.",
+      "html": "<div class=\"ds-wall\"><div class=\"ds-card\"><h2>Registration</h2><p>11 of 32 places taken</p></div></div>",
+      "css": ".ds-wall{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);padding:24px;background:var(--bg,#edf0f4)}.ds-card{background:var(--surface,#fff);border:1px solid var(--border,#dde1e8);border-radius:8px;padding:24px;color:var(--text,#121417);font-size:.875rem;line-height:1.43}.ds-card h2{margin:0 0 .5em;font-size:1.125rem;font-weight:600;line-height:1.2}.ds-card p{margin:0;color:var(--text-muted,#535b68)}"
+    },
+    {
+      "name": "Underline Tabs",
+      "kind": "nav",
+      "refersTo": "tab",
+      "description": "Page tabs on one full-width rule; the current tab underlined in ballpoint.",
+      "html": "<nav class=\"ds-tabs\"><a href=\"#\">Overview</a><a href=\"#\" aria-current=\"page\">Bracket</a><a href=\"#\">Matches</a></nav>",
+      "css": ".ds-tabs{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:flex;gap:1.25rem;border-bottom:1px solid var(--border,#dde1e8);font-size:.875rem}.ds-tabs a{padding:.6rem 0;margin-bottom:-1px;color:var(--text-muted,#535b68);font-weight:550;text-decoration:none;border-bottom:2px solid transparent;transition:color 180ms ease}.ds-tabs a:hover{color:var(--text,#121417)}.ds-tabs a:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}.ds-tabs a[aria-current=page]{color:var(--text,#121417);border-bottom-color:var(--accent,#1f49c7)}"
+    },
+    {
+      "name": "Match Lines",
+      "kind": "custom",
+      "refersTo": "match-line",
+      "description": "The signature: two names on printed lines, a joint, the winner's line in ink, your own line in blue.",
+      "html": "<div class=\"ds-lines\"><div class=\"ds-line ds-me ds-win\"><span class=\"ds-who\">kestrel</span><span class=\"ds-score\">2</span></div><div class=\"ds-line ds-lose\"><span class=\"ds-who\">juno</span><span class=\"ds-score\">1</span></div></div>",
+      "css": ".ds-lines{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);position:relative;display:flex;flex-direction:column;width:14rem;margin-right:.75rem;font-size:.875rem;color:var(--text,#121417)}.ds-lines::after{content:'';position:absolute;right:0;top:calc(50% - 1px);height:50%;border-right:1px solid var(--line,#8a93a2)}.ds-lines::before{content:'';position:absolute;right:-.75rem;top:75%;margin-top:-.5px;width:.75rem;border-top:2px solid var(--text,#121417)}.ds-line{position:relative;display:flex;align-items:flex-end;gap:.75rem;min-height:30px;padding:0 .5rem .3rem .1rem}.ds-line::after{content:'';position:absolute;inset:auto 0 0;height:1px;background:var(--line,#8a93a2)}.ds-who{flex:1;font-stretch:88%;font-weight:600}.ds-score{min-width:1.25rem;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}.ds-win .ds-who,.ds-win .ds-score{font-weight:700}.ds-win::after{height:2px;background:var(--text,#121417)}.ds-me::after{height:2px;background:var(--accent,#1f49c7)}.ds-me .ds-who{color:var(--accent,#1f49c7)}.ds-lose .ds-who,.ds-lose .ds-score{color:var(--text-muted,#535b68)}"
+    },
+    {
+      "name": "Alerts",
+      "kind": "custom",
+      "refersTo": "alert",
+      "description": "A message inside the block it concerns; warnings ringed in red, not filled.",
+      "html": "<p class=\"ds-alert ds-error\">Reports disagree.</p><p class=\"ds-alert ds-ok\">Score reported.</p><p class=\"ds-alert ds-warn\">Check-in closes in 10 minutes.</p>",
+      "css": ".ds-alert{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);margin:0 0 .75rem;padding:.65rem .9rem;border-radius:6px;font-size:.875rem;background:var(--surface-2,#f3f5f8);color:var(--text,#121417)}.ds-error{background:var(--danger-soft,#ffedea);color:var(--danger-ink,#831c1e)}.ds-ok{background:var(--accent-soft,#eef2fd);color:var(--accent-ink,#173a9e)}.ds-warn{background:var(--surface,#fff);border:1px solid var(--danger,#c4242a)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Wall Sheet",
+    "overview": "A tournament is the bracket sheet taped to the venue wall: one printed sheet that fills in as matches are played and that everyone reads the same way. Every screen is white sheet stock laid on a cool wall-grey ground, printed in near-black. Players write in ballpoint blue; the organizer's red pen marks only decisions, disputes and help. Nothing at rest is lifted off the wall; sheets are edged, not shadowed.\n\nThe working screens are dense and predictable: a 48px top bar, a 1152px column, underline tabs on one rule, and sheets of rows. The signature, used everywhere a match appears (bracket, match lists, match room, organizer queue, home page), is **names on printed lines**: each player's name sits on its own ruled line with the score at the line's end, the two lines meet in a joint at the right, and the winner's line carries on in 2px ink. Matches are not boxed. The brand mark is the same joint: two lines meeting and a blue line carrying on.\n\nThe home page is the same world at poster scale. The joint becomes a giant flat ballpoint field running off the window's right edge, the type condenses further (72% width for display, 80% for statements), and the pictures are the product's own interface fragments. Game flavour lives only in bracket themes (the TETR.IO theme is dark navy with a yellow ink); the site itself stays game-neutral.",
+    "keyCharacteristics": [
+      "White sheets on a cool grey wall, near-black print, flat at rest.",
+      "One hue, ballpoint blue: full strength on small marks, pale tints for areas.",
+      "Red pen for disputes, help and organizer decisions only.",
+      "One variable grotesk (Archivo) with a width axis; names semi-condensed and bold.",
+      "Names on printed lines, joints, and a winner line that carries on in ink.",
+      "Light and dark themes from the same token names via `prefers-color-scheme`."
+    ],
+    "rules": [
+      {
+        "name": "The One Pen Rule",
+        "body": "Blue is the only hue on working screens. At full strength it goes on small marks only: the one primary action, your own line, the highlighted path, a focus ring. Areas take its tints.",
+        "section": "colors"
+      },
+      {
+        "name": "The Red Pen Rule",
+        "body": "Red appears only where an organizer must decide: disputes, help requests, destructive actions, errors and unmet requirements. Never as decoration or emphasis.",
+        "section": "colors"
+      },
+      {
+        "name": "The Poster Exception",
+        "body": "On the Persuade surface the pen may fill flat colour fields at poster scale (the hero joint, the closing row, the stage clause). This is the same pen drawn large, not a second palette; it does not carry over to working screens.",
+        "section": "colors"
+      },
+      {
+        "name": "The Draw Sheet Rule",
+        "body": "Only names are condensed. If it is not a person, a team or the wordmark, it is set at full width.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Score Rule",
+        "body": "Scores, match numbers, tables and anything marked `.num` use tabular figures, right-aligned at the end of their line.",
+        "section": "typography"
+      },
+      {
+        "name": "The Taped Sheet Rule",
+        "body": "A sheet is edged, never shadowed. If something needs to read as separate, give it the sheet colour and a 1px edge on the wall, or a tint step inside a sheet.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do set every match as two names on printed lines with the score at the line's end, a joint at the right, and the winner's line carrying on in 2px ink.",
+      "Do keep ballpoint blue at full strength for small marks (one primary action per view, your own line, the highlighted path, focus) and use its tints (`ballpoint-tint`, `ballpoint-track`) for areas.",
+      "Do reserve the red pen for disputes, help, destructive actions, errors and unmet requirements.",
+      "Do lay sheets on the wall with a 1px sheet edge and 8px corners; separate rows with the row rule.",
+      "Do set player names at 88% width and 650 weight, and keep everything else at full width.",
+      "Do use tabular figures for every score, number and table.",
+      "Do keep game flavour inside bracket themes and their participant labels.",
+      "Do give controls 44px on coarse pointers and set fields to 1rem there."
+    ],
+    "donts": [
+      "Don't put a shadow on anything at rest; there is no floating layer in the shipped system.",
+      "Don't box a match or a name; the printed line is the container.",
+      "Don't introduce a second accent hue on working screens, or use green beyond tags, dots and met-requirement marks.",
+      "Don't condense or embolden text that is not a name.",
+      "Don't bring a game's colours, ranks or uppercase styling into the site's own chrome; that belongs to the theme.",
+      "Don't invent photographs, logos, testimonials or user counts as imagery; pictures are the product's own interface fragments."
+    ]
+  }
+}

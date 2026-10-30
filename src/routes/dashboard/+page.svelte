@@ -83,8 +83,6 @@
 </div>
 
 <style lang="scss">
-	@use 'tokens' as *;
-
 	// A greeting, not the screen's subject: the desk below is.
 	h1 {
 		font-size: var(--fs-section);
@@ -155,15 +153,11 @@
 		font-weight: 600;
 	}
 
+	// One column: each block runs the column's width, so none ends short or holds a blank band.
 	.grid {
 		display: grid;
 		gap: var(--gap);
 		margin-top: var(--gap);
-		align-items: stretch;
-
-		@include up($bp-md) {
-			grid-template-columns: 2fr 1fr;
-		}
 	}
 
 	h2 {

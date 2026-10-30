@@ -136,7 +136,6 @@
 	}
 
 	main {
-		flex: 1 0 auto;
 		padding-bottom: 4rem;
 	}
 

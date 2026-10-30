@@ -300,7 +300,7 @@
 		> section,
 		> aside {
 			padding-top: 0.75rem;
-			border-top: 1px solid var(--line);
+			border-top: 1px solid var(--control);
 		}
 
 		h2 {
