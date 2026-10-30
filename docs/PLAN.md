@@ -70,7 +70,7 @@ interface AuthModule<Cfg = unknown> {
 ### Data model (Drizzle, Postgres)
 
 - `users` (username, displayName, bio, avatar, showResults, showActivity, isInstanceAdmin) · `identities` (userId, moduleId, providerUserId, data jsonb, fetchedAt; unique(moduleId, providerUserId)) · `sessions` (id = sha256(token), userId, authModuleId, expiresAt)
-- `organizations` (slug, name, description) · `org_members` (role: owner|admin) · `api_keys` (orgId, prefix, sha256 hash, name, lastUsedAt, revokedAt)
+- `organizations` (slug, name, description) · `org_members` (role: owner|admin) · `api_keys` (orgId, prefix, sha256 hash, name, createdBy, lastUsedAt; revoking deletes the row)
 - `tournaments` (orgId, slug, name, description, startsAt, status: draft|registration|check_in|running|completed|cancelled, themeId, game jsonb, settings jsonb) · `tournament_auth_requirements` (moduleId, config jsonb)
 - `participants` (tournamentId, userId, seed, checkedInAt, status, finalRank)
 - `stages` (tournamentId, index 0|1, type, settings jsonb: groupCount, advancePerGroup, swissRounds, thirdPlace, grandFinalReset…, status) · `groups` · `rounds`
@@ -105,7 +105,7 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | **M0** ✅ | Scaffold, tooling, Docker/compose, CI, docs/PLAN.md                                                                                                  | `pnpm check/lint/test` green in CI, image builds                     |
 | **M1** ✅ | Sessions, module interface/registry, dev + discord + tetrio modules, login/link identities, settings, basic profile                                  | Dev login e2e passes. Discord/tetrio callbacks pass with mocked HTTP |
-| M2        | Organizations: create, public page (about/upcoming/archive), admin (settings, members, API keys), trust guard                                        | Untrusted session blocked from admin                                 |
+| M2 ✅     | Organizations: create, public page (about/upcoming/archive), admin (settings, members, API keys), trust guard                                        | Untrusted session blocked from admin                                 |
 | M3        | Bracket engine (pure lib), can run in parallel with M2                                                                                               | Property and fixture tests for all 4 types + groups                  |
 | M4        | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
 | M5        | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |

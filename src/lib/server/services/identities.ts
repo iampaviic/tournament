@@ -3,11 +3,12 @@ import { db } from '#lib/server/db/index.ts';
 import { identities, users, type Identity } from '#lib/server/db/schema.ts';
 import type { AuthModule, ExternalIdentity } from '#lib/server/modules/types.ts';
 import { usernameCandidates } from '#lib/server/auth/username.ts';
+import { ServiceError } from './errors';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /** A sign-in or account-linking failure whose message can be shown to the user. */
-export class IdentityError extends Error {
+export class IdentityError extends ServiceError {
 	override name = 'IdentityError';
 }
 

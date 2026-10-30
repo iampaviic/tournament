@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { uniqueName } from './helpers';
 
 test('sign in, edit the profile and sign out', async ({ page }) => {
-	const username = `e2e-${Date.now()}`;
+	const username = uniqueName('e2e');
 
 	await page.goto('/dashboard');
 	await expect(page).toHaveURL('/login?next=%2Fdashboard');

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { sql } from 'drizzle-orm';
 import { db } from '#lib/server/db/index.ts';
+import { resetDatabase } from '#lib/server/testing/factories.ts';
 import type { AuthModule, ExternalIdentity } from '#lib/server/modules/types.ts';
 import {
 	IdentityError,
@@ -25,9 +26,7 @@ const module = (id: string, extra: Partial<AuthModule> = {}): AuthModule => ({
 	...extra
 });
 
-beforeEach(async () => {
-	await db.execute(sql`TRUNCATE users CASCADE`);
-});
+beforeEach(resetDatabase);
 
 describe('signIn', () => {
 	it('creates a user on first sign-in and reuses it afterwards', async () => {

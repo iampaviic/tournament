@@ -1,8 +1,12 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const roleLabel = (role: 'owner' | 'admin') =>
+		role === 'owner' ? m.members_role_owner() : m.members_role_admin();
 </script>
 
 <svelte:head>
@@ -21,8 +25,27 @@
 		<p class="muted">{m.dashboard_tournaments_empty()}</p>
 	</section>
 	<section class="card">
-		<h2>{m.dashboard_orgs_title()}</h2>
-		<p class="muted">{m.dashboard_orgs_empty()}</p>
+		<div class="heading">
+			<h2>{m.dashboard_orgs_title()}</h2>
+			{#if data.trusted}
+				<a class="btn small" href={resolve('/organizations/new')}>{m.dashboard_new_org()}</a>
+			{/if}
+		</div>
+		{#if data.organizations.length}
+			<ul class="orgs">
+				{#each data.organizations as org (org.slug)}
+					<li>
+						<a href={resolve('/o/[org]/admin', { org: org.slug })}>{org.name}</a>
+						<span class="badge">{roleLabel(org.role)}</span>
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<p class="muted">{m.dashboard_orgs_empty()}</p>
+		{/if}
+		{#if !data.trusted}
+			<p class="muted small">{m.dashboard_orgs_untrusted()}</p>
+		{/if}
 	</section>
 </div>
 
@@ -33,6 +56,7 @@
 		display: grid;
 		gap: 1rem;
 		margin-top: 1.5rem;
+		align-items: start;
 
 		@include up($bp-md) {
 			grid-template-columns: 2fr 1fr;
@@ -41,5 +65,37 @@
 
 	h2 {
 		font-size: 1.15rem;
+		margin: 0;
+	}
+
+	.heading {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.orgs {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.4rem 0;
+		}
+
+		a {
+			font-weight: 600;
+			text-decoration: none;
+		}
+	}
+
+	.small {
+		font-size: 0.85rem;
+		margin-bottom: 0;
 	}
 </style>

@@ -15,8 +15,9 @@ export const usernameSchema = z
 export function slugifyUsername(input: string): string {
 	const slug = input
 		.normalize('NFKD')
-		.replace(/[̀-ͯ]/g, '')
+		.replace(/\p{Diacritic}/gu, '')
 		.toLowerCase()
+		.replace(/đ/g, 'd')
 		.replace(/[^a-z0-9_-]+/g, '-')
 		.replace(/^-+|-+$/g, '')
 		.slice(0, USERNAME_MAX - 4);
