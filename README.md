@@ -38,6 +38,14 @@ pnpm dev
 
 With the default `.env`, the login page offers the **dev** module, which signs you in as any username. It only works in `pnpm dev`.
 
+To try the app with data in it, add a demo club with sixteen players and a tournament in every state: two being played (with a disputed match, a help request and chat), one finished, one open for registration and a draft.
+
+```bash
+pnpm db:seed
+```
+
+Sign in with the dev module as `mara`, who runs the club, or as a player such as `kestrel`. `pnpm db:seed --reset` empties the whole database and adds the demo data again.
+
 ### Database changes
 
 Edit `src/lib/server/db/schema.ts`, then generate a migration and commit it with the schema change:
