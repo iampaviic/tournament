@@ -3,6 +3,7 @@ import { createAuthorizationURL } from '../oauth2';
 import {
 	AuthModuleError,
 	type AuthModule,
+	type ConfigField,
 	type ExternalIdentity,
 	type StoredIdentity
 } from '../types';
@@ -96,6 +97,24 @@ export function checkTetrioEligibility(data: TetrioData, config: TetrioConfig) {
 	return { ok: true } as const;
 }
 
+const rankOptions = [
+	{ value: '', label: 'Any' },
+	...[...TETRIO_RANKS].reverse().map((rank) => ({ value: rank, label: formatRank(rank) }))
+];
+
+export const tetrioConfigFields: ConfigField[] = [
+	{ key: 'minRank', label: 'Minimum rank', type: 'select', options: rankOptions },
+	{ key: 'maxRank', label: 'Maximum rank', type: 'select', options: rankOptions },
+	{ key: 'minTr', label: 'Minimum TR', type: 'number', min: 0, max: 25000 },
+	{ key: 'maxTr', label: 'Maximum TR', type: 'number', min: 0, max: 25000 },
+	{
+		key: 'allowUnranked',
+		label: 'Allow unranked players',
+		hint: 'They skip the rank and TR limits.',
+		type: 'checkbox'
+	}
+];
+
 interface Envelope<T> {
 	success: boolean;
 	data?: T;
@@ -185,6 +204,7 @@ export function tetrioModule(options: DiscordOptions): AuthModule<TetrioConfig> 
 		refreshProfile: (identity) => loadIdentity(identity.providerUserId),
 		refreshInterval: 5 * 60 * 1000,
 		tournamentConfig: tetrioConfig,
+		configFields: tetrioConfigFields,
 		checkEligibility: (identity, config) =>
 			checkTetrioEligibility(identity.data as TetrioData, config),
 		bracketFields(identity: StoredIdentity) {

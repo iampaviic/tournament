@@ -36,6 +36,13 @@ export interface CallbackRequest {
 
 export type Eligibility = { ok: true } | { ok: false; reason: string };
 
+/** A field of the form organizers fill in to configure a module for a tournament. */
+export type ConfigField = { key: string; label: string; hint?: string } & (
+	| { type: 'select'; options: { value: string; label: string }[] }
+	| { type: 'number'; min?: number; max?: number }
+	| { type: 'checkbox' }
+);
+
 /**
  * An auth module adds a sign-in method and links users to their identity on another platform.
  * Modules are installed in `registry.ts` and enabled per instance with `AUTH_MODULES`.
@@ -53,6 +60,8 @@ export interface AuthModule<Config = unknown> {
 	refreshInterval?: number;
 	/** Options organizers can set when a tournament requires this module. */
 	tournamentConfig?: z.ZodType<Config>;
+	/** The form for `tournamentConfig`. Empty values are left out of the parsed object. */
+	configFields?: ConfigField[];
 	/** Decides whether a participant may join a tournament configured with `config`. */
 	checkEligibility?(identity: StoredIdentity, config: Config): Eligibility;
 	/** Short labelled values bracket themes can show next to a participant. */

@@ -1,4 +1,27 @@
-import type { Entrant, MatchResult, MatchState, MatchTemplate, SlotSource } from './types';
+import type {
+	BracketSide,
+	Entrant,
+	MatchResult,
+	MatchState,
+	MatchTemplate,
+	SlotSource
+} from './types';
+
+const SIDE_ORDER: Record<BracketSide, number> = {
+	main: 0,
+	winners: 0,
+	losers: 1,
+	third_place: 2,
+	grand_final: 3
+};
+
+/**
+ * The order templates are generated in: by side, then round, then position. Earlier matches come
+ * first, which `eliminationStandings` relies on. Sort templates loaded from storage with this.
+ */
+export function compareTemplates(a: MatchTemplate, b: MatchTemplate): number {
+	return SIDE_ORDER[a.side] - SIDE_ORDER[b.side] || a.round - b.round || a.position - b.position;
+}
 
 export interface ResolvedStage {
 	/** Every match's state, in template order. */

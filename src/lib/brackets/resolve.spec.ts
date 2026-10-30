@@ -1,8 +1,34 @@
 import { describe, expect, it } from 'vitest';
-import { singleElimination } from './elimination';
-import { isStageComplete, resolveStage } from './resolve';
+import { doubleElimination, singleElimination } from './elimination';
+import { compareTemplates, isStageComplete, resolveStage } from './resolve';
+import { eliminationStandings } from './standings';
 import { favorites, seedIds, simulate } from './simulate';
 import type { MatchResult } from './types';
+
+describe('compareTemplates', () => {
+	it('restores generation order', () => {
+		for (const templates of [
+			singleElimination(seedIds(8), { thirdPlaceMatch: true }),
+			doubleElimination(seedIds(16))
+		]) {
+			const shuffled = templates.toSorted((a, b) => b.id.localeCompare(a.id));
+			expect(shuffled.toSorted(compareTemplates).map((t) => t.id)).toEqual(
+				templates.map((t) => t.id)
+			);
+		}
+	});
+
+	it('keeps standings stable for templates loaded in any order', () => {
+		const templates = doubleElimination(seedIds(4));
+		const pick = (a: string, b: string, m: { template: { id: string } }) =>
+			m.template.id === 'GF1' ? 1 : favorites(a, b, m as never);
+		const { results } = simulate(templates, pick);
+		const reversed = [...templates].reverse().sort(compareTemplates);
+		expect(eliminationStandings(seedIds(4), resolveStage(reversed, results).matches)).toEqual(
+			eliminationStandings(seedIds(4), resolveStage(templates, results).matches)
+		);
+	});
+});
 
 describe('resolveStage', () => {
 	const templates = singleElimination(seedIds(4));

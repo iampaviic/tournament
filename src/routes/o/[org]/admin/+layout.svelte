@@ -13,6 +13,11 @@
 			label: m.org_admin_settings
 		},
 		{
+			route: '/o/[org]/admin/tournaments',
+			href: resolve('/o/[org]/admin/tournaments', { org: data.org.slug }),
+			label: m.org_admin_tournaments
+		},
+		{
 			route: '/o/[org]/admin/members',
 			href: resolve('/o/[org]/admin/members', { org: data.org.slug }),
 			label: m.org_admin_members
@@ -53,33 +58,6 @@
 
 		h1 {
 			margin: 0;
-		}
-	}
-
-	.tabs {
-		display: flex;
-		gap: 0.25rem;
-		margin: 1rem 0 1.5rem;
-		border-bottom: 1px solid var(--border);
-		overflow-x: auto;
-
-		a {
-			padding: 0.6rem 0.9rem;
-			color: var(--text-muted);
-			text-decoration: none;
-			border-bottom: 2px solid transparent;
-			margin-bottom: -1px;
-			white-space: nowrap;
-
-			&:hover {
-				color: var(--text);
-			}
-
-			&[aria-current='page'] {
-				color: var(--text);
-				font-weight: 600;
-				border-bottom-color: var(--accent);
-			}
 		}
 	}
 </style>

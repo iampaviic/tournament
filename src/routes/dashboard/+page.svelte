@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
+	import TournamentList from '#lib/components/TournamentList.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -21,8 +22,8 @@
 
 <div class="grid">
 	<section class="card">
-		<h2>{m.dashboard_tournaments_title()}</h2>
-		<p class="muted">{m.dashboard_tournaments_empty()}</p>
+		<h2 class="spaced">{m.dashboard_tournaments_title()}</h2>
+		<TournamentList items={data.tournaments} empty={m.dashboard_tournaments_empty()} />
 	</section>
 	<section class="card">
 		<div class="heading">
@@ -66,6 +67,10 @@
 	h2 {
 		font-size: 1.15rem;
 		margin: 0;
+	}
+
+	.spaced {
+		margin-bottom: 0.75rem;
 	}
 
 	.heading {

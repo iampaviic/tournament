@@ -1,6 +1,6 @@
 import { and, asc, count, eq, ne } from 'drizzle-orm';
 import { z } from 'zod';
-import { db } from '#lib/server/db/index.ts';
+import { db, type Transaction } from '#lib/server/db/index.ts';
 import { orgMembers, organizations, users, type OrgRole } from '#lib/server/db/schema.ts';
 import { ServiceError } from './errors';
 
@@ -130,8 +130,6 @@ export async function addMember(orgId: string, username: string, role: OrgRole) 
 	}
 	await db.insert(orgMembers).values({ orgId, userId: user.id, role });
 }
-
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /** Every organization keeps at least one owner, so it can always be managed. */
 async function assertOtherOwner(tx: Transaction, orgId: string, userId: string) {

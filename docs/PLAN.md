@@ -40,7 +40,7 @@ src/
     api/v1/...                  # REST, Bearer API key
 ```
 
-**Core rule:** UI form actions and the REST endpoints both call the same `services/*` functions. This keeps the proposal's promise that everything in the admin UI is also reachable over REST. The services take an actor (user session or API key) and do the authorization themselves.
+**Core rule:** UI form actions and the REST endpoints both call the same `services/*` functions. This keeps the proposal's promise that everything in the admin UI is also reachable over REST. Authorization happens at the edge in guards (`requireOrgRole`, `requireTournamentAdmin`, and an API key guard in M7) that both UI and API use; services enforce the tournament's own rules (what can change in which phase).
 
 ### Auth modules (the extensibility point)
 
@@ -71,9 +71,9 @@ interface AuthModule<Cfg = unknown> {
 
 - `users` (username, displayName, bio, avatar, showResults, showActivity, isInstanceAdmin) · `identities` (userId, moduleId, providerUserId, data jsonb, fetchedAt; unique(moduleId, providerUserId)) · `sessions` (id = sha256(token), userId, authModuleId, expiresAt)
 - `organizations` (slug, name, description) · `org_members` (role: owner|admin) · `api_keys` (orgId, prefix, sha256 hash, name, createdBy, lastUsedAt; revoking deletes the row)
-- `tournaments` (orgId, slug, name, description, startsAt, status: draft|registration|check_in|running|completed|cancelled, themeId, game jsonb, settings jsonb) · `tournament_auth_requirements` (moduleId, config jsonb)
-- `participants` (tournamentId, userId, seed, checkedInAt, status, finalRank)
-- `stages` (tournamentId, index 0|1, type, settings jsonb: groupCount, advancePerGroup, swissRounds, thirdPlace, grandFinalReset…, status) · `groups` · `rounds`
+- `tournaments` (orgId, slug unique per org, name, description, startsAt, participantLimit, status: draft|registration|check_in|running|completed, themeId) · `tournament_requirements` (moduleId, config jsonb)
+- `participants` (tournamentId, userId, seed, checkedInAt, finalRank)
+- `stages` (tournamentId, index 0|1, type, settings jsonb: groupCount, advancePerGroup, thirdPlaceMatch, grandFinal, doubleRoundRobin, swissRounds, scoring; status; groups jsonb = participant ids per group)
 - `matches` (stageId, groupId, the engine template: templateId, side, round, position, slot sources; result: entrants, scores, winner; cached p1/p2 participantId and status for queries; helpRequested) · `match_reports` (by participant/organizer/api key, scores) · `match_messages` (matchId, authorId, body, createdAt)
 
 ### Bracket engine (`src/lib/brackets`, pure + exhaustively unit-tested) ✅
@@ -115,7 +115,7 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 | **M1** ✅ | Sessions, module interface/registry, dev + discord + tetrio modules, login/link identities, settings, basic profile                                  | Dev login e2e passes. Discord/tetrio callbacks pass with mocked HTTP |
 | M2 ✅     | Organizations: create, public page (about/upcoming/archive), admin (settings, members, API keys), trust guard                                        | Untrusted session blocked from admin                                 |
 | M3 ✅     | Bracket engine (pure lib)                                                                                                                            | Property and fixture tests for all 4 types + groups                  |
-| M4        | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
+| M4 ✅     | Tournaments: create/config, structure editor (locked after start), auth requirements + eligibility, registration/check-in, start, result propagation | Full 2-stage tournament played via UI with dev users                 |
 | M5        | Bracket view: pan/zoom canvas (EU Cannon style), themes (default + tetrio)                                                                           | All stage types render. Theme switch works                           |
 | M6        | Matches page, match room, SSE chat, reporting/disputes, help flag, organizer match queue                                                             | Two browsers chat live and report                                    |
 | M7        | REST API + OpenAPI + docs page                                                                                                                       | API e2e: create → start → report via key                             |
@@ -128,6 +128,14 @@ Steam game picker: search `IStoreService/GetAppList` with a server-side key and 
 - adapter-node 6 has no `ORIGIN`. Behind Apache, set `PROTOCOL_HEADER=x-forwarded-proto` (and `HOST_HEADER` unless `ProxyPreserveHost On`). OAuth redirect URIs are built from the request URL.
 - The app builds without any env vars (`building` guards in `db/index.ts` and `modules/registry.ts`). A misconfigured auth module fails at startup.
 - Tests: `*.spec.ts` are pure unit tests. `*.db.spec.ts` run against `TEST_DATABASE_URL`, whose schema is recreated. Playwright e2e runs the production build with the `dev` module (`ALLOW_DEV_AUTH=true`).
+
+## Implementation notes (M4)
+
+- Lifecycle: `draft` → `registration` (published) → optional `check_in` → `running` → `completed`. Starting from check-in removes participants who didn't check in. Requirements and structure are locked once running.
+- `refreshStage` (in `services/stages.ts`) is the single place that turns templates + results into stored match state. It runs after every result change inside a transaction that locks the stage row, pairs the next Swiss round, completes stages, and on the last stage writes final ranks (group stage leavers are ranked by group placing below the final stage) and completes the tournament.
+- The final stage is started by the organizer once the group stage is done, so they can review the standings first.
+- In M4 only organizers enter results (admin Matches tab). Player reporting, disputes and chat are M6. Theme selection is M5; the bracket page is a plain list until then.
+- Auth modules describe their tournament options with `configFields`, which the Requirements tab renders as a form; tetr.io has rank and TR limits.
 
 ## M0 + M1 in detail
 

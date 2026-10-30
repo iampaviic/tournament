@@ -15,6 +15,13 @@
       "when": 1793356910955,
       "tag": "0001_organizations",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793358765755,
+      "tag": "0002_tournaments",
+      "breakpoints": true
     }
   ]
 }

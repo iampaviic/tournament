@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
+	import TournamentList from '#lib/components/TournamentList.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -24,12 +25,12 @@
 
 <section class="card">
 	<h2>{m.org_upcoming_title()}</h2>
-	<p class="muted">{m.org_upcoming_empty()}</p>
+	<TournamentList items={data.current} empty={m.org_upcoming_empty()} />
 </section>
 
 <section class="card">
 	<h2>{m.org_archive_title()}</h2>
-	<p class="muted">{m.org_archive_empty()}</p>
+	<TournamentList items={data.archive} empty={m.org_archive_empty()} />
 </section>
 
 <style lang="scss">

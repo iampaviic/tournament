@@ -80,6 +80,12 @@ a {
 		background: var(--surface-2);
 	}
 
+	&:disabled {
+		opacity: 0.45;
+		cursor: default;
+		pointer-events: none;
+	}
+
 	&.primary {
 		background: var(--accent);
 		border-color: var(--accent);
@@ -122,6 +128,8 @@ a {
 }
 
 input[type='text'],
+input[type='number'],
+input[type='datetime-local'],
 textarea,
 select {
 	width: 100%;
@@ -180,5 +188,32 @@ select {
 
 	&.success {
 		color: var(--success);
+	}
+}
+
+.tabs {
+	display: flex;
+	gap: 0.25rem;
+	margin: 1.25rem 0 1.5rem;
+	border-bottom: 1px solid var(--border);
+	overflow-x: auto;
+
+	a {
+		padding: 0.6rem 0.9rem;
+		color: var(--text-muted);
+		text-decoration: none;
+		border-bottom: 2px solid transparent;
+		margin-bottom: -1px;
+		white-space: nowrap;
+
+		&:hover {
+			color: var(--text);
+		}
+
+		&[aria-current='page'] {
+			color: var(--text);
+			font-weight: 600;
+			border-bottom-color: var(--accent);
+		}
 	}
 }
