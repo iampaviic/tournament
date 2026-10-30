@@ -4,6 +4,18 @@ import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
+const testDatabaseUrl =
+	process.env.TEST_DATABASE_URL ??
+	'postgres://root:mysecretpassword@localhost:5432/tournament_test';
+
+// SvelteKit fills in `$app/env/private` from the environment (and `.env`) when Vitest loads this
+// config, so `test.env` comes too late for it. Set the test values here instead; otherwise the
+// tests would run against the database in `.env`, or fail where there is none, as in CI.
+if (process.env.VITEST) {
+	process.env.DATABASE_URL = testDatabaseUrl;
+	process.env.AUTH_MODULES = 'dev';
+}
+
 export default defineConfig({
 	plugins: [
 		sveltekit({
@@ -55,12 +67,8 @@ export default defineConfig({
 					include: ['src/**/*.db.{test,spec}.{js,ts}'],
 					globalSetup: ['src/lib/server/testing/db-setup.ts'],
 					fileParallelism: false,
-					env: {
-						DATABASE_URL:
-							process.env.TEST_DATABASE_URL ??
-							'postgres://root:mysecretpassword@localhost:5432/tournament_test',
-						AUTH_MODULES: 'dev'
-					}
+					// Read by the global setup, which recreates this database's schema.
+					env: { DATABASE_URL: testDatabaseUrl }
 				}
 			}
 		]
