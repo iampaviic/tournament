@@ -102,6 +102,6 @@
 	}
 
 	.small {
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 	}
 </style>

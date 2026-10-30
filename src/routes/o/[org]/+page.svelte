@@ -11,7 +11,7 @@
 	<title>{data.org.name} · {m.app_name()}</title>
 </svelte:head>
 
-<section class="card header">
+<header class="header">
 	<div>
 		<h1>{data.org.name}</h1>
 		{#if data.org.description}<p class="description">{data.org.description}</p>{/if}
@@ -21,7 +21,7 @@
 			{m.org_manage()}
 		</a>
 	{/if}
-</section>
+</header>
 
 <section class="card">
 	<h2>{m.org_upcoming_title()}</h2>
@@ -34,8 +34,10 @@
 </section>
 
 <style lang="scss">
+	@use 'tokens' as *;
+
 	section + section {
-		margin-top: 1rem;
+		margin-top: var(--gap);
 	}
 
 	.header {
@@ -43,14 +45,25 @@
 		justify-content: space-between;
 		align-items: flex-start;
 		gap: 1rem;
+		margin-bottom: 1.5rem;
+
+		h1 {
+			font-size: 1.5rem;
+
+			@include up($bp-sm) {
+				font-size: var(--fs-title);
+			}
+		}
 	}
 
 	.description {
 		margin: 0;
+		max-width: 65ch;
+		color: var(--text-muted);
 		white-space: pre-line;
 	}
 
 	h2 {
-		font-size: 1.15rem;
+		font-size: var(--fs-section);
 	}
 </style>

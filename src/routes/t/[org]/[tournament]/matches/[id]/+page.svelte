@@ -4,11 +4,11 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
-	import Avatar from '#lib/components/Avatar.svelte';
 	import MatchChat from '#lib/components/MatchChat.svelte';
+	import MatchLines from '#lib/components/MatchLines.svelte';
 	import ScoreForm from '#lib/components/ScoreForm.svelte';
 	import { formatScore } from '#lib/format.ts';
-	import { matchContext, matchStatusLabel } from '#lib/labels.ts';
+	import { matchContext, matchStatusLabel, progressTone } from '#lib/labels.ts';
 	import { listen } from '#lib/live.ts';
 	import type { ChatMessage } from '#lib/server/services/chat.ts';
 	import type { PageProps } from './$types';
@@ -83,10 +83,10 @@
 		{#if context}<p class="muted">{context}</p>{/if}
 	</div>
 	<div class="status">
-		<span class="badge" class:danger={match.progress === 'disputed'} data-testid="match-status"
+		<span class="badge {progressTone(match.progress)}" data-testid="match-status"
 			>{matchStatusLabel(match.progress)}</span
 		>
-		{#if match.helpRequested}<span class="badge warning">{m.match_help()}</span>{/if}
+		{#if match.helpRequested}<span class="badge danger">{m.match_help()}</span>{/if}
 		<span class="live" class:on={connected} data-testid="live"
 			>{connected ? m.live_on() : m.live_off()}</span
 		>
@@ -101,24 +101,16 @@
 
 <div class="layout">
 	<div class="main">
-		<section class="card scoreboard">
-			{#each [0, 1] as const as slot (slot)}
-				{@const entrant = match.entrants[slot]}
-				<div
-					class="player"
-					class:winner={match.status === 'completed' && match.result?.winner === slot}
-				>
-					{#if entrant}
-						<Avatar src={data.players[entrant]?.avatarUrl} name={names[slot]} size={48} />
-					{/if}
-					<span class="name">{names[slot]}</span>
-				</div>
-				{#if slot === 0}
-					<strong class="score"
-						>{match.result?.scores ? formatScore(match.result.scores) : '–'}</strong
-					>
-				{/if}
-			{/each}
+		<section class="card scoreboard" aria-label={m.room_result()}>
+			<MatchLines
+				size="lg"
+				sides={[
+					{ name: names[0], placeholder: !match.entrants[0], score: match.result?.scores?.[0] },
+					{ name: names[1], placeholder: !match.entrants[1], score: match.result?.scores?.[1] }
+				]}
+				winner={match.status === 'completed' ? (match.result?.winner ?? null) : null}
+				me={data.side === 0 || data.side === 1 ? data.side : null}
+			/>
 		</section>
 
 		{#if showResult}
@@ -232,7 +224,7 @@
 		margin-bottom: 1rem;
 
 		h2 {
-			font-size: 1.4rem;
+			font-size: 1.5rem;
 			margin: 0;
 		}
 
@@ -252,7 +244,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 		color: var(--text-muted);
 
 		&::before {
@@ -260,7 +252,7 @@
 			width: 0.5rem;
 			height: 0.5rem;
 			border-radius: 50%;
-			background: var(--border);
+			background: var(--control);
 		}
 
 		&.on::before {
@@ -271,7 +263,7 @@
 	.layout {
 		display: grid;
 		gap: 1rem;
-		align-items: start;
+		align-items: stretch;
 
 		@include up($bp-md) {
 			grid-template-columns: 3fr 2fr;
@@ -286,29 +278,7 @@
 	}
 
 	.scoreboard {
-		display: grid;
-		grid-template-columns: 1fr auto 1fr;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	.player {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-		min-width: 0;
-		text-align: center;
-		overflow-wrap: anywhere;
-
-		&.winner .name {
-			font-weight: 700;
-		}
-	}
-
-	.score {
-		font-size: 1.75rem;
-		font-variant-numeric: tabular-nums;
+		padding-block: 1rem 1.25rem;
 	}
 
 	.result,
@@ -319,7 +289,6 @@
 		gap: 0.75rem;
 
 		h3 {
-			font-size: 1.05rem;
 			margin: 0;
 		}
 

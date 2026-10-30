@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import { formatDate } from '#lib/format.ts';
-	import { statusLabel } from '#lib/labels.ts';
+	import { statusLabel, statusTone } from '#lib/labels.ts';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -41,7 +41,9 @@
 			<a class="muted org" href={resolve('/o/[org]', { org: data.org.slug })}>{data.org.name}</a>
 			<h1>{data.tournament.name}</h1>
 			<p class="muted meta">
-				<span class="badge">{statusLabel(data.tournament.status)}</span>
+				<span class="badge {statusTone(data.tournament.status)}"
+					>{statusLabel(data.tournament.status)}</span
+				>
 				{#if data.tournament.startsAt}
 					{m.t_starts({
 						date: formatDate(data.tournament.startsAt, { dateStyle: 'medium', timeStyle: 'short' })
@@ -66,6 +68,8 @@
 {/if}
 
 <style lang="scss">
+	@use 'tokens' as *;
+
 	.tournament {
 		display: flex;
 		justify-content: space-between;
@@ -73,12 +77,22 @@
 		gap: 1rem;
 
 		h1 {
-			margin: 0.1rem 0 0.4rem;
+			margin: 0.15rem 0 0.5rem;
+			font-size: 1.5rem;
+
+			@include up($bp-sm) {
+				font-size: var(--fs-title);
+			}
 		}
 
 		.org {
+			color: var(--text-muted);
+			font-weight: 550;
 			text-decoration: none;
-			font-size: 0.9rem;
+
+			&:hover {
+				color: var(--text);
+			}
 		}
 
 		.meta {

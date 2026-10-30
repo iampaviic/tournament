@@ -17,3 +17,5 @@ bun.lockb
 /.claude/skills/
 /.claude/agents/
 skills-lock.json
+# Written by the Impeccable engine
+/.impeccable/

@@ -13,13 +13,12 @@ export const tetrioTheme: BracketTheme = {
 		card: '#171b31',
 		border: '#2b3156',
 		text: '#eef0ff',
-		muted: '#8d93bb',
-		line: '#3b4270',
-		accent: '#ffd23f',
-		accentText: '#1b1500',
+		muted: '#9aa0c6',
+		line: '#4a5285',
+		ink: '#ffd23f',
+		ready: '#1a1f3b',
 		highlight: '#ffd23f',
-		radius: '4px',
-		font: "'Inter', system-ui, sans-serif"
+		font: 'var(--font)'
 	},
 	ParticipantLabel
 };

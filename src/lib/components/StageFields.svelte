@@ -112,7 +112,7 @@
 
 <style lang="scss">
 	h2 {
-		font-size: 1.1rem;
+		font-size: var(--fs-section);
 	}
 
 	.grid {
@@ -138,7 +138,7 @@
 			display: flex;
 			flex-direction: column;
 			gap: 0.25rem;
-			font-size: 0.9rem;
+			font-size: var(--fs-body);
 			width: 6rem;
 		}
 	}

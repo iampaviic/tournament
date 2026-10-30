@@ -43,7 +43,7 @@
 		border-color: var(--danger);
 
 		h2 {
-			font-size: 1.1rem;
+			font-size: var(--fs-section);
 			color: var(--danger);
 		}
 	}

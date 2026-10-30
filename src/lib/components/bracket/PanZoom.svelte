@@ -2,6 +2,7 @@
 	import { onMount, type Snippet } from 'svelte';
 	import { m } from '#lib/paraglide/messages.js';
 	import { clampView, fitView, zoomAt, type View } from '#lib/panZoom.ts';
+	import Icon from '#lib/components/Icon.svelte';
 
 	let {
 		width,
@@ -157,16 +158,16 @@
 			type="button"
 			onclick={() => move(zoomAt(view, STEP, center()))}
 			aria-label={m.bracket_zoom_in()}
-			title={m.bracket_zoom_in()}>+</button
+			title={m.bracket_zoom_in()}><Icon name="plus" /></button
 		>
 		<button
 			type="button"
 			onclick={() => move(zoomAt(view, 1 / STEP, center()))}
 			aria-label={m.bracket_zoom_out()}
-			title={m.bracket_zoom_out()}>−</button
+			title={m.bracket_zoom_out()}><Icon name="minus" /></button
 		>
 		<button type="button" onclick={fit} aria-label={m.bracket_fit()} title={m.bracket_fit()}
-			>⤢</button
+			><Icon name="fit" /></button
 		>
 		{#if canFullscreen}
 			<button
@@ -174,7 +175,7 @@
 				onclick={toggleFullscreen}
 				aria-label={fullscreen ? m.bracket_exit_fullscreen() : m.bracket_fullscreen()}
 				title={fullscreen ? m.bracket_exit_fullscreen() : m.bracket_fullscreen()}
-				aria-pressed={fullscreen}>⛶</button
+				aria-pressed={fullscreen}><Icon name={fullscreen ? 'collapse' : 'expand'} /></button
 			>
 		{/if}
 	</div>
@@ -270,8 +271,11 @@
 		button {
 			width: 1.9rem;
 			height: 1.9rem;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
 			border: 1px solid var(--bracket-border);
-			border-radius: var(--bracket-radius);
+			border-radius: var(--radius-sm);
 			background: var(--bracket-card);
 			color: var(--bracket-text);
 			font: inherit;

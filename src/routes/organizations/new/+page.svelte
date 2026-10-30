@@ -1,12 +1,20 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import OrganizationFields from '#lib/components/OrganizationFields.svelte';
 	import type { PageProps } from './$types';
 
 	let { form }: PageProps = $props();
 
-	const values = $derived(form?.values ?? { name: '', slug: '', description: '' });
+	// The home page's "Start a tournament" form arrives with the name filled in.
+	const values = $derived(
+		form?.values ?? {
+			name: page.url.searchParams.get('name')?.slice(0, 80) ?? '',
+			slug: '',
+			description: ''
+		}
+	);
 </script>
 
 <svelte:head>

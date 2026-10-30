@@ -4,6 +4,9 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import Avatar from '#lib/components/Avatar.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import MatchLines from '#lib/components/MatchLines.svelte';
+	import { matchStatusLabel, progressTone, stageLabel } from '#lib/labels.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -19,16 +22,70 @@
 	);
 	const linkHref = (moduleId: string) =>
 		`/auth/${moduleId}/login?intent=link&next=${encodeURIComponent(here)}`;
+	const side = (entrant: string | null | undefined) =>
+		entrant
+			? { name: entrant }
+			: { name: entrant === null ? m.match_bye() : m.match_tbd(), placeholder: true };
+	const params = $derived({ org: data.org.slug, tournament: data.tournament.slug });
 </script>
+
+{#if data.next}
+	{@const next = data.next}
+	<section class="card next" aria-labelledby="next-match">
+		<header>
+			<h2 id="next-match">{m.t_next_match()}</h2>
+			<span class="muted">
+				{m.t_match_number({ number: next.number })}{#if next.stageCount > 1}
+					· {stageLabel(next.stageIndex, next.stageCount)}{/if}
+			</span>
+		</header>
+		<div class="next-body">
+			<MatchLines
+				size="lg"
+				sides={[side(next.entrants[0]), side(next.entrants[1])]}
+				me={next.side}
+			/>
+			<div class="next-action">
+				<span class="badge {progressTone(next.progress)}">{matchStatusLabel(next.progress)}</span>
+				<a
+					class="btn primary"
+					href={resolve('/t/[org]/[tournament]/matches/[id]', { ...params, id: next.id })}
+				>
+					{m.t_open_room()}
+				</a>
+			</div>
+		</div>
+	</section>
+{/if}
 
 <div class="layout">
 	{#if data.description}
-		<section class="card description">
+		<section class="card description" aria-labelledby="about">
+			<h2 id="about">{m.t_about()}</h2>
 			<p>{data.description}</p>
 		</section>
 	{/if}
 
-	<aside class="card registration">
+	<aside class="card registration" aria-labelledby="registration">
+		<h2 id="registration">{m.t_registration()}</h2>
+		{#if data.limit !== null && (status === 'registration' || status === 'check_in')}
+			<div class="capacity">
+				<div
+					class="track"
+					role="meter"
+					aria-valuemin={0}
+					aria-valuemax={data.limit}
+					aria-valuenow={data.participants.length}
+					aria-label={m.t_capacity({ count: data.participants.length, limit: data.limit })}
+				>
+					<span style:width="{Math.min(100, (data.participants.length / data.limit) * 100)}%"
+					></span>
+				</div>
+				<span class="muted num">
+					{m.t_capacity({ count: data.participants.length, limit: data.limit })}
+				</span>
+			</div>
+		{/if}
 		{#if form?.error}<p class="alert error" role="alert">{form.error}</p>{/if}
 
 		{#if data.me}
@@ -56,11 +113,14 @@
 					{#each data.requirements as requirement (requirement.moduleId)}
 						<li class:ok={requirement.status === 'ok'}>
 							{#if requirement.status === 'ok'}
-								✓ {m.t_requirement_ok({ module: requirement.moduleName })}
+								<Icon name="check" />
+								{m.t_requirement_ok({ module: requirement.moduleName })}
 							{:else if requirement.status === 'ineligible'}
-								✗ {requirement.reason}
+								<Icon name="cross" />
+								{requirement.reason}
 							{:else}
-								✗ {m.t_requirement_missing({ module: requirement.moduleName })}
+								<Icon name="cross" />
+								{m.t_requirement_missing({ module: requirement.moduleName })}
 								{#if data.user && requirement.status === 'missing'}
 									<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- server endpoint that redirects to the provider -->
 									<a class="btn small" href={linkHref(requirement.moduleId)} data-sveltekit-reload>
@@ -98,7 +158,7 @@
 					<li>
 						{#if ranked}<span class="rank">{participant.finalRank ?? '–'}</span>{/if}
 						<Avatar src={participant.avatarUrl} name={participant.displayName} size={28} />
-						<a href={resolve('/u/[username]', { username: participant.username })}>
+						<a class="name" href={resolve('/u/[username]', { username: participant.username })}>
 							{participant.displayName}
 						</a>
 					</li>
@@ -113,23 +173,57 @@
 <style lang="scss">
 	@use 'tokens' as *;
 
+	.next {
+		margin-bottom: var(--gap);
+
+		header {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: 0.25rem 0.75rem;
+			margin-bottom: 0.75rem;
+
+			h2 {
+				margin: 0;
+			}
+		}
+	}
+
+	.next-body {
+		display: grid;
+		gap: 1rem 2rem;
+		align-items: end;
+
+		@include up($bp-sm) {
+			grid-template-columns: minmax(0, 28rem) auto;
+		}
+	}
+
+	.next-action {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
 	.layout {
 		display: grid;
-		gap: 1rem;
-		align-items: start;
+		gap: var(--gap);
+		align-items: stretch;
 
 		@include up($bp-md) {
 			grid-template-columns: 2fr 1fr;
 
 			.registration {
 				grid-column: 2;
-				grid-row: 1;
+				grid-row: 1 / span 2;
 			}
 		}
 	}
 
 	.description p {
 		margin: 0;
+		max-width: 65ch;
 		white-space: pre-line;
 	}
 
@@ -139,8 +233,30 @@
 		gap: 0.75rem;
 		align-items: flex-start;
 
+		h2,
 		p {
 			margin: 0;
+		}
+	}
+
+	.capacity {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		align-self: stretch;
+	}
+
+	.track {
+		height: 8px;
+		border-radius: 999px;
+		background: var(--accent-track);
+		overflow: hidden;
+
+		span {
+			display: block;
+			height: 100%;
+			border-radius: inherit;
+			background: var(--accent);
 		}
 	}
 
@@ -166,28 +282,30 @@
 	}
 
 	.participants {
-		h2 {
-			font-size: 1.1rem;
-		}
-
 		ol {
 			list-style: none;
 			margin: 0;
 			padding: 0;
-			columns: 14rem;
+			columns: 13rem;
+			column-gap: 1.5rem;
 		}
 
 		li {
 			display: flex;
 			align-items: center;
 			gap: 0.5rem;
-			padding: 0.3rem 0;
+			min-height: 40px;
+			border-bottom: 1px solid var(--rule);
 			break-inside: avoid;
 		}
 
 		a {
 			color: var(--text);
 			text-decoration: none;
+
+			&:hover {
+				color: var(--accent);
+			}
 		}
 
 		.rank {

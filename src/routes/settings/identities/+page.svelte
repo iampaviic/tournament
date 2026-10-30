@@ -116,13 +116,12 @@
 		flex-wrap: wrap;
 		gap: 0.25rem 1rem;
 		margin: 0.25rem 0 0;
-		font-size: 0.875rem;
+		font-size: var(--fs-body);
 	}
 
 	dt {
 		color: var(--text-muted);
-		text-transform: uppercase;
-		font-size: 0.75rem;
+		font-size: var(--fs-small);
 		align-self: center;
 	}
 

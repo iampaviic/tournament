@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '@fontsource-variable/archivo/wdth.css';
 	import '#lib/styles/global.scss';
 	import type { ResolvedPathname } from '$app/types';
 	import { resolve } from '$app/paths';
@@ -7,6 +8,7 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import favicon from '#lib/assets/favicon.svg';
 	import Avatar from '#lib/components/Avatar.svelte';
+	import Mark from '#lib/components/Mark.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -19,15 +21,18 @@
 
 <header>
 	<div class="container bar">
-		<a class="brand" href={resolve('/')}>{m.app_name()}</a>
-		<nav>
+		<a class="brand" href={resolve('/')}>
+			<Mark />
+			<span>{m.app_name()}</span>
+		</a>
+		<nav aria-label={m.nav_label()}>
 			{#if data.user}
 				<a href={resolve('/dashboard')}>{m.nav_dashboard()}</a>
+				<a href={resolve('/settings')}>{m.nav_settings()}</a>
 				<a class="me" href={resolve('/u/[username]', { username: data.user.username })}>
-					<Avatar src={data.user.avatarUrl} name={data.user.displayName} size={28} />
+					<Avatar src={data.user.avatarUrl} name={data.user.displayName} size={24} />
 					<span>{data.user.displayName}</span>
 				</a>
-				<a href={resolve('/settings')}>{m.nav_settings()}</a>
 				<form method="POST" action={resolve('/auth/logout')}>
 					<button class="btn small" type="submit">{m.nav_logout()}</button>
 				</form>
@@ -43,7 +48,12 @@
 </main>
 
 <footer>
-	<div class="container">
+	<div class="container close">
+		<a class="brand" href={resolve('/')}>
+			<Mark size={16} />
+			<span>{m.app_name()}</span>
+		</a>
+		<p class="muted">{m.footer_tagline()}</p>
 		<a href={resolve('/docs/api')}>{m.footer_api_docs()}</a>
 	</div>
 </footer>
@@ -59,8 +69,6 @@
 	@use 'tokens' as *;
 
 	header {
-		background: var(--surface);
-		border-bottom: 1px solid var(--border);
 		margin-bottom: 2rem;
 	}
 
@@ -69,69 +77,82 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
-		min-height: 3.5rem;
+		min-height: 48px;
 	}
 
 	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
 		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		font-weight: 700;
 		color: var(--text);
+		font-size: 0.9375rem;
+		font-stretch: var(--name-stretch);
+		font-weight: 700;
 		text-decoration: none;
+
+		span {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
 	}
 
 	nav {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 1rem;
 		white-space: nowrap;
+		font-weight: 600;
 
-		@include up($bp-sm) {
-			gap: 1rem;
-		}
-
-		a:not(.btn) {
+		> a:not(.btn) {
+			display: none;
 			color: var(--text-muted);
 			text-decoration: none;
 
 			&:hover {
 				color: var(--text);
 			}
-		}
-	}
-
-	.me {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-
-		span {
-			display: none;
 
 			@include up($bp-sm) {
 				display: inline;
 			}
 		}
+
+		> a.me {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+
+			span {
+				display: none;
+
+				@include up($bp-sm) {
+					display: inline;
+				}
+			}
+		}
 	}
 
 	main {
-		padding-bottom: 3rem;
+		flex: 1 0 auto;
+		padding-bottom: 4rem;
 	}
 
 	footer {
-		border-top: 1px solid var(--border);
-		padding: 1.25rem 0 2rem;
-		font-size: 0.9rem;
+		padding: 2rem 0 3rem;
+	}
 
-		a {
-			color: var(--text-muted);
-			text-decoration: none;
+	.close {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.5rem 1.5rem;
 
-			&:hover {
-				color: var(--text);
-			}
+		p {
+			flex: 1;
+			margin: 0;
+			min-width: 14rem;
 		}
 	}
 </style>

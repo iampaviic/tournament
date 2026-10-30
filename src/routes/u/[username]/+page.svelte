@@ -89,7 +89,7 @@
 	}
 
 	h2 {
-		font-size: 1.15rem;
+		font-size: var(--fs-section);
 	}
 
 	ul {

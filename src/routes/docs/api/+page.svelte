@@ -227,7 +227,7 @@
 		margin-bottom: 2.5rem;
 
 		> h2 {
-			font-size: 1.4rem;
+			font-size: var(--fs-section);
 		}
 	}
 
@@ -240,7 +240,7 @@
 		}
 
 		h4 {
-			font-size: 0.9rem;
+			font-size: var(--fs-body);
 			color: var(--text-muted);
 			margin: 1rem 0 0.5rem;
 		}
@@ -250,7 +250,7 @@
 	pre,
 	.method {
 		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-		font-size: 0.875rem;
+		font-size: var(--fs-body);
 	}
 
 	pre {
@@ -269,7 +269,7 @@
 		border-radius: var(--radius-sm);
 		background: var(--surface-2);
 		color: var(--accent);
-		font-size: 0.8rem;
+		font-size: var(--fs-small);
 		font-weight: 700;
 	}
 
@@ -290,7 +290,7 @@
 		}
 
 		th {
-			font-size: 0.8rem;
+			font-size: var(--fs-small);
 			color: var(--text-muted);
 			font-weight: 600;
 		}
@@ -300,7 +300,7 @@
 		}
 
 		tbody tr td {
-			border-top: 1px solid var(--border);
+			border-top: 1px solid var(--rule);
 		}
 	}
 

@@ -75,61 +75,88 @@
 </div>
 
 <style lang="scss">
+	// Drawn like a printed draw: each name sits on its own line, the score at the line's end, and
+	// the two lines meet in a joint at the right. A decided match's winner line is set in ink.
 	.match {
 		position: absolute;
 		display: flex;
 		flex-direction: column;
-		background: var(--bracket-card);
-		border: 1px solid var(--bracket-border);
-		border-radius: var(--bracket-radius);
 		box-sizing: border-box;
+		border-radius: 4px;
 
-		&.ready {
-			border-color: color-mix(in srgb, var(--bracket-highlight) 40%, var(--bracket-border));
+		// The joint where the two lines meet; connectors leave from its middle.
+		&::after {
+			content: '';
+			position: absolute;
+			right: 0;
+			top: calc(50% - 1px);
+			height: 50%;
+			border-right: 1px solid var(--bracket-line);
 		}
 
-		&.involved {
-			border-color: var(--bracket-highlight);
-			box-shadow: 0 0 0 1px var(--bracket-highlight);
+		&.ready {
+			background: var(--bracket-ready);
+		}
+
+		&.involved .slot.highlighted::after {
+			height: 2px;
+			background: var(--bracket-highlight);
 		}
 	}
 
+	// Level with the first name, clear of the connectors that arrive on the lines.
 	.number {
 		position: absolute;
-		right: calc(100% + 8px);
-		top: 50%;
+		right: calc(100% + 10px);
+		top: 25%;
 		transform: translateY(-50%);
-		font-size: 0.7rem;
+		font-size: 0.6875rem;
 		color: var(--bracket-muted);
 		font-variant-numeric: tabular-nums;
 	}
 
 	.slot {
+		position: relative;
 		flex: 1;
 		display: flex;
-		align-items: stretch;
+		align-items: flex-end;
+		gap: 0.5rem;
 		min-height: 0;
-		font-size: 0.85rem;
+		padding: 0 0.4rem 0.3rem;
+		font-size: 0.875rem;
 
-		& + .slot {
-			border-top: 1px solid var(--bracket-border);
+		// The printed line the name is written on.
+		&::after {
+			content: '';
+			position: absolute;
+			inset: auto 0 0;
+			height: 1px;
+			background: var(--bracket-line);
+		}
+
+		&.winner::after {
+			height: 2px;
+			background: var(--bracket-ink);
 		}
 
 		&.winner {
-			font-weight: 600;
+			.who {
+				font-weight: 650;
+			}
 
 			.score {
-				background: var(--bracket-accent);
-				color: var(--bracket-accent-text);
+				color: var(--bracket-text);
+				font-weight: 700;
 			}
 		}
 
-		&.loser .who {
-			opacity: 0.6;
+		&.loser .who,
+		&.loser .score {
+			color: var(--bracket-muted);
 		}
 
-		&.highlighted {
-			background: color-mix(in srgb, var(--bracket-highlight) 14%, transparent);
+		&.highlighted .who {
+			color: var(--bracket-highlight);
 		}
 	}
 
@@ -138,33 +165,25 @@
 		display: flex;
 		align-items: center;
 		min-width: 0;
-		padding: 0 0.5rem;
 		overflow: hidden;
+		font-stretch: 88%;
+		font-weight: 550;
 	}
 
 	.placeholder {
 		color: var(--bracket-muted);
-		font-style: italic;
-		font-size: 0.8rem;
+		font-size: 0.8125rem;
+		font-stretch: 100%;
+		font-weight: 400;
 		white-space: nowrap;
 	}
 
 	.score {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 2rem;
 		flex-shrink: 0;
-		border-left: 1px solid var(--bracket-border);
+		min-width: 1.25rem;
+		text-align: right;
+		color: var(--bracket-text);
 		font-variant-numeric: tabular-nums;
 		font-weight: 600;
-	}
-
-	.slot:first-child .score {
-		border-top-right-radius: calc(var(--bracket-radius) - 1px);
-	}
-
-	.slot:last-child .score {
-		border-bottom-right-radius: calc(var(--bracket-radius) - 1px);
 	}
 </style>

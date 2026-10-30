@@ -29,7 +29,7 @@
 	}
 
 	h1 {
-		font-size: 1.25rem;
+		font-size: var(--fs-section);
 		margin-bottom: 1.5rem;
 	}
 </style>

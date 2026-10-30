@@ -11,6 +11,8 @@ import {
 	register,
 	unregister
 } from '#lib/server/services/participants.ts';
+import { listMatches } from '#lib/server/services/matches.ts';
+import { getBracket } from '#lib/server/services/stages.ts';
 import { getRequirements } from '#lib/server/services/tournaments.ts';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 
@@ -28,8 +30,35 @@ export const load: PageServerLoad = async (event) => {
 				status: 'missing' as const
 			}));
 
+	// The viewer's next match: one to play now, else the next one they wait for.
+	let next = null;
+	if (me && tournament.status === 'running') {
+		const mine = (await listMatches(await getBracket(tournament.id))).filter((match) =>
+			match.entrants.includes(me.id)
+		);
+		const now = mine.find((match) => ['ready', 'reported', 'disputed'].includes(match.progress));
+		const match = now ?? mine.find((match) => match.progress === 'waiting');
+		const names = new Map(participants.map((p) => [p.id, p.displayName]));
+		if (match) {
+			next = {
+				id: match.id,
+				number: match.number,
+				stageIndex: match.stageIndex,
+				stageCount: match.stageCount,
+				progress: match.progress,
+				side: match.entrants.indexOf(me.id) as 0 | 1,
+				entrants: match.entrants.map((id) => (id ? (names.get(id) ?? '?') : id)) as [
+					string | null | undefined,
+					string | null | undefined
+				]
+			};
+		}
+	}
+
 	return {
 		description: tournament.description,
+		limit: tournament.participantLimit,
+		next,
 		full:
 			tournament.participantLimit !== null && participants.length >= tournament.participantLimit,
 		me: me && { checkedIn: Boolean(me.checkedInAt), finalRank: me.finalRank },

@@ -85,3 +85,17 @@ export function roundTitle(
 			return m.side_third_place();
 	}
 }
+
+/** The tag colour for a match's progress: blue while it is being played, red pen on a dispute. */
+export const progressTone = (progress: MatchProgress): string =>
+	progress === 'disputed'
+		? 'danger'
+		: progress === 'ready' || progress === 'reported'
+			? 'accent'
+			: '';
+
+/** The tag colour for a tournament's phase. */
+export const statusTone = (status: TournamentStatus): string =>
+	({ draft: '', registration: 'success', check_in: 'warning', running: 'accent', completed: '' })[
+		status
+	];

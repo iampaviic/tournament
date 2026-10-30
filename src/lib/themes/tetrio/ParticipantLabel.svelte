@@ -59,6 +59,5 @@
 		font-weight: 800;
 		line-height: 1.15rem;
 		text-align: center;
-		text-shadow: 0 1px 1px rgb(0 0 0 / 35%);
 	}
 </style>

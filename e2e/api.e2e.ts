@@ -166,7 +166,8 @@ test('create → start → report via key', async ({ page, browser, request }) =
 	await expect(page.locator('.placements li').first()).toContainText(players[0]);
 	await page.goto(`${path}/matches`);
 	await expect(page.getByTestId(`match-${final.id}`)).toContainText('Done');
-	await expect(page.getByTestId(`match-${final.id}`)).toContainText('3–1');
+	// Each score is printed at the end of its player's line.
+	await expect(page.getByTestId(`match-${final.id}`).locator('.score')).toHaveText(['3', '1']);
 	await page.goto(`${path}/matches/${final.id}`);
 	const posted = page.getByRole('log').getByRole('listitem').filter({ hasText: 'Final is up' });
 	await expect(posted).toContainText('Discord bot');

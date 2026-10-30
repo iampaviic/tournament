@@ -66,7 +66,7 @@
 	}
 
 	.hint {
-		font-size: 0.8rem;
+		font-size: var(--fs-small);
 		margin: 0.35rem 0 0;
 	}
 </style>

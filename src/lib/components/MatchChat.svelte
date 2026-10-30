@@ -20,8 +20,10 @@
 		{#each messages as message (message.id)}
 			<li>
 				<p class="meta">
-					<strong>{message.author?.displayName ?? message.apiKey}</strong>
-					{#if message.asOrganizer}<span class="badge">{m.chat_organizer()}</span>{/if}
+					<strong class="name" class:pen={message.asOrganizer}
+						>{message.author?.displayName ?? message.apiKey}</strong
+					>
+					{#if message.asOrganizer}<span class="badge danger">{m.chat_organizer()}</span>{/if}
 					{#if message.apiKey}<span class="badge">{m.chat_api_key()}</span>{/if}
 					<time class="muted" datetime={message.createdAt.toISOString()}
 						>{formatTime(message.createdAt)}</time
@@ -56,7 +58,6 @@
 		gap: 0.75rem;
 
 		h3 {
-			font-size: 1.05rem;
 			margin: 0;
 		}
 
@@ -82,10 +83,14 @@
 		align-items: center;
 		gap: 0.5rem;
 		margin: 0;
-		font-size: 0.9rem;
 
 		time {
-			font-size: 0.8rem;
+			font-size: var(--fs-small);
+		}
+
+		// An organizer writes in the red pen.
+		.pen {
+			color: var(--danger);
 		}
 	}
 

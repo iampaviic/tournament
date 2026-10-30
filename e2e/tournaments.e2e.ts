@@ -95,7 +95,7 @@ test('registration checks the linked accounts a tournament requires', async ({ p
 	const player = await context.newPage();
 	await signIn(player, uniqueName('rp'));
 	await player.goto(`/t/${orgSlug}/ranked-cup`);
-	await expect(player.getByText('✓ Development login account linked')).toBeVisible();
+	await expect(player.getByText('Development login account linked')).toBeVisible();
 	await player.getByRole('button', { name: 'Register' }).click();
 	await expect(player.getByText("You're registered.")).toBeVisible();
 	await context.close();

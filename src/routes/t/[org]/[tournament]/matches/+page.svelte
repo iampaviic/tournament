@@ -3,8 +3,14 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
-	import { formatScore } from '#lib/format.ts';
-	import { groupName, matchStatusLabel, stageLabel } from '#lib/labels.ts';
+	import MatchLines from '#lib/components/MatchLines.svelte';
+	import {
+		groupName,
+		matchContext,
+		matchStatusLabel,
+		progressTone,
+		stageLabel
+	} from '#lib/labels.ts';
 	import { listen } from '#lib/live.ts';
 	import type { PageProps } from './$types';
 
@@ -42,6 +48,14 @@
 			: entrant === null
 				? m.match_bye()
 				: (data.names[entrant] ?? '?');
+	const side = (match: Item, slot: 0 | 1) => {
+		const entrant = match.entrants[slot];
+		return {
+			name: name(entrant),
+			placeholder: !entrant,
+			score: match.result?.scores?.[slot] ?? null
+		};
+	};
 	const room = (id: string) =>
 		resolve('/t/[org]/[tournament]/matches/[id]', {
 			org: data.org.slug,
@@ -51,15 +65,18 @@
 </script>
 
 {#snippet link(match: Item)}
+	{@const winner = match.result?.winner ?? null}
+	{@const mySide = data.me ? match.entrants.indexOf(data.me) : -1}
 	<a href={room(match.id)}>
 		<span class="number">#{match.number}</span>
-		<span class="pair">
-			<span>{name(match.entrants[0])}</span>
-			<strong>{match.result?.scores ? formatScore(match.result.scores) : '–'}</strong>
-			<span>{name(match.entrants[1])}</span>
-		</span>
-		<span class="badge" class:danger={match.progress === 'disputed'}>
-			{matchStatusLabel(match.progress)}
+		<MatchLines
+			sides={[side(match, 0), side(match, 1)]}
+			winner={match.status === 'completed' ? winner : null}
+			me={mySide === 0 || mySide === 1 ? mySide : null}
+		/>
+		<span class="context muted">{matchContext(match)}</span>
+		<span class="status">
+			<span class="badge {progressTone(match.progress)}">{matchStatusLabel(match.progress)}</span>
 		</span>
 	</a>
 {/snippet}
@@ -84,6 +101,7 @@
 		</section>
 	{/if}
 
+	{#if mine.length && data.stageCount === 1}<h2>{m.t_all_matches()}</h2>{/if}
 	{#each stages as stage (stage.index)}
 		{#if data.stageCount > 1}<h2>{stageLabel(stage.index, data.stageCount)}</h2>{/if}
 		{#each stage.groups as group, groupIndex (groupIndex)}
@@ -101,25 +119,24 @@
 
 <style lang="scss">
 	h2 {
-		font-size: 1.25rem;
-		margin-top: 1.5rem;
+		margin-top: 2rem;
 	}
 
 	h3 {
-		font-size: 1.05rem;
-		margin-top: 1rem;
+		margin-top: 1.25rem;
 	}
 
 	.bar {
 		display: flex;
 		justify-content: flex-end;
+		margin-bottom: 0.5rem;
 	}
 
 	.live {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 		color: var(--text-muted);
 
 		&::before {
@@ -127,7 +144,7 @@
 			width: 0.5rem;
 			height: 0.5rem;
 			border-radius: 50%;
-			background: var(--border);
+			background: var(--control);
 		}
 
 		&.on::before {
@@ -142,18 +159,15 @@
 		overflow: hidden;
 
 		li + li {
-			border-top: 1px solid var(--border);
-		}
-
-		.mine {
-			box-shadow: inset 3px 0 0 var(--accent);
+			border-top: 1px solid var(--rule);
 		}
 
 		a {
-			display: flex;
+			display: grid;
+			grid-template-columns: 2.5rem minmax(0, 24rem) minmax(0, 1fr) auto;
 			align-items: center;
-			gap: 0.75rem;
-			padding: 0.6rem 1.25rem;
+			gap: 1rem;
+			padding: 0.5rem var(--pad) 0.75rem;
 			color: var(--text);
 			text-decoration: none;
 
@@ -164,27 +178,20 @@
 	}
 
 	.number {
-		min-width: 2.5rem;
 		color: var(--text-muted);
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 		font-variant-numeric: tabular-nums;
 	}
 
-	.pair {
-		flex: 1;
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.5rem;
-		min-width: 0;
-
-		strong {
-			font-variant-numeric: tabular-nums;
-		}
+	.context {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
-	.badge {
-		min-width: 5rem;
-		text-align: center;
+	// One fixed cell for the state, so it is in the same place on every row.
+	.status {
+		display: flex;
+		justify-content: flex-end;
 	}
 </style>

@@ -41,7 +41,7 @@ export interface RoundHeader {
 export interface Connector {
 	from: string;
 	to: string;
-	/** SVG path from the right edge of `from` to the slot of `to` it feeds. */
+	/** SVG path from the joint at `from`'s right edge to the line of the slot of `to` it feeds. */
 	path: string;
 }
 
@@ -213,9 +213,11 @@ export function layoutBracket<T extends { template: MatchTemplate }>(items: T[])
 		});
 		slots.forEach((slot, index) => {
 			if (!('match' in slot) || slot.outcome !== 'winner' || !visible(slot.match)) return;
+			// Drawn like a printed draw: from the joint where the feeder's two lines meet to the line
+			// the winner's name is written on.
 			const from = positions.get(slot.match)!;
-			const y1 = from.y + CARD_HEIGHT / 2;
-			const y2 = to.y + SLOT_HEIGHT * (index + 0.5);
+			const y1 = from.y + SLOT_HEIGHT * 1.5;
+			const y2 = to.y + SLOT_HEIGHT * (index + 1);
 			const xm = to.x - COLUMN_GAP / 2;
 			connectors.push({
 				from: slot.match,

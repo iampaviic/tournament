@@ -55,9 +55,9 @@
 
 	.grid {
 		display: grid;
-		gap: 1rem;
+		gap: var(--gap);
 		margin-top: 1.5rem;
-		align-items: start;
+		align-items: stretch;
 
 		@include up($bp-md) {
 			grid-template-columns: 2fr 1fr;
@@ -65,7 +65,6 @@
 	}
 
 	h2 {
-		font-size: 1.15rem;
 		margin: 0;
 	}
 
@@ -90,7 +89,11 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			padding: 0.4rem 0;
+			min-height: 44px;
+
+			& + li {
+				border-top: 1px solid var(--rule);
+			}
 		}
 
 		a {
@@ -100,7 +103,7 @@
 	}
 
 	.small {
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 		margin-bottom: 0;
 	}
 </style>

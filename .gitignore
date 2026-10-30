@@ -31,3 +31,6 @@ project.inlang/cache/
 /.claude/skills/impeccable/scripts/bin/
 # Working files of the design skills
 /.taste-skill/
+/.impeccable/hook.cache.json
+/.impeccable/config.local.json
+/.impeccable/review/

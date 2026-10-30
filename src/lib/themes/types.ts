@@ -13,21 +13,27 @@ export interface ParticipantLabelProps {
 	participant: ThemeParticipant;
 }
 
-/** Colors and shapes of the bracket view. Values are CSS, so app tokens like `var(--surface)` work. */
+/**
+ * Colors of the bracket view, which is drawn like a printed draw sheet: names sit on printed
+ * lines, and a decided match's winner line carries on into the next round. Values are CSS, so app
+ * tokens like `var(--surface)` work.
+ */
 export interface ThemeStyle {
+	/** The sheet the bracket is printed on. */
 	background: string;
+	/** Controls on the sheet, such as the zoom buttons. */
 	card: string;
 	border: string;
 	text: string;
 	muted: string;
-	/** Lines between matches. */
+	/** Printed lines: the line each name is written on, and the joints between rounds. */
 	line: string;
-	/** The winner's score box. */
-	accent: string;
-	accentText: string;
-	/** Outline of matches that are ready to be played, and of a hovered participant's matches. */
+	/** A decided match's winner line and the connector it continues into. */
+	ink: string;
+	/** Behind a match that is ready to be played. */
+	ready: string;
+	/** A hovered participant's path through the bracket. */
 	highlight: string;
-	radius: string;
 	font: string;
 }
 

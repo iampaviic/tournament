@@ -20,13 +20,13 @@
 	/** Hovering a participant highlights their way through the bracket. */
 	let highlighted = $state<string | null>(null);
 
-	const entrantsById = $derived(
-		new Map(layout.matches.map((p) => [p.match.template.id, p.match.entrants]))
-	);
+	const byId = $derived(new Map(layout.matches.map((p) => [p.match.template.id, p.match])));
 	const onPath = (from: string, to: string) =>
 		highlighted !== null &&
-		entrantsById.get(from)!.includes(highlighted) &&
-		entrantsById.get(to)!.includes(highlighted);
+		byId.get(from)!.entrants.includes(highlighted) &&
+		byId.get(to)!.entrants.includes(highlighted);
+	/** A decided match's winner line carries on into the next round in ink. */
+	const carried = (from: string) => byId.get(from)!.status === 'completed';
 
 	function onpointerover(event: PointerEvent) {
 		const slot = (event.target as Element).closest('[data-entrant]');
@@ -44,7 +44,11 @@
 >
 	<svg class="lines" width={layout.width} height={layout.height} aria-hidden="true">
 		{#each layout.connectors as connector (`${connector.from}>${connector.to}`)}
-			<path d={connector.path} class:highlighted={onPath(connector.from, connector.to)} />
+			<path
+				d={connector.path}
+				class:carried={carried(connector.from)}
+				class:highlighted={onPath(connector.from, connector.to)}
+			/>
 		{/each}
 	</svg>
 
@@ -80,11 +84,17 @@
 		path {
 			fill: none;
 			stroke: var(--bracket-line);
+			stroke-width: 1;
+		}
+
+		path.carried {
+			stroke: var(--bracket-ink);
 			stroke-width: 2;
 		}
 
 		path.highlighted {
 			stroke: var(--bracket-highlight);
+			stroke-width: 2;
 		}
 	}
 
@@ -92,10 +102,8 @@
 		position: absolute;
 		display: flex;
 		align-items: center;
-		font-size: 0.75rem;
+		font-size: 0.8125rem;
 		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
 		color: var(--bracket-muted);
 		white-space: nowrap;
 	}

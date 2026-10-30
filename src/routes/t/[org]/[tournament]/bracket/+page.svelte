@@ -96,7 +96,7 @@
 		}
 
 		.format {
-			font-size: 0.9rem;
+			font-size: var(--fs-body);
 			font-weight: 400;
 			margin-left: 0.5rem;
 		}
@@ -106,11 +106,11 @@
 		margin-bottom: 1.5rem;
 
 		h3 {
-			font-size: 1.1rem;
+			font-size: var(--fs-section);
 		}
 
 		h4 {
-			font-size: 0.95rem;
+			font-size: var(--fs-body);
 			color: var(--text-muted);
 			margin: 1rem 0 0.5rem;
 		}
@@ -133,7 +133,7 @@
 		}
 
 		th {
-			font-size: 0.8rem;
+			font-size: var(--fs-small);
 			color: var(--text-muted);
 			font-weight: 600;
 		}
@@ -144,7 +144,7 @@
 		}
 
 		tbody tr + tr td {
-			border-top: 1px solid var(--border);
+			border-top: 1px solid var(--rule);
 		}
 	}
 

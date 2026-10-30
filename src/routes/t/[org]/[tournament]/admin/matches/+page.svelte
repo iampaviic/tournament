@@ -6,7 +6,14 @@
 	import { matchNumbers } from '#lib/bracketLayout.ts';
 	import { sections } from '#lib/bracketView.ts';
 	import { formatScore } from '#lib/format.ts';
-	import { groupName, matchContext, matchStatusLabel, sideLabel, stageLabel } from '#lib/labels.ts';
+	import {
+		groupName,
+		matchContext,
+		matchStatusLabel,
+		progressTone,
+		sideLabel,
+		stageLabel
+	} from '#lib/labels.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -36,28 +43,32 @@
 		<h2>{m.queue_title()}</h2>
 		<p class="muted">{m.queue_lead()}</p>
 		{#if data.queue.length}
-			<ol>
+			<ol class="card">
 				{#each data.queue as item (item.id)}
 					{@const context = matchContext(item)}
 					{@const names = [name(item.entrants[0]), name(item.entrants[1])] as [string, string]}
-					<li class="card" data-testid="queue-{item.id}">
+					<li data-testid="queue-{item.id}">
 						<div class="summary">
-							<a href={room(item.id)}>{m.match_number({ number: item.number })}</a>
-							{#if context}<span class="muted">{context}</span>{/if}
-							<span class="badge" class:danger={item.progress === 'disputed'}>
-								{matchStatusLabel(item.progress)}
-							</span>
-							{#if item.helpRequested}<span class="badge warning">{m.match_help()}</span>{/if}
-						</div>
-						{#each item.reports as report (report.side)}
-							<p class="report">
-								{m.room_reported({ name: names[report.side], score: formatScore(report.scores) })}
+							<p class="title">
+								<a href={room(item.id)}>{m.match_number({ number: item.number })}</a>
+								{#if context}<span class="muted">{context}</span>{/if}
 							</p>
-						{/each}
+							<p class="tags">
+								<span class="badge {progressTone(item.progress)}">
+									{matchStatusLabel(item.progress)}
+								</span>
+								{#if item.helpRequested}<span class="badge danger">{m.match_help()}</span>{/if}
+							</p>
+							{#each item.reports as report (report.side)}
+								<p class="report">
+									{m.room_reported({ name: names[report.side], score: formatScore(report.scores) })}
+								</p>
+							{/each}
+						</div>
+						<ScoreForm action="?/result" {names} submit={m.matches_save()}>
+							<input type="hidden" name="matchId" value={item.id} />
+						</ScoreForm>
 						<div class="actions">
-							<ScoreForm action="?/result" {names} submit={m.matches_save()}>
-								<input type="hidden" name="matchId" value={item.id} />
-							</ScoreForm>
 							{#if item.helpRequested}
 								<form method="POST" action="?/clearHelp" use:enhance>
 									<input type="hidden" name="matchId" value={item.id} />
@@ -96,7 +107,9 @@
 										? `#${numbers.get(match.template.id)}`
 										: ''}</span
 								>
-								<span class="badge">{matchStatusLabel(match.status)}</span>
+								<span class="badge {progressTone(match.status)}"
+									>{matchStatusLabel(match.status)}</span
+								>
 								{#if editable}
 									<ScoreForm
 										action="?/result"
@@ -133,18 +146,20 @@
 {/each}
 
 <style lang="scss">
+	@use 'tokens' as *;
+
 	h2 {
-		font-size: 1.25rem;
+		font-size: var(--fs-section);
 		margin-top: 1.5rem;
 	}
 
 	h3 {
-		font-size: 1.05rem;
+		font-size: 1rem;
 		margin-top: 1rem;
 	}
 
 	h4 {
-		font-size: 0.95rem;
+		font-size: var(--fs-body);
 		color: var(--text-muted);
 		margin: 1rem 0 0.5rem;
 	}
@@ -152,37 +167,57 @@
 	.queue {
 		margin-bottom: 2rem;
 
+		// One sheet; each match on it is a ruled row: what it is, the score lines, what else to do.
 		ol {
 			list-style: none;
 			margin: 0;
-			padding: 0;
-			display: flex;
-			flex-direction: column;
-			gap: 0.75rem;
+			padding-block: 0;
 		}
 
 		li {
-			display: flex;
-			flex-direction: column;
-			gap: 0.5rem;
-			padding: 0.75rem 1.25rem;
+			display: grid;
+			gap: 0.75rem 2rem;
+			padding-block: 1rem;
+
+			& + li {
+				border-top: 1px solid var(--rule);
+			}
+
+			@include up($bp-md) {
+				grid-template-columns: minmax(0, 16rem) minmax(0, 1fr) auto;
+				align-items: center;
+			}
 		}
 
-		.summary,
+		.summary {
+			display: flex;
+			flex-direction: column;
+			gap: 0.35rem;
+		}
+
+		.title,
+		.tags {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 0.25rem 0.5rem;
+			margin: 0;
+		}
+
+		.title a {
+			font-weight: 600;
+		}
+
 		.actions {
 			display: flex;
 			flex-wrap: wrap;
 			align-items: center;
-			gap: 0.5rem 0.75rem;
-		}
-
-		.summary a {
-			font-weight: 600;
+			gap: 0.5rem 1rem;
 		}
 
 		.report {
 			margin: 0;
-			font-size: 0.9rem;
+			color: var(--text-muted);
 		}
 	}
 
@@ -191,11 +226,9 @@
 		padding: 0.75rem 1.25rem;
 
 		h5 {
-			font-size: 0.85rem;
+			font-size: var(--fs-small);
 			color: var(--text-muted);
 			margin: 0 0 0.5rem;
-			text-transform: uppercase;
-			letter-spacing: 0.04em;
 		}
 
 		ul {
@@ -212,20 +245,20 @@
 			padding: 0.4rem 0;
 
 			& + li {
-				border-top: 1px solid var(--border);
+				border-top: 1px solid var(--rule);
 			}
 		}
 
 		.number {
 			min-width: 2rem;
 			color: var(--text-muted);
-			font-size: 0.85rem;
+			font-size: var(--fs-small);
 			font-variant-numeric: tabular-nums;
 		}
 
 		.badge {
 			min-width: 5rem;
-			text-align: center;
+			justify-content: center;
 		}
 	}
 

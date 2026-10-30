@@ -82,7 +82,7 @@
 			padding: 0.6rem 0;
 
 			& + li {
-				border-top: 1px solid var(--border);
+				border-top: 1px solid var(--rule);
 			}
 		}
 
@@ -93,7 +93,7 @@
 	}
 
 	.small {
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 	}
 
 	.empty {
@@ -104,7 +104,7 @@
 		margin-top: 1.5rem;
 
 		h2 {
-			font-size: 1.1rem;
+			font-size: var(--fs-section);
 		}
 	}
 

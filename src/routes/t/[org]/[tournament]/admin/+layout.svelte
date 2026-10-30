@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
-	import { statusLabel } from '#lib/labels.ts';
+	import { statusLabel, statusTone } from '#lib/labels.ts';
 	import type { SubmitFunction } from '$app/forms';
 	import type { LayoutProps } from './$types';
 
@@ -109,7 +109,7 @@
 
 <section class="card lifecycle">
 	<div>
-		<span class="badge">{statusLabel(status)}</span>
+		<span class="badge {statusTone(status)}">{statusLabel(status)}</span>
 		<p>{description}</p>
 		{#if lifecycleError}<p class="error" role="alert">{lifecycleError}</p>{/if}
 	</div>
@@ -136,6 +136,8 @@
 {@render children()}
 
 <style lang="scss">
+	@use 'tokens' as *;
+
 	.title {
 		display: flex;
 		flex-wrap: wrap;
@@ -145,12 +147,22 @@
 		margin-bottom: 1rem;
 
 		h1 {
-			margin: 0;
+			margin: 0.15rem 0 0;
+			font-size: 1.5rem;
+
+			@include up($bp-sm) {
+				font-size: var(--fs-title);
+			}
 		}
 
 		.org {
+			color: var(--text-muted);
+			font-weight: 550;
 			text-decoration: none;
-			font-size: 0.9rem;
+
+			&:hover {
+				color: var(--text);
+			}
 		}
 	}
 
@@ -167,6 +179,10 @@
 
 		.error {
 			color: var(--danger);
+		}
+
+		@include up($bp-sm) {
+			flex-wrap: nowrap;
 		}
 	}
 

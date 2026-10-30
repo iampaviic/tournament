@@ -3,7 +3,7 @@
 	import type { TournamentStatus } from '#lib/server/db/schema.ts';
 	import { m } from '#lib/paraglide/messages.js';
 	import { formatDate } from '#lib/format.ts';
-	import { statusLabel } from '#lib/labels.ts';
+	import { statusLabel, statusTone } from '#lib/labels.ts';
 
 	interface Item {
 		orgSlug: string;
@@ -32,9 +32,9 @@
 					</div>
 				</div>
 				{#if item.finalRank}
-					<span class="badge">{m.participants_rank({ rank: item.finalRank })}</span>
+					<span class="badge accent">{m.participants_rank({ rank: item.finalRank })}</span>
 				{:else}
-					<span class="badge">{statusLabel(item.status)}</span>
+					<span class="badge {statusTone(item.status)}">{statusLabel(item.status)}</span>
 				{/if}
 			</li>
 		{/each}
@@ -55,10 +55,11 @@
 		justify-content: space-between;
 		align-items: center;
 		gap: 1rem;
+		min-height: 56px;
 		padding: 0.5rem 0;
 
 		& + li {
-			border-top: 1px solid var(--border);
+			border-top: 1px solid var(--rule);
 		}
 	}
 
@@ -68,7 +69,7 @@
 	}
 
 	.small {
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 	}
 
 	p {

@@ -69,7 +69,7 @@
 
 		&.selected {
 			border-color: var(--accent);
-			box-shadow: 0 0 0 1px var(--accent);
+			outline: 1px solid var(--accent);
 		}
 	}
 
@@ -80,7 +80,7 @@
 	}
 
 	.description {
-		font-size: 0.9rem;
+		font-size: var(--fs-body);
 	}
 
 	.preview {

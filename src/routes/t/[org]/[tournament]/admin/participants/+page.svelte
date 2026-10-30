@@ -147,7 +147,7 @@
 			padding: 0.6rem 0;
 
 			& + li {
-				border-top: 1px solid var(--border);
+				border-top: 1px solid var(--rule);
 			}
 		}
 	}
@@ -175,7 +175,7 @@
 	}
 
 	.small {
-		font-size: 0.85rem;
+		font-size: var(--fs-small);
 	}
 
 	.actions {

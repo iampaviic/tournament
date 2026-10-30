@@ -5,18 +5,17 @@ import ParticipantLabel from './ParticipantLabel.svelte';
 export const defaultTheme: BracketTheme = {
 	id: 'default',
 	name: 'Default',
-	description: 'Clean cards in the colors of the site, light or dark.',
+	description: 'The printed draw sheet of the site, in light or dark.',
 	style: {
-		background: 'var(--bg)',
+		background: 'var(--surface)',
 		card: 'var(--surface)',
-		border: 'var(--border)',
+		border: 'var(--control)',
 		text: 'var(--text)',
 		muted: 'var(--text-muted)',
-		line: 'color-mix(in srgb, var(--text-muted) 45%, transparent)',
-		accent: 'var(--accent)',
-		accentText: 'var(--accent-text)',
+		line: 'var(--line)',
+		ink: 'var(--text)',
+		ready: 'var(--accent-soft)',
 		highlight: 'var(--accent)',
-		radius: 'var(--radius-sm)',
 		font: 'var(--font)'
 	},
 	ParticipantLabel
