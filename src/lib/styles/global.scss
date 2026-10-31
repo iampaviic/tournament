@@ -25,15 +25,18 @@
 	@media (max-width: 639.98px) {
 		--fs-title: 1.625rem;
 	}
-	// Character tiles: a player without a picture gets one of these, picked from their name.
-	--tile-1: #ff7a45;
-	--tile-2: #2fb8ff;
-	--tile-3: #ffd23f;
-	--tile-4: #34e08b;
-	--tile-5: #b48cff;
-	--tile-6: #ff7ac8;
-	--tile-7: #ff9f1c;
-	--tile-8: #5ee7df;
+	// Character tiles: a player without a picture gets one of these, picked from their name. Four
+	// families (pink, lime, teal, lilac), each light and deep, so neighbours differ in hue or in
+	// lightness. None is a side colour, gold, or a state colour, so a tile never reads as player one,
+	// player two, a state or the winner, and the gold "You" frame shows on every tile.
+	--tile-1: #ffb0dc;
+	--tile-2: #a8e03a;
+	--tile-3: #93f0dd;
+	--tile-4: #b964f2;
+	--tile-5: #ff6ec7;
+	--tile-6: #e3f88a;
+	--tile-7: #1ec9a7;
+	--tile-8: #e6c2ff;
 	// The slant of a state chip and the primary plate, as on a versus screen.
 	--slant: -10deg;
 	// Motion: quick and exact under the hand, slower only for things arriving.
@@ -463,6 +466,15 @@ legend {
 
 		&::before {
 			background: var(--accent);
+			box-shadow: none;
+		}
+	}
+
+	&.play {
+		color: var(--on-play);
+
+		&::before {
+			background: var(--play);
 			box-shadow: none;
 		}
 	}

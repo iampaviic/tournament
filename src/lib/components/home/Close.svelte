@@ -22,12 +22,6 @@
 	</div>
 </section>
 
-<!-- The brand mark at the scale of the page: player one's side and player two's, meeting at the cut. -->
-<div class="mark" aria-hidden="true">
-	<span class="p1"></span>
-	<span class="p2"></span>
-</div>
-
 <style lang="scss">
 	@use 'tokens' as *;
 
@@ -40,6 +34,7 @@
 			minmax(1rem, 1fr) [full-end];
 		width: 100vw;
 		margin-inline: calc(50% - 50vw);
+		margin-bottom: 1rem;
 	}
 
 	.tile {
@@ -102,65 +97,6 @@
 
 		:focus-visible {
 			outline-color: var(--accent-text);
-		}
-	}
-
-	// Two sides meeting at the cut, the 20px mark in the header at the width of the page.
-	.mark {
-		--cut: clamp(2rem, 7vw, 6rem);
-		display: flex;
-		height: clamp(4.5rem, 14vw, 10rem);
-		margin-block: 5rem 1rem;
-	}
-
-	.p1,
-	.p2 {
-		flex: 1;
-	}
-
-	.p1 {
-		flex-basis: 58%;
-		background: var(--p1);
-		clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
-		margin-right: calc(var(--cut) / -2 + 0.5rem);
-	}
-
-	.p2 {
-		background: var(--p2);
-		clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%);
-		margin-left: calc(var(--cut) / -2 + 0.5rem);
-	}
-
-	// Scrolling the mark into view slides the two sides in from their edges until they meet. Without
-	// scroll timelines it is simply there.
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: view()) {
-			.p1,
-			.p2 {
-				animation: linear both;
-				animation-timeline: view();
-				animation-range: entry 0% entry 100%;
-			}
-
-			.p1 {
-				animation-name: from-left;
-			}
-
-			.p2 {
-				animation-name: from-right;
-			}
-		}
-	}
-
-	@keyframes from-left {
-		from {
-			transform: translateX(-40%);
-		}
-	}
-
-	@keyframes from-right {
-		from {
-			transform: translateX(40%);
 		}
 	}
 </style>

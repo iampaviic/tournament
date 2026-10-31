@@ -4,9 +4,9 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import BracketView from '#lib/components/bracket/BracketView.svelte';
-	import Avatar from '#lib/components/Avatar.svelte';
 	import Icon from '#lib/components/Icon.svelte';
 	import Podium from '#lib/components/Podium.svelte';
+	import Roster from '#lib/components/Roster.svelte';
 	import Versus from '#lib/components/Versus.svelte';
 	import {
 		formatLabel,
@@ -59,6 +59,8 @@
 				size="md"
 				names={[sideName(next.entrants[0]), sideName(next.entrants[1])]}
 				placeholders={[!next.entrants[0], !next.entrants[1]]}
+				scores={next.reported}
+				pending
 				me={next.side}
 			/>
 			<div class="next-action">
@@ -211,18 +213,19 @@
 	<section class="participants">
 		<h2>{m.t_participants({ count: data.participants.length })}</h2>
 		{#if participants.length}
-			<!-- The roster as a select screen: one tile per player. -->
-			<ol class="roster">
-				{#each participants as participant (participant.id)}
-					<li class:podium={ranked && (participant.finalRank ?? 99) <= 3}>
-						<Avatar src={participant.avatarUrl} name={participant.displayName} size={40} />
-						<a class="name" href={resolve('/u/[username]', { username: participant.username })}>
-							{participant.displayName}
-						</a>
-						{#if ranked}<span class="rank">{participant.finalRank ?? '–'}</span>{/if}
-					</li>
-				{/each}
-			</ol>
+			<Roster
+				players={participants.map((p) => ({
+					id: p.id,
+					name: p.displayName,
+					avatarUrl: p.avatarUrl,
+					href: resolve('/u/[username]', { username: p.username }),
+					rank: ranked ? p.finalRank : null,
+					cursor: data.user?.username === p.username ? 'you' : null
+				}))}
+				open={data.limit !== null && (status === 'registration' || status === 'check_in')
+					? Math.max(0, data.limit - data.participants.length)
+					: 0}
+			/>
 		{:else}
 			<p class="muted">{m.t_no_participants()}</p>
 		{/if}
@@ -405,60 +408,6 @@
 			&.ok {
 				color: var(--success);
 			}
-		}
-	}
-
-	.roster {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-		gap: 0.5rem;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-
-		li {
-			display: flex;
-			align-items: center;
-			gap: 0.65rem;
-			min-width: 0;
-			min-height: 56px;
-			padding: 0.5rem 0.65rem 0.5rem 0.5rem;
-			border: 1px solid var(--border);
-			border-radius: var(--radius-sm);
-			background: var(--surface);
-			transition: border-color var(--t-hover) ease;
-
-			&:hover {
-				border-color: var(--line);
-			}
-
-			&.podium {
-				border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
-			}
-		}
-
-		a {
-			flex: 1;
-			min-width: 0;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			color: var(--text);
-			text-decoration: none;
-
-			&:hover {
-				color: var(--accent-ink);
-			}
-		}
-
-		.rank {
-			font-family: var(--font-display);
-			color: var(--text-muted);
-			font-variant-numeric: tabular-nums;
-		}
-
-		.podium .rank {
-			color: var(--accent-ink);
 		}
 	}
 </style>

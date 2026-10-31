@@ -482,15 +482,11 @@
 	"home_org_placeholder": "Kvart Gaming Club",
 	"home_start": "Start a tournament",
 	"home_example": "Example",
-	"home_play": "If you play",
-	"home_run": "If you run it",
 	"home_play_match": "Match #7 · Winners round 2",
 	"home_report": "Report {score}",
 	"home_reported": "Bram confirmed. Aiko plays match #11.",
 	"home_again": "Play it again",
-	"home_run_match": "Match #6 · Winners round 2",
-	"home_run_note": "An organizer settles it from the match queue.",
-	"home_joint_label": "An example match on both sides: the player reports, the organizer settles disputes, and the winner's line carries on into the next round.",
+	"home_joint_label": "An example match: report the score and the winner takes the screen.",
 	"home_formats": "Four formats",
 	"home_format_single_elimination": "Lose once and you are out. The top seeds get the byes.",
 	"home_format_double_elimination": "Lose twice and you are out, with a bracket reset if the grand final needs one.",
@@ -526,5 +522,8 @@
 	"versus_winner": "Winner",
 	"theme_dark": "Dark look",
 	"versus_vs": "VS",
-	"versus_side": "P{side}"
+	"versus_side": "P{side}",
+	"roster_more_open": "+{count} open",
+	"home_roster_title": "Registration fills the roster",
+	"home_roster_lead": "Players register themselves. Set a limit, require a linked game account, and watch the open places fill."
 }

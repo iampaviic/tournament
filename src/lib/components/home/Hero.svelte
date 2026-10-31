@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
-	import MatchLines from '#lib/components/MatchLines.svelte';
 	import ScoreLines from '#lib/components/ScoreLines.svelte';
 	import Versus from '#lib/components/Versus.svelte';
 	import { formatScore } from '#lib/format.ts';
-	import { matchStatusLabel } from '#lib/labels.ts';
 
 	// The live thing: report the example match and the winner takes the screen.
 	let scores = $state<[number | null, number | null]>([2, 1]);
@@ -40,11 +38,11 @@
 
 	<div class="play" role="group" aria-label={m.home_joint_label()}>
 		<p class="head">
-			<span class="who-for">{m.home_play()}</span>
-			<span class="muted">{m.home_play_match()}</span>
+			<span>{m.home_play_match()}</span>
 			<span class="badge">{m.home_example()}</span>
 		</p>
-		<Versus {names} intro scores={reported === null ? null : [a, b]} winner={reported} me={0} />
+		<!-- While a score is typed the pips show it half lit; reporting it decides the match. -->
+		<Versus {names} intro scores={[a, b]} pending={reported === null} winner={reported} me={0} />
 		<div class="report" aria-live="polite">
 			{#if reported === null}
 				<ScoreLines {names} {scores} onscores={(next) => (scores = next)} />
@@ -62,23 +60,6 @@
 					{m.home_again()}
 				</button>
 			{/if}
-		</div>
-
-		<!-- The other side of the same event: a disputed match waits for the organizer. -->
-		<div class="run">
-			<p class="head">
-				<span class="who-for">{m.home_run()}</span>
-				<span class="muted">{m.home_run_match()}</span>
-				<span class="badge danger">{matchStatusLabel('disputed')}</span>
-			</p>
-			<div class="run-body">
-				<MatchLines sides={[{ name: 'Cleo' }, { name: 'Dario' }]} disputed />
-				<div class="reports">
-					<span>{m.room_reported({ name: 'Cleo', score: '2–1' })}</span>
-					<span>{m.room_reported({ name: 'Dario', score: '1–2' })}</span>
-					<span class="muted">{m.home_run_note()}</span>
-				</div>
-			</div>
 		</div>
 	</div>
 </section>
@@ -132,7 +113,7 @@
 		}
 
 		.gold {
-			color: var(--accent-ink);
+			color: var(--accent-display);
 		}
 	}
 
@@ -216,12 +197,8 @@
 		align-items: center;
 		gap: 0.35rem 0.75rem;
 		margin: 0;
+		color: var(--text-muted);
 		font-size: var(--fs-small);
-	}
-
-	.who-for {
-		font-family: var(--font-display);
-		font-size: 1rem;
 	}
 
 	.report {
@@ -241,31 +218,5 @@
 	.note {
 		margin: 0;
 		font-weight: 600;
-	}
-
-	.run {
-		display: flex;
-		flex-direction: column;
-		gap: 0.6rem;
-		margin-top: 0.75rem;
-		padding-top: 1.1rem;
-		border-top: 1px solid var(--border);
-	}
-
-	.run-body {
-		display: grid;
-		gap: 0.75rem 1.25rem;
-		align-items: center;
-
-		@include up($bp-sm) {
-			grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
-		}
-	}
-
-	.reports {
-		display: flex;
-		flex-direction: column;
-		gap: 0.15rem;
-		font-size: var(--fs-small);
 	}
 </style>

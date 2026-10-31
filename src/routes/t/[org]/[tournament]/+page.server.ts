@@ -52,6 +52,8 @@ export const load: PageServerLoad = async (event) => {
 				stageIndex: match.stageIndex,
 				stageCount: match.stageCount,
 				progress: match.progress,
+				// A single report shows on the plate as pending pips, as in the match room.
+				reported: match.reports.length === 1 ? match.reports[0].scores : null,
 				side: match.entrants.indexOf(me.id) as 0 | 1,
 				entrants: match.entrants.map((id) => (id ? (names.get(id) ?? '?') : id)) as [
 					string | null | undefined,

@@ -4,12 +4,15 @@
 	let {
 		names,
 		scores = null,
+		winner = null,
 		onscores
 	}: {
 		/** The two players' names, in slot order. */
 		names: [string, string];
 		/** Prefills the inputs; `null` leaves one empty. */
 		scores?: readonly [number | null, number | null] | null;
+		/** A decided match's winner: their slot fills with its side's colour, the other drains. */
+		winner?: 0 | 1 | null;
 		/** Called as either score is typed; an empty field is `null`. */
 		onscores?: (scores: [number | null, number | null]) => void;
 	} = $props();
@@ -21,7 +24,7 @@
 <!-- The versus plate with a score cell at the end of each player's slot. -->
 <div class="lines">
 	{#each [0, 1] as const as i (i)}
-		<label class="line">
+		<label class="line" class:winner={winner === i} class:loser={winner !== null && winner !== i}>
 			<span class="name">{names[i]}</span>
 			<input
 				bind:this={inputs[i]}
@@ -71,6 +74,19 @@
 			border-radius: 1px;
 			background: var(--side);
 			transform: skewX(var(--slant));
+		}
+
+		&.winner {
+			background: var(--side);
+			color: var(--on-side);
+
+			&::before {
+				background: var(--on-side);
+			}
+		}
+
+		&.loser .name {
+			color: var(--text-muted);
 		}
 	}
 

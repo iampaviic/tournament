@@ -8,6 +8,7 @@
 		action,
 		names,
 		scores = null,
+		winner = null,
 		submit,
 		quiet = false,
 		children
@@ -17,6 +18,8 @@
 		names: [string, string];
 		/** Prefills the inputs. */
 		scores?: Scores | null;
+		/** A decided match's winner: their slot is filled, while the scores stay editable. */
+		winner?: 0 | 1 | null;
 		/** The submit button's label. */
 		submit: string;
 		/** In a long list: the button only turns primary once a score is changed. */
@@ -30,7 +33,7 @@
 
 <form method="POST" {action} class="result" use:enhance oninput={() => (edited = true)}>
 	{@render children?.()}
-	<ScoreLines {names} {scores} />
+	<ScoreLines {names} {scores} {winner} />
 	<button class="btn small" class:primary={!quiet || edited} type="submit">{submit}</button>
 </form>
 

@@ -111,7 +111,9 @@
 			<Versus
 				{names}
 				placeholders={[!match.entrants[0], !match.entrants[1]]}
-				scores={match.result?.scores ?? null}
+				scores={match.result?.scores ??
+					(match.reports.length === 1 ? match.reports[0].scores : null)}
+				pending={!match.result && match.reports.length === 1}
 				winner={match.status === 'completed' ? (match.result?.winner ?? null) : null}
 				me={data.side === 0 || data.side === 1 ? data.side : null}
 			/>

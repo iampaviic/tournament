@@ -6,6 +6,7 @@
 	import Features from '#lib/components/home/Features.svelte';
 	import Formats from '#lib/components/home/Formats.svelte';
 	import Hero from '#lib/components/home/Hero.svelte';
+	import Signup from '#lib/components/home/Signup.svelte';
 	import Stages from '#lib/components/home/Stages.svelte';
 
 	onMount(() => revealOnScroll());
@@ -17,6 +18,7 @@
 </svelte:head>
 
 <Hero />
+<Signup />
 <Formats />
 <Features />
 <Stages />

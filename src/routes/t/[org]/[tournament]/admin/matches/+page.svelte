@@ -127,6 +127,7 @@
 										action="?/result"
 										names={[name(match.entrants[0]), name(match.entrants[1])]}
 										scores={match.result?.scores}
+										winner={match.status === 'completed' ? (match.result?.winner ?? null) : null}
 										submit={m.matches_save()}
 										quiet
 									>

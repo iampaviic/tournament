@@ -86,16 +86,21 @@ export function roundTitle(
 	}
 }
 
-/** The tag colour for a match's progress: blue while it is being played, red pen on a dispute. */
+/**
+ * The chip colour for a match's progress: violet while it is open to play, pink-red on a dispute,
+ * green once done. Gold stays for the primary action and the winner.
+ */
 export const progressTone = (progress: MatchProgress): string =>
 	progress === 'disputed'
 		? 'danger'
 		: progress === 'ready' || progress === 'reported'
-			? 'accent'
-			: '';
+			? 'play'
+			: progress === 'completed'
+				? 'success'
+				: '';
 
-/** The tag colour for a tournament's phase. */
+/** The chip colour for a tournament's phase, on the same scale as a match's. */
 export const statusTone = (status: TournamentStatus): string =>
-	({ draft: '', registration: 'accent', check_in: 'accent', running: 'accent', completed: '' })[
+	({ draft: '', registration: 'play', check_in: 'play', running: 'play', completed: 'success' })[
 		status
 	];

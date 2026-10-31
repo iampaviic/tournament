@@ -8,7 +8,8 @@
 		winner = null,
 		me = null,
 		size = 'lg',
-		intro = false
+		intro = false,
+		pending = false
 	}: {
 		/** The two players' names, in slot order. */
 		names: [string, string];
@@ -21,7 +22,13 @@
 		size?: 'md' | 'lg';
 		/** Plays the versus intro on load: the sides slide in from their edges and the VS lands. */
 		intro?: boolean;
+		/** The scores are reported but not decided: the pips show them, half lit, without the numbers. */
+		pending?: boolean;
 	} = $props();
+
+	// Round pips, as under a fighting game's health bars: one per game the leader has won, lit for
+	// the games each side won.
+	const pips = $derived(scores ? Math.max(scores[0] ?? 0, scores[1] ?? 0, 0) : 0);
 
 	// The winner takes the screen. When a result arrives while the page is open, the take is played
 	// once; a page opened on a decided match shows it already taken.
@@ -51,7 +58,14 @@
 				{#if winner === i}<span class="stamp">{m.versus_winner()}</span>{/if}
 			</div>
 			<span class="who">{names[i]}</span>
-			<span class="score">{scores?.[i] ?? ''}</span>
+			<span class="score">{pending ? '' : (scores?.[i] ?? '')}</span>
+			{#if pips}
+				<span class="pips" class:pending aria-hidden="true">
+					{#each Array.from({ length: pips }, (_, n) => n) as n (n)}
+						<i class:won={n < (scores?.[i] ?? 0)}></i>
+					{/each}
+				</span>
+			{/if}
 		</div>
 	{/each}
 	<span class="vs" aria-hidden="true">{m.versus_vs()}</span>
@@ -94,7 +108,8 @@
 		grid-template:
 			'tags score' auto
 			'. score' 1fr
-			'who who' auto / 1fr auto;
+			'who who' auto
+			'pips pips' auto / 1fr auto;
 		gap: 0.35rem 0.75rem;
 		min-width: 0;
 		padding: 1rem calc(var(--cut) / 2 + 1rem) 1.1rem 1.1rem;
@@ -111,13 +126,15 @@
 			grid-template:
 				'score tags' auto
 				'score .' 1fr
-				'who who' auto / auto 1fr;
+				'who who' auto
+				'pips pips' auto / auto 1fr;
 			padding: 1rem 1.1rem 1.1rem calc(var(--cut) / 2 + 1rem);
 			clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%);
 			margin: 0 0 0 calc(var(--cut) / -2);
 			text-align: right;
 
-			.tags {
+			.tags,
+			.pips {
 				justify-content: flex-end;
 			}
 		}
@@ -209,6 +226,31 @@
 
 		.md & {
 			font-size: clamp(1.5rem, 4vw, 2.5rem);
+		}
+	}
+
+	.pips {
+		grid-area: pips;
+		display: flex;
+		gap: 0.5rem;
+		min-height: 0.9rem;
+
+		i {
+			width: 0.75rem;
+			height: 0.75rem;
+			border: 2px solid currentColor;
+			border-radius: 2px;
+			transform: rotate(45deg);
+			transition: background-color 200ms ease;
+
+			&.won {
+				background: currentColor;
+			}
+		}
+
+		// Reported, not yet decided: the lit pips are half lit.
+		&.pending i.won {
+			background: color-mix(in srgb, currentColor 45%, transparent);
 		}
 	}
 

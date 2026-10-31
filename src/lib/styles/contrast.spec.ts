@@ -46,7 +46,10 @@ const pairs: [string, string][] = [
 	['accent-text', 'accent-hover'],
 	// Names set on a side's colour, where the winner takes the plate.
 	['on-side', 'p1'],
-	['on-side', 'p2']
+	['on-side', 'p2'],
+	// State chips: open to play, and done.
+	['on-play', 'play'],
+	['on-side', 'success']
 ];
 
 describe('design tokens', () => {

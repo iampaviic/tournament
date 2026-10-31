@@ -103,14 +103,15 @@
 		white-space: nowrap;
 	}
 
-	// The step itself: gold for the winner, the two side colours for second and third.
+	// The step itself: gold for the winner, then violet, then a plain panel. The side colours stay
+	// for player one and player two.
 	.block {
 		display: grid;
 		place-items: start center;
 		padding-top: 0.6rem;
 		border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-		background: var(--p2);
-		color: var(--on-side);
+		background: var(--play);
+		color: var(--on-play);
 		transform-origin: bottom;
 	}
 
@@ -126,7 +127,10 @@
 
 	.r3 .block {
 		height: 3.75rem;
-		background: var(--p1);
+		border: 1px solid var(--control);
+		border-bottom: 0;
+		background: var(--surface-2);
+		color: var(--text);
 	}
 
 	.rank {

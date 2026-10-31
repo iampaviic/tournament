@@ -55,11 +55,6 @@
 	<div class="picture" data-reveal="settle" style:--d="200ms">
 		<div class="fragment sheet" class:shown={step === 0} data-ui inert>
 			<h3>{m.t_registration()}</h3>
-			<!-- The select screen filling up: taken places as tiles, open ones still empty. -->
-			<div class="tiles" aria-hidden="true">
-				{#each NAMES.slice(0, 5) as name (name)}<Avatar {name} size={40} />{/each}
-				<span class="open"></span><span class="open"></span><span class="open"></span>
-			</div>
 			<div class="track"><span style:width="{(11 / 32) * 100}%"></span></div>
 			<p class="muted">{m.t_capacity({ count: 11, limit: 32 })}</p>
 			<span class="btn primary">{m.t_register()}</span>
@@ -391,19 +386,6 @@
 
 		&:first-child .rank {
 			color: var(--accent-ink);
-		}
-	}
-
-	.tiles {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-
-		.open {
-			width: 40px;
-			height: 40px;
-			border: 1.5px dashed var(--control);
-			border-radius: 9px;
 		}
 	}
 </style>
