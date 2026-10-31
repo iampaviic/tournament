@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          ".impeccable/review/decision/**"
+        ],
+        "createdAt": "2026-10-31T08:12:52.744Z",
+        "reason": "Agent: decision-page sketches only; Backglass draws lit pinball lamps, a lit start button and a dot-matrix display, so the glow is the lamp's own light"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "*",
+        "files": [
+          ".impeccable/review/decision/**"
+        ],
+        "createdAt": "2026-10-31T08:12:52.759Z",
+        "reason": "Agent: the decision page compares candidate worlds before DESIGN.md is rewritten; the fonts are the candidates"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          ".impeccable/review/decision/**"
+        ],
+        "createdAt": "2026-10-31T08:16:31.439Z",
+        "reason": "Agent: decision-page sketches only; the flagged rows are vertically centred in fixed-height match plates and the pixel map's children are absolutely placed"
+      }
+    ]
+  }
+}

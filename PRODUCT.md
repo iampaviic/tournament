@@ -18,7 +18,7 @@ Tournament Manager is an open-source platform for organizing tournaments, inspir
 
 ## Positioning
 
-Game-neutral and open source: no game or community owns the identity. What a closed host can't offer is that every admin action is also available over a documented REST API, and that sign-in and eligibility rules come from pluggable auth modules (Discord, TETR.IO and others) that organizers can require per tournament.
+Game-neutral and open source: no single game or community owns the identity. It is still made by gamers for gamers, and it looks it. What a closed host can't offer is that every admin action is also available over a documented REST API, and that sign-in and eligibility rules come from pluggable auth modules (Discord, TETR.IO and others) that organizers can require per tournament.
 
 ## Operating Context
 
@@ -34,13 +34,16 @@ Game-neutral and open source: no game or community owns the identity. What a clo
 - The interface is in English and must stay translatable (Paraglide messages), so layouts must survive longer strings.
 - Bracket themes change how brackets look per tournament. Two are installed: `default`, which follows the site, and `tetrio`, which shows rank, TR and country from linked TETR.IO accounts.
 - Admin pages need a session from a trusted sign-in module.
-- Open: the Steam game picker, public profiles with history (M8) and deployment (M9) are not built yet.
+- Open: deployment (M9) is not built yet.
 
 ## Brand Commitments
 
 - Working name "Tournament Manager". It is open source and was started as a FER _Programsko inženjerstvo_ course project.
-- No logo, mascot or brand colors exist yet.
-- Game-specific flavor belongs in modules and bracket themes, never in the site's own identity.
+- No logo or mascot exists yet.
+- Personality: playful, colourful and loud at the moments that matter (a result coming in, a final, a champion), with type and colour that feel at home next to games. A dry, neutral "business tool" look is the failure this commitment exists to prevent.
+- Game-neutral, not personality-neutral: the site's look borrows no single game's art, logo or style, so any game's event feels at home; game-specific flavor stays in modules and bracket themes.
+- Dark is the main look and the default. A light look stays fully designed and available through a theme switch.
+- Organizer work screens wear the same world, calmer: less motion and decoration, the same colours and type.
 
 ## Evidence on Hand
 
@@ -50,6 +53,6 @@ Game-neutral and open source: no game or community owns the identity. What a clo
 ## Product Principles
 
 1. Players first on public pages: what's happening now (my next match, the live bracket, standings) comes before anything else, and it works with a thumb on a phone.
-2. Organizers get dense, predictable work screens; every action they take in the UI also exists in the API.
+2. Organizers get dense, predictable work screens, calmer than the player-facing pages; every action they take in the UI also exists in the API.
 3. Honest state: whether something is waiting, ready, reported, disputed or done is always visible and never guessed.
-4. Game-neutral: the platform stays out of the way, and games bring their character through modules and bracket themes.
+4. Fun with a purpose: the site's own character peaks where something happens (a report, a win, a final) and never hides state or slows a task. Games add their own character through modules and bracket themes.
