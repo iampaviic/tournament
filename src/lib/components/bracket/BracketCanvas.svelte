@@ -97,7 +97,7 @@
 		path {
 			fill: none;
 			stroke: var(--bracket-line);
-			stroke-width: 1;
+			stroke-width: 1.5;
 		}
 
 		path.carried {
@@ -116,7 +116,8 @@
 		display: flex;
 		align-items: center;
 		font-size: 0.8125rem;
-		font-weight: 600;
+		font-weight: 650;
+		letter-spacing: 0.02em;
 		color: var(--bracket-muted);
 		white-space: nowrap;
 	}

@@ -8,8 +8,9 @@
 </script>
 
 <script lang="ts">
-	// A match the way a draw sheet prints it: each name on its own line, the score at the line's
-	// end, the two lines meeting in a joint. The winner's line is inked; the viewer's line is blue.
+	// A match as a versus plate: player one's slot over player two's, each with its side's tick and
+	// the score at the end. Once decided the winner's slot fills with its side's colour and the
+	// loser's drains; the viewer's slot is ringed in gold.
 	let {
 		sides,
 		winner = null,
@@ -21,7 +22,7 @@
 		winner?: 0 | 1 | null;
 		/** The side the viewer plays on. */
 		me?: 0 | 1 | null;
-		/** The players' reports disagree: the joint is redrawn in the organizer's red pen. */
+		/** The players' reports disagree: the plate is ringed in the dispute colour. */
 		disputed?: boolean;
 		size?: 'md' | 'lg';
 	} = $props();
@@ -44,74 +45,55 @@
 
 <style lang="scss">
 	.lines {
-		position: relative;
 		display: flex;
 		flex-direction: column;
 		min-width: 0;
-		margin-right: 0.75rem;
+		overflow: hidden;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		background: var(--surface-2);
 
-		// The joint where the two lines meet, and the stub the winner's line leaves on.
-		&::after {
-			content: '';
-			position: absolute;
-			right: 0;
-			top: calc(50% - 1px);
-			height: 50%;
-			border-right: 1px solid var(--line);
-		}
-
-		&::before {
-			content: '';
-			position: absolute;
-			right: -0.75rem;
-			top: 75%;
-			width: 0.75rem;
-			border-top: 1px solid var(--line);
-		}
-
-		&.decided::before {
-			border-top: 2px solid var(--text);
-			margin-top: -0.5px;
-		}
-
-		&.disputed::after {
-			border-right: 2px solid var(--danger);
-		}
-
-		&.disputed::before {
-			border-top-color: var(--danger);
+		&.disputed {
+			border-color: var(--danger);
+			box-shadow: 0 0 0 1px var(--danger);
 		}
 	}
 
-	// The printed line a name is written on, as a bar at the foot of the row.
 	.line {
-		position: relative;
+		--side: var(--p1);
 		display: flex;
-		align-items: flex-end;
-		gap: 0.75rem;
-		min-height: 30px;
-		padding: 0 0.5rem 0.3rem 0.1rem;
+		align-items: center;
+		gap: 0.6rem;
+		min-height: 32px;
+		padding: 0 0.65rem;
 
-		&::after {
-			content: '';
-			position: absolute;
-			inset: auto 0 0;
-			height: 1px;
-			background: var(--line);
+		+ .line {
+			--side: var(--p2);
+			border-top: 1px solid var(--border);
 		}
 
-		&.winner::after {
-			height: 2px;
-			background: var(--text);
+		// The side's tick, slanted like the cut between the two sides of a versus screen.
+		&::before {
+			content: '';
+			flex: none;
+			width: 4px;
+			height: 14px;
+			border-radius: 1px;
+			background: var(--side);
+			transform: skewX(var(--slant));
 		}
 
 		&.winner {
-			.who {
-				font-weight: 700;
+			background: var(--side);
+			color: var(--on-side);
+
+			&::before {
+				background: var(--on-side);
 			}
 
+			.who,
 			.score {
-				font-weight: 700;
+				color: var(--on-side);
 			}
 		}
 
@@ -120,14 +102,11 @@
 			color: var(--text-muted);
 		}
 
-		&.me::after {
-			height: 2px;
-			background: var(--accent);
-		}
-
 		&.me {
-			.who {
-				color: var(--accent);
+			box-shadow: inset 0 0 0 2px var(--accent);
+
+			&:not(.winner) .who {
+				color: var(--accent-ink);
 			}
 		}
 	}
@@ -138,32 +117,37 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-stretch: var(--name-stretch);
-		font-weight: 600;
+		font-weight: 700;
 
 		&.placeholder {
 			color: var(--text-muted);
-			font-stretch: 100%;
 			font-weight: 400;
 		}
 	}
 
 	.score {
 		flex: none;
-		min-width: 1.25rem;
+		min-width: 1.5rem;
 		text-align: right;
+		font-family: var(--font-display);
 		font-variant-numeric: tabular-nums;
-		font-weight: 600;
 	}
 
 	.lg {
 		.line {
-			min-height: 44px;
-			padding-bottom: 0.4rem;
+			min-height: 48px;
+			padding-inline: 0.9rem;
+
+			&::before {
+				width: 6px;
+				height: 22px;
+			}
 		}
 
 		.who,
 		.score {
+			font-family: var(--font-display);
+			font-weight: 400;
 			font-size: 1.25rem;
 			line-height: 1.2;
 		}

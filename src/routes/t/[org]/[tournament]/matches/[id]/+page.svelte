@@ -6,7 +6,7 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import LiveStatus from '#lib/components/LiveStatus.svelte';
 	import MatchChat from '#lib/components/MatchChat.svelte';
-	import MatchLines from '#lib/components/MatchLines.svelte';
+	import Versus from '#lib/components/Versus.svelte';
 	import ScoreForm from '#lib/components/ScoreForm.svelte';
 	import { mergeMessages } from '#lib/chat.ts';
 	import { formatScore } from '#lib/format.ts';
@@ -107,13 +107,11 @@
 
 <div class="layout">
 	<div class="main">
-		<section class="card scoreboard" aria-label={m.room_result()}>
-			<MatchLines
-				size="lg"
-				sides={[
-					{ name: names[0], placeholder: !match.entrants[0], score: match.result?.scores?.[0] },
-					{ name: names[1], placeholder: !match.entrants[1], score: match.result?.scores?.[1] }
-				]}
+		<section class="scoreboard" aria-label={m.room_result()}>
+			<Versus
+				{names}
+				placeholders={[!match.entrants[0], !match.entrants[1]]}
+				scores={match.result?.scores ?? null}
 				winner={match.status === 'completed' ? (match.result?.winner ?? null) : null}
 				me={data.side === 0 || data.side === 1 ? data.side : null}
 			/>
@@ -230,7 +228,7 @@
 		margin-bottom: 1rem;
 
 		h2 {
-			font-size: 1.5rem;
+			font-size: var(--fs-title);
 			margin: 0;
 		}
 
@@ -261,10 +259,6 @@
 		flex-direction: column;
 		gap: 1rem;
 		min-width: 0;
-	}
-
-	.scoreboard {
-		padding-block: 1rem 1.25rem;
 	}
 
 	.result,

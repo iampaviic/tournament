@@ -14,9 +14,9 @@ export interface ParticipantLabelProps {
 }
 
 /**
- * Colors of the bracket view, which is drawn like a printed draw sheet: names sit on printed
- * lines, and a decided match's winner line carries on into the next round. Values are CSS, so app
- * tokens like `var(--surface)` work.
+ * Colors of the bracket view. Each match is a plate of two slots, player one over player two; a
+ * decided match's winner slot fills with its side's colour and its line carries on into the next
+ * round. Values are CSS, so app tokens like `var(--surface)` work.
  */
 export interface ThemeStyle {
 	/** The sheet the bracket is printed on. */
@@ -26,14 +26,19 @@ export interface ThemeStyle {
 	border: string;
 	text: string;
 	muted: string;
-	/** Printed lines: the line each name is written on, and the joints between rounds. */
+	/** Connectors between rounds that no result has reached yet. */
 	line: string;
-	/** A decided match's winner line and the connector it continues into. */
+	/** The connector a decided match's winner continues along. */
 	ink: string;
 	/** Behind a match that is ready to be played. */
 	ready: string;
 	/** A hovered participant's path through the bracket. */
 	highlight: string;
+	/** The fill of a winning slot on player one's and player two's side; both default to `ink`. */
+	p1?: string;
+	p2?: string;
+	/** Text on a winning slot's fill; defaults to `background`. */
+	onSide?: string;
 	font: string;
 }
 

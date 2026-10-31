@@ -2,15 +2,14 @@
 	let { size = 20 }: { size?: number } = $props();
 </script>
 
-<!-- Two entrants' lines join, and the winner's line goes on: a bracket, the product's own object. -->
+<!-- Two sides meeting at a slanted cut, the versus screen in miniature: player one, player two. -->
 <svg class="mark" width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
-	<path d="M1 4.5H9V15.5H1" fill="none" stroke="currentColor" stroke-width="2" />
-	<path d="M9 10H19" fill="none" stroke="var(--mark-accent, var(--accent))" stroke-width="2" />
+	<path d="M1 3H11.2L7.8 17H1Z" fill="var(--p1)" />
+	<path d="M13.2 3H19V17H9.8Z" fill="var(--p2)" />
 </svg>
 
 <style lang="scss">
 	.mark {
 		flex: none;
-		color: var(--text);
 	}
 </style>

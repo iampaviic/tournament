@@ -103,41 +103,60 @@
 		}
 	}
 
-	h2,
-	button {
-		font-size: var(--fs-statement);
-		font-stretch: 80%;
-		font-weight: 750;
-		line-height: 1.15;
-		letter-spacing: -0.01em;
-	}
-
 	h2 {
-		margin: 0;
-		color: var(--text-muted);
+		margin: 0 0 1rem;
+		font-size: var(--fs-statement);
 	}
 
+	// A mode select: the picked format sits on the gold plate.
 	ul {
 		display: flex;
 		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.2rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
 	button {
-		padding: 0;
+		position: relative;
+		isolation: isolate;
+		padding: 0.15em 0.45em;
+		margin-left: -0.45em;
 		border: 0;
 		background: none;
 		color: var(--text-muted);
+		font-family: var(--font-display);
+		font-size: clamp(1.35rem, 2.3vw, 2rem);
+		line-height: 1.2;
 		text-align: left;
 		white-space: nowrap;
 		cursor: pointer;
-		transition: color 240ms ease-out;
+		transition: color 200ms ease-out;
 
-		&[aria-pressed='true'],
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: var(--radius-sm);
+			background: var(--accent);
+			transform: skewX(var(--slant)) scaleX(0);
+			transform-origin: left;
+			transition: transform 260ms var(--ease-expo);
+		}
+
 		&:hover {
 			color: var(--text);
+		}
+
+		&[aria-pressed='true'] {
+			color: var(--accent-text);
+
+			&::before {
+				transform: skewX(var(--slant));
+			}
 		}
 	}
 

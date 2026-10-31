@@ -136,10 +136,7 @@
 		margin: 0;
 		max-width: 14ch;
 		font-size: var(--fs-statement);
-		font-stretch: 80%;
-		font-weight: 750;
 		line-height: 1.1;
-		letter-spacing: -0.01em;
 		animation: swap 200ms ease-out;
 	}
 

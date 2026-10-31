@@ -30,7 +30,7 @@ function contrast(a: string, b: string) {
 
 /** Text colors and the backgrounds they're shown on. */
 const pairs: [string, string][] = [
-	...['text', 'text-muted', 'accent'].flatMap((text) =>
+	...['text', 'text-muted', 'link'].flatMap((text) =>
 		['bg', 'surface', 'surface-2'].map((background): [string, string] => [text, background])
 	),
 	...['danger', 'success'].flatMap((text) =>
@@ -40,9 +40,13 @@ const pairs: [string, string][] = [
 		`${tone}-ink`,
 		`${tone}-soft`
 	]),
+	['accent-ink', 'surface'],
 	['text-faint', 'surface'],
 	['accent-text', 'accent'],
-	['accent-text', 'accent-hover']
+	['accent-text', 'accent-hover'],
+	// Names set on a side's colour, where the winner takes the plate.
+	['on-side', 'p1'],
+	['on-side', 'p2']
 ];
 
 describe('design tokens', () => {

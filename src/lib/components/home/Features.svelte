@@ -37,26 +37,21 @@
 
 	h2 {
 		margin: 0 0 1.5rem;
-		color: var(--text-muted);
 		font-size: var(--fs-statement);
-		font-stretch: 80%;
-		font-weight: 750;
-		line-height: 1.15;
-		letter-spacing: -0.01em;
 	}
 
 	ul {
 		margin: 0;
 		padding: 0;
 		list-style: none;
-		border-top: 1px solid var(--line);
+		border-top: 1px solid var(--border);
 	}
 
 	li {
 		display: grid;
 		gap: 0.5rem 2.5rem;
 		padding: 1.25rem 0 1.1rem;
-		border-bottom: 1px solid var(--line);
+		border-bottom: 1px solid var(--border);
 
 		@include up($bp-md) {
 			grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
@@ -70,11 +65,9 @@
 	}
 
 	.say {
-		font-size: var(--fs-statement);
-		font-stretch: 80%;
-		font-weight: 750;
-		line-height: 1.15;
-		letter-spacing: -0.01em;
+		font-family: var(--font-display);
+		font-size: clamp(1.3rem, 2.2vw, 1.85rem);
+		line-height: 1.2;
 		text-wrap: balance;
 	}
 

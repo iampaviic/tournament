@@ -1,0 +1,303 @@
+<script lang="ts">
+	import { m } from '#lib/paraglide/messages.js';
+
+	let {
+		names,
+		placeholders = [false, false],
+		scores = null,
+		winner = null,
+		me = null,
+		size = 'lg',
+		intro = false
+	}: {
+		/** The two players' names, in slot order. */
+		names: [string, string];
+		/** A slot without a player yet ("Winner of #3", a bye) is drawn without a side colour. */
+		placeholders?: [boolean, boolean];
+		scores?: readonly [number | null, number | null] | null;
+		winner?: 0 | 1 | null;
+		/** The side the viewer plays on. */
+		me?: 0 | 1 | null;
+		size?: 'md' | 'lg';
+		/** Plays the versus intro on load: the sides slide in from their edges and the VS lands. */
+		intro?: boolean;
+	} = $props();
+
+	// The winner takes the screen. When a result arrives while the page is open, the take is played
+	// once; a page opened on a decided match shows it already taken.
+	let slam = $state(false);
+	let seen: 0 | 1 | null | undefined;
+	$effect(() => {
+		const now = winner;
+		if (seen === null && now !== null) {
+			slam = true;
+			setTimeout(() => (slam = false), 1200);
+		}
+		seen = now;
+	});
+</script>
+
+<div class="versus {size}" class:decided={winner !== null} class:slam class:intro>
+	{#each [0, 1] as const as i (i)}
+		<div
+			class="side s{i}"
+			class:won={winner === i}
+			class:lost={winner !== null && winner !== i}
+			class:open={placeholders[i]}
+		>
+			<div class="tags">
+				<span class="tag" aria-hidden="true">{m.versus_side({ side: i + 1 })}</span>
+				{#if me === i}<span class="you">{m.versus_you()}</span>{/if}
+				{#if winner === i}<span class="stamp">{m.versus_winner()}</span>{/if}
+			</div>
+			<span class="who">{names[i]}</span>
+			<span class="score">{scores?.[i] ?? ''}</span>
+		</div>
+	{/each}
+	<span class="vs" aria-hidden="true">{m.versus_vs()}</span>
+</div>
+
+<style lang="scss">
+	@use 'tokens' as *;
+
+	// Two sides meeting at a slanted cut: player one's colour on the left, player two's on the right.
+	.versus {
+		--cut: 32px;
+		position: relative;
+		display: flex;
+		min-height: 168px;
+		overflow: hidden;
+		border-radius: var(--radius);
+		background: var(--surface);
+		isolation: isolate;
+
+		@include up($bp-md) {
+			--cut: 48px;
+			min-height: 210px;
+		}
+
+		&.md {
+			min-height: 128px;
+
+			@include up($bp-md) {
+				--cut: 36px;
+				min-height: 148px;
+			}
+		}
+	}
+
+	.side {
+		--side: var(--p1);
+		position: relative;
+		flex: 1 1 0;
+		display: grid;
+		grid-template:
+			'tags score' auto
+			'. score' 1fr
+			'who who' auto / 1fr auto;
+		gap: 0.35rem 0.75rem;
+		min-width: 0;
+		padding: 1rem calc(var(--cut) / 2 + 1rem) 1.1rem 1.1rem;
+		background: var(--side);
+		color: var(--on-side);
+		clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+		margin-right: calc(var(--cut) / -2);
+		transition:
+			flex-grow 480ms var(--ease-expo),
+			background-color 300ms ease;
+
+		&.s1 {
+			--side: var(--p2);
+			grid-template:
+				'score tags' auto
+				'score .' 1fr
+				'who who' auto / auto 1fr;
+			padding: 1rem 1.1rem 1.1rem calc(var(--cut) / 2 + 1rem);
+			clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%);
+			margin: 0 0 0 calc(var(--cut) / -2);
+			text-align: right;
+
+			.tags {
+				justify-content: flex-end;
+			}
+		}
+
+		// A slot no player has reached yet carries no side colour.
+		&.open {
+			background: var(--surface-2);
+			color: var(--text-muted);
+
+			.who {
+				font-family: var(--font);
+				font-size: 1rem;
+				font-weight: 500;
+			}
+		}
+
+		&.won {
+			flex-grow: 1.5;
+		}
+
+		// The loser's side drains to a shadow of its colour.
+		&.lost {
+			background: color-mix(in srgb, var(--side) 22%, var(--surface));
+			color: var(--text-muted);
+		}
+	}
+
+	.tags {
+		grid-area: tags;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		align-items: center;
+	}
+
+	.tag,
+	.you,
+	.stamp {
+		padding: 0.15rem 0.45rem;
+		border-radius: var(--radius-tag);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		line-height: 1.2;
+	}
+
+	.tag {
+		background: color-mix(in srgb, currentColor 16%, transparent);
+	}
+
+	.you {
+		background: var(--accent);
+		color: var(--accent-text);
+		letter-spacing: 0.02em;
+	}
+
+	.stamp {
+		background: var(--on-side);
+		color: var(--side);
+		font-family: var(--font-display);
+		font-weight: 400;
+		font-size: 0.875rem;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	.who {
+		grid-area: who;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-family: var(--font-display);
+		font-size: clamp(1.5rem, 4.2vw, 2.75rem);
+		line-height: 1.05;
+
+		.md & {
+			font-size: clamp(1.25rem, 3vw, 2rem);
+		}
+	}
+
+	.score {
+		grid-area: score;
+		align-self: start;
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 6vw, 3.75rem);
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+
+		.md & {
+			font-size: clamp(1.5rem, 4vw, 2.5rem);
+		}
+	}
+
+	// Gold, outlined in the stage's ink, sitting in the cut.
+	.vs {
+		position: absolute;
+		left: 50%;
+		top: 42%;
+		z-index: 2;
+		transform: translate(-50%, -50%);
+		color: var(--accent);
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 5vw, 3.5rem);
+		line-height: 1;
+		-webkit-text-stroke: 4px var(--accent-text);
+		paint-order: stroke fill;
+		pointer-events: none;
+		transition: opacity 200ms ease;
+
+		.md & {
+			font-size: clamp(1.5rem, 3.6vw, 2.5rem);
+		}
+
+		.decided & {
+			opacity: 0;
+		}
+	}
+
+	// A result arriving live: the winner's side surges and the stamp slams down.
+	@media (prefers-reduced-motion: no-preference) {
+		:global(.js) .intro {
+			.s0 {
+				animation: from-left 700ms var(--ease-expo) 120ms both;
+			}
+
+			.s1 {
+				animation: from-right 700ms var(--ease-expo) 120ms both;
+			}
+
+			.vs {
+				animation: land 480ms var(--ease-slam) 620ms both;
+			}
+		}
+
+		.slam .won {
+			animation: surge 700ms var(--ease-expo);
+		}
+
+		.slam .stamp {
+			animation: stamp 520ms var(--ease-slam) 180ms both;
+		}
+	}
+
+	@keyframes from-left {
+		from {
+			transform: translateX(-60%);
+		}
+	}
+
+	@keyframes from-right {
+		from {
+			transform: translateX(60%);
+		}
+	}
+
+	@keyframes land {
+		from {
+			opacity: 0;
+			transform: translate(-50%, -50%) scale(2.6);
+		}
+	}
+
+	@keyframes surge {
+		0% {
+			filter: brightness(1.6);
+		}
+		100% {
+			filter: none;
+		}
+	}
+
+	@keyframes stamp {
+		0% {
+			opacity: 0;
+			transform: scale(2.4) rotate(-6deg);
+		}
+		100% {
+			opacity: 1;
+			transform: none;
+		}
+	}
+</style>

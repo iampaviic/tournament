@@ -1,6 +1,7 @@
-// Design tokens: the wall sheet. A white sheet on a cool wall-grey ground, printed in near-black.
-// Players write in ballpoint blue, the one hue, at full strength on small marks only, with its
-// pale tints doing the area work. The organizer's red pen marks disputes, help and decisions.
+// Design tokens: the select screen. A fighting game's select and versus screens on a deep indigo
+// stage. Player one is red-orange and player two blue: the two side colours of every match. Gold is
+// the primary action, focus and the winner; pink-red marks disputes and organizer decisions; green
+// is done. Dark is the default look; the light look is a pale violet ground with white panels.
 // Components use the CSS custom properties; SCSS variables only hold breakpoints.
 $bp-sm: 640px;
 $bp-md: 900px;
@@ -11,56 +12,66 @@ $bp-md: 900px;
 	}
 }
 
-@mixin tokens-light {
-	--bg: #edf0f4; // the wall
-	--surface: #ffffff; // the sheet
-	--surface-2: #f3f5f8; // one step off the sheet: fills, tracks, quiet panels
-	--border: #dde1e8; // the sheet's edge
-	--rule: #e8ebf0; // row rules
-	--control: #c3c9d3; // input and button outlines, one step stronger
-	--line: #8a93a2; // a printed line a name is written on
-	--text: #121417; // print ink
-	--text-muted: #535b68;
-	--text-faint: #626c7c; // placeholders, still 4.5:1 on the sheet
-	--accent: #1f49c7; // ballpoint
-	--accent-hover: #173a9e;
-	--accent-text: #ffffff;
-	--accent-soft: #eef2fd;
-	--accent-track: #d7e0f9;
-	--accent-ink: #173a9e;
-	--danger: #c4242a; // the organizer's red pen
-	--danger-soft: #ffedea;
-	--danger-ink: #831c1e;
-	--success: #247b50;
-	--success-soft: #dcfae5;
-	--success-ink: #04250e;
-	--shadow: none; // nothing at rest casts a shadow
-	--shadow-float: 0 8px 24px rgb(18 20 23 / 12%), 0 1px 3px rgb(18 20 23 / 8%);
+@mixin tokens-dark {
+	--bg: #0f0b22; // the stage
+	--surface: #1a1535; // a panel on the stage
+	--surface-2: #221c45; // one step up: fills, tracks, quiet panels
+	--border: #2e2858; // a panel's edge
+	--rule: #262050; // row rules
+	--control: #6a62b4; // input and button outlines, 3:1 on a panel
+	--line: #7d75bb; // bracket joints and connectors
+	--text: #f6f3ff;
+	--text-muted: #bdb6dd;
+	--text-faint: #9d96c6; // placeholders, still 4.5:1 on a panel
+	--link: #6fd0ff;
+	--focus: #ffd23f;
+	--accent: #ffd23f; // gold: the primary action and the winner
+	--accent-hover: #ffe07a;
+	--accent-text: #1d1500;
+	--accent-soft: #2b2350;
+	--accent-track: #342c66;
+	--accent-ink: #ffe07a;
+	--p1: #ff5a2c; // player one's side
+	--p2: #25b9ff; // player two's side
+	--on-side: #140a24; // text on a side colour
+	--danger: #ff4d82; // disputes and organizer decisions
+	--danger-soft: #3a1533;
+	--danger-ink: #ffa6c2;
+	--success: #34e08b;
+	--success-soft: #133229;
+	--success-ink: #8ef0bf;
+	--shadow: none;
+	--shadow-float: 0 12px 32px rgb(4 2 14 / 60%), 0 2px 6px rgb(4 2 14 / 40%);
 }
 
-@mixin tokens-dark {
-	--bg: #0d0e10;
-	--surface: #16181b;
-	--surface-2: #1e2125;
-	--border: #272a30;
-	--rule: #202328;
-	--control: #3d424b;
-	--line: #6c7480;
-	--text: #f1f2f4;
-	--text-muted: #a9afb9;
-	--text-faint: #9097a2;
-	--accent: #85a1f4;
-	--accent-hover: #a7bbf7;
-	--accent-text: #0d0e10;
-	--accent-soft: #19213a;
-	--accent-track: #24335f;
-	--accent-ink: #b4c6f8;
-	--danger: #f0696d;
-	--danger-soft: #2c1a1c;
-	--danger-ink: #f6a7a9;
-	--success: #4cc285;
-	--success-soft: #142a1e;
-	--success-ink: #8fe0b5;
+@mixin tokens-light {
+	--bg: #f2f0fa;
+	--surface: #ffffff;
+	--surface-2: #f6f4fd;
+	--border: #dfdbf0;
+	--rule: #ebe8f6;
+	--control: #8f87bb;
+	--line: #8d86b3;
+	--text: #160d2b;
+	--text-muted: #514873;
+	--text-faint: #675f8c;
+	--link: #0b6aa6;
+	--focus: #160d2b;
+	--accent: #ffc61a;
+	--accent-hover: #ffd34d;
+	--accent-text: #1d1500;
+	--accent-soft: #fff4cc;
+	--accent-track: #ece8f8;
+	--accent-ink: #6b4d00;
+	--p1: #cc3a10;
+	--p2: #0a72b0;
+	--on-side: #ffffff;
+	--danger: #c80f4a;
+	--danger-soft: #ffe6ee;
+	--danger-ink: #85072f;
+	--success: #11804a;
+	--success-soft: #ddf7e8;
+	--success-ink: #0a4a2b;
 	--shadow: none;
-	--shadow-float: 0 8px 24px rgb(0 0 0 / 50%);
+	--shadow-float: 0 12px 32px rgb(22 13 43 / 14%), 0 2px 6px rgb(22 13 43 / 8%);
 }

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
-	import Mark from '#lib/components/Mark.svelte';
 </script>
 
 <section class="close" aria-labelledby="close-title">
@@ -18,16 +17,15 @@
 				autocomplete="organization"
 				placeholder={m.home_org_label()}
 			/>
-			<button class="btn" type="submit"><Mark size={16} />{m.home_start()}</button>
+			<button class="btn" type="submit">{m.home_start()}</button>
 		</form>
 	</div>
 </section>
 
-<!-- The brand mark at the scale of the page: one bracket stroke, open on the left, and the
-	 blue line that leaves its bar. -->
+<!-- The brand mark at the scale of the page: player one's side and player two's, meeting at the cut. -->
 <div class="mark" aria-hidden="true">
-	<span class="bracket"></span>
-	<span class="carry"></span>
+	<span class="p1"></span>
+	<span class="p2"></span>
 </div>
 
 <style lang="scss">
@@ -63,9 +61,7 @@
 		h2 {
 			margin: 0;
 			font-size: var(--fs-statement);
-			font-stretch: 80%;
-			font-weight: 750;
-			line-height: 1.05;
+			line-height: 1.08;
 		}
 
 		p {
@@ -78,83 +74,93 @@
 	form {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5rem;
-		max-width: 30rem;
+		gap: 0.75rem;
+		max-width: 31rem;
 
 		input {
 			flex: 1 1 14rem;
-			min-height: 44px;
+			min-height: 48px;
 			border-color: transparent;
 			font-size: 1rem;
 		}
 
+		// On the gold tile the action is the stage's ink with gold letters.
 		.btn {
-			min-height: 44px;
-			border-color: var(--surface);
-			background: var(--surface);
-			color: var(--text);
+			min-height: 48px;
+			padding: 0 1.4rem;
+			border: 0;
+			background: var(--accent-text);
+			color: var(--accent);
+			font-family: var(--font-display);
+			font-weight: 400;
 			font-size: 1rem;
+
+			&:hover {
+				background: color-mix(in srgb, var(--accent-text) 80%, var(--accent));
+			}
+		}
+
+		:focus-visible {
+			outline-color: var(--accent-text);
 		}
 	}
 
-	// Every stroke the same weight at any width, as in the 20px mark in the header.
+	// Two sides meeting at the cut, the 20px mark in the header at the width of the page.
 	.mark {
-		--stroke: clamp(0.875rem, 2.2vw, 1.75rem);
+		--cut: clamp(2rem, 7vw, 6rem);
 		display: flex;
-		align-items: center;
 		height: clamp(4.5rem, 14vw, 10rem);
 		margin-block: 5rem 1rem;
 	}
 
-	.bracket {
-		flex: 0 0 58%;
-		align-self: stretch;
-		border: var(--stroke) solid var(--text);
-		border-left: 0;
-	}
-
-	.carry {
+	.p1,
+	.p2 {
 		flex: 1;
-		height: var(--stroke);
-		background: var(--accent);
 	}
 
-	// Scrolling the mark into view draws it the way the line runs: the bracket from its open end to
-	// the bar, then the line that carries on. Without scroll timelines it is simply there.
+	.p1 {
+		flex-basis: 58%;
+		background: var(--p1);
+		clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+		margin-right: calc(var(--cut) / -2 + 0.5rem);
+	}
+
+	.p2 {
+		background: var(--p2);
+		clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%);
+		margin-left: calc(var(--cut) / -2 + 0.5rem);
+	}
+
+	// Scrolling the mark into view slides the two sides in from their edges until they meet. Without
+	// scroll timelines it is simply there.
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: view()) {
-			.bracket,
-			.carry {
+			.p1,
+			.p2 {
 				animation: linear both;
 				animation-timeline: view();
+				animation-range: entry 0% entry 100%;
 			}
 
-			.bracket {
-				animation-name: draw;
-				animation-range: entry 0% entry 80%;
+			.p1 {
+				animation-name: from-left;
 			}
 
-			.carry {
-				transform-origin: left center;
-				animation-name: carry;
-				animation-range: entry 60% entry 100%;
+			.p2 {
+				animation-name: from-right;
 			}
 		}
 	}
 
-	@keyframes draw {
+	@keyframes from-left {
 		from {
-			clip-path: inset(0 100% 0 0);
-		}
-
-		to {
-			clip-path: inset(0);
+			transform: translateX(-40%);
 		}
 	}
 
-	@keyframes carry {
+	@keyframes from-right {
 		from {
-			transform: scaleX(0);
+			transform: translateX(40%);
 		}
 	}
 </style>

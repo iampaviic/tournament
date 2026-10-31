@@ -74,6 +74,7 @@ export const load: PageServerLoad = async (event) => {
 			id: p.id,
 			username: p.username,
 			displayName: p.displayName,
+			avatarUrl: p.avatarUrl,
 			finalRank: p.finalRank
 		}))
 	};

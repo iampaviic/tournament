@@ -4,8 +4,9 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import BracketView from '#lib/components/bracket/BracketView.svelte';
+	import Avatar from '#lib/components/Avatar.svelte';
 	import Icon from '#lib/components/Icon.svelte';
-	import MatchLines from '#lib/components/MatchLines.svelte';
+	import Versus from '#lib/components/Versus.svelte';
 	import {
 		formatLabel,
 		groupName,
@@ -29,10 +30,8 @@
 	);
 	const linkHref = (moduleId: string) =>
 		`/auth/${moduleId}/login?intent=link&next=${encodeURIComponent(here)}`;
-	const side = (entrant: string | null | undefined) =>
-		entrant
-			? { name: entrant }
-			: { name: entrant === null ? m.match_bye() : m.match_tbd(), placeholder: true };
+	const sideName = (entrant: string | null | undefined) =>
+		entrant ?? (entrant === null ? m.match_bye() : m.match_tbd());
 	const params = $derived({ org: data.org.slug, tournament: data.tournament.slug });
 
 	// The stage being played, or the last one once the tournament is over.
@@ -46,7 +45,7 @@
 
 {#if data.next}
 	{@const next = data.next}
-	<section class="card next" aria-labelledby="next-match">
+	<section class="next" aria-labelledby="next-match">
 		<header>
 			<h2 id="next-match">{m.t_next_match()}</h2>
 			<span class="muted">
@@ -55,9 +54,10 @@
 			</span>
 		</header>
 		<div class="next-body">
-			<MatchLines
-				size="lg"
-				sides={[side(next.entrants[0]), side(next.entrants[1])]}
+			<Versus
+				size="md"
+				names={[sideName(next.entrants[0]), sideName(next.entrants[1])]}
+				placeholders={[!next.entrants[0], !next.entrants[1]]}
 				me={next.side}
 			/>
 			<div class="next-action">
@@ -201,13 +201,15 @@
 	<section class="participants">
 		<h2>{m.t_participants({ count: data.participants.length })}</h2>
 		{#if participants.length}
-			<ol>
+			<!-- The roster as a select screen: one tile per player. -->
+			<ol class="roster">
 				{#each participants as participant (participant.id)}
-					<li>
-						{#if ranked}<span class="rank">{participant.finalRank ?? '–'}</span>{/if}
+					<li class:podium={ranked && (participant.finalRank ?? 99) <= 3}>
+						<Avatar src={participant.avatarUrl} name={participant.displayName} size={40} />
 						<a class="name" href={resolve('/u/[username]', { username: participant.username })}>
 							{participant.displayName}
 						</a>
+						{#if ranked}<span class="rank">{participant.finalRank ?? '–'}</span>{/if}
 					</li>
 				{/each}
 			</ol>
@@ -238,19 +240,14 @@
 
 	.next-body {
 		display: grid;
-		gap: 1rem 2rem;
-		align-items: end;
-
-		@include up($bp-sm) {
-			grid-template-columns: minmax(0, 28rem) auto;
-			justify-content: space-between;
-		}
+		gap: 1rem;
 	}
 
 	.next-action {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
+		justify-content: flex-end;
 		gap: 0.75rem;
 	}
 
@@ -296,11 +293,11 @@
 			}
 		}
 
-		// Each block starts on a printed rule, like a section in the sheet's margin.
+		// Each block starts on a rule.
 		> section,
 		> aside {
 			padding-top: 0.75rem;
-			border-top: 1px solid var(--control);
+			border-top: 1px solid var(--border);
 		}
 
 		h2 {
@@ -368,38 +365,57 @@
 		}
 	}
 
-	.participants {
-		ol {
-			list-style: none;
-			margin: 0;
-			padding: 0;
-			columns: 13rem;
-			column-gap: 1.5rem;
-		}
+	.roster {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+		gap: 0.5rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
 
 		li {
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
-			min-height: 40px;
-			border-bottom: 1px solid var(--rule);
-			break-inside: avoid;
+			gap: 0.65rem;
+			min-width: 0;
+			min-height: 56px;
+			padding: 0.5rem 0.65rem 0.5rem 0.5rem;
+			border: 1px solid var(--border);
+			border-radius: var(--radius-sm);
+			background: var(--surface);
+			transition: border-color var(--t-hover) ease;
+
+			&:hover {
+				border-color: var(--line);
+			}
+
+			&.podium {
+				border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+			}
 		}
 
 		a {
+			flex: 1;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 			color: var(--text);
 			text-decoration: none;
 
 			&:hover {
-				color: var(--accent);
+				color: var(--accent-ink);
 			}
 		}
 
 		.rank {
-			width: 1.75rem;
-			text-align: right;
+			font-family: var(--font-display);
 			color: var(--text-muted);
 			font-variant-numeric: tabular-nums;
+		}
+
+		.podium .rank {
+			color: var(--accent-ink);
 		}
 	}
 </style>

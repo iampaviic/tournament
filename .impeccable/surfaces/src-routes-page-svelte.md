@@ -7,26 +7,24 @@ related_targets: ["src/lib/components/home/Hero.svelte","src/lib/components/home
 
 # Home page
 
-Scope: the public landing page at `/`. Mode: Persuade. It lives inside the wall-sheet world of the app surface brief and borrows its tokens, type and components.
+Scope: the public landing page at `/`. Mode: Persuade. It lives inside the select-screen world of the app surface brief and borrows its tokens, type and components.
 
 Audience and job: a player who was sent a link and an organizer looking for a tool for their club. Within seconds they should know this is a free, open-source tournament platform for any game, and either start a tournament (an organization name, then the create form) or sign in.
 
 Proof and content: only what the product does today. No testimonials, logos, player counts or photographs of people; example names are labelled as examples.
 
-Composition from Taste Skill's page sheet: direction `one-motif` (seed 915308984), hero redrawn to "Giant cropped shape" because the dealt "Tabbed folder stack" contradicted the structure the user locked. Signature motion: index with preview.
-
 ## Direction contract
 
-THESIS: The bracket joint (two players' lines meeting, one carrying on) is the page's one giant shape. It refuses the category's SaaS hero (a screenshot in a browser frame beside three feature cards) and the dark esports splash.
+THESIS: Every match is a main event. The page opens on a fighting game's versus screen, player one against player two, and a result lands like a knockout. It refuses the category's SaaS hero (a screenshot in a browser frame beside feature cards) and the stock esports splash (near-black, one neon, angled panels everywhere).
 
-OWN-WORLD: The app's world at poster scale: the cool wall-grey ground, white sheets, ballpoint blue as the one hue and as flat colour fields, the organizer's red pen only on the dispute. Archivo condensed to 72% for display, 80% for statements. Pictures are the product's own interface fragments; nothing else.
+OWN-WORLD: A deep indigo stage. Player one in hot red-orange, player two in electric blue, gold for the winner and the one primary action, pink-red only for disputes, green for done. Dela Gothic One for names, headlines and scores; Onest for everything read. Diagonal cuts only where two sides meet; players as coloured character tiles; state as skewed chips.
 
-STORY: The upper arm is "If you play": report the example match and the winner's name runs out along the line that carries on. The lower arm is "If you run it": a disputed match goes to the organizer. Then the four formats, what it does written on printed lines (each claim and how it works, all stated as facts: switches with some set "off" made shipped features read as missing, against PRODUCT.md principle 3), the four stages of an event (the clause and its slider in one blue band, the stage's sheet below), and the closing row with the same start form, signed off by the brand mark at scale.
+STORY: The visitor reports the example match on the versus screen and the winner's side takes it. Then registration as a character-select grid, the four formats, what it does, the four stages of an event, and the closing start form.
 
-FIRST VIEWPORT: The 48px bar. Left: the two-line display headline, one lead sentence and the organization-name field with "Start a tournament" as the primary. Right: the joint in flat blue running off the window's right edge, its two arms holding white match sheets, the carried line between them.
+FIRST VIEWPORT: The bar. Left: the two-line display headline with its second line in gold, one lead sentence, the organization-name field and the gold "Start a tournament". Right: the versus plate, Aiko in orange against Bram in blue, the gold VS in the cut, round pips, the match line and the report control under it.
 
-FORM: Play / run, the dealt lead of the surface round, locked by the user. seed:a67496faf9aea332
+FORM: Select screen, #1 on my ordered list, chosen by the user over the dealt Backglass (#7). seed:7cc18c1ad431ea32
 
-SIGNATURE: The live joint. The example score is real input; reporting it moves the winner's name along the carried line, the same way the bracket fills in.
+SIGNATURE: Winner takes the screen. Reporting the example grows the winner's side, drains the loser's, fills the pips and slams a gold banner; across the app the same move fills each decided match with the winner's side colour.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

@@ -81,51 +81,34 @@
 </div>
 
 <style lang="scss">
-	// Drawn like a printed draw: each name sits on its own line, the score at the line's end, and
-	// the two lines meet in a joint at the right. A decided match's winner line is set in ink.
+	// A versus plate: player one's slot over player two's. A decided match's winner takes the plate
+	// in its side's colour; the connector leaves from the plate's right edge.
 	.match {
 		position: absolute;
 		display: flex;
 		flex-direction: column;
 		box-sizing: border-box;
-		border-radius: 4px;
-
-		// The joint where the two lines meet; connectors leave from its middle.
-		&::after {
-			content: '';
-			position: absolute;
-			right: 0;
-			top: calc(50% - 1px);
-			height: 50%;
-			border-right: 1px solid var(--bracket-line);
-		}
+		overflow: visible;
+		border: 1px solid var(--bracket-border);
+		border-radius: 6px;
+		background: var(--bracket-card);
 
 		&.ready {
+			border-color: var(--bracket-line);
 			background: var(--bracket-ready);
-		}
-
-		&.involved .slot.highlighted::after {
-			height: 2px;
-			background: var(--bracket-highlight);
 		}
 	}
 
-	// The organizer's red pen: the number circled and the joint drawn over in red.
+	// A dispute: the plate ringed and its number set on a chip in the dispute colour.
 	.disputed {
-		&::after {
-			border-right: 2px solid var(--danger);
-		}
+		border-color: var(--danger);
+		box-shadow: 0 0 0 1px var(--danger);
 
-		// Circled in the clear space between the incoming connector and the card.
 		.number {
-			right: calc(100% + 2px);
-			display: grid;
-			place-items: center;
-			min-width: 1.125rem;
-			height: 1.125rem;
-			border: 1.5px solid var(--danger);
-			border-radius: 50%;
-			color: var(--danger);
+			padding: 0 0.3rem;
+			border-radius: 3px;
+			background: var(--danger);
+			color: var(--bracket-background);
 			font-weight: 700;
 		}
 	}
@@ -133,7 +116,7 @@
 	// Level with the first name, between the card and the connector that arrives half a gap away.
 	.number {
 		position: absolute;
-		right: calc(100% + 4px);
+		right: calc(100% + 5px);
 		top: 25%;
 		transform: translateY(-50%);
 		font-size: 0.6875rem;
@@ -142,36 +125,53 @@
 	}
 
 	.slot {
+		--side: var(--bracket-p1, var(--bracket-ink));
 		position: relative;
 		flex: 1;
 		display: flex;
-		align-items: flex-end;
-		gap: 0.5rem;
+		align-items: center;
+		gap: 0.45rem;
 		min-height: 0;
-		padding: 0 0.4rem 0.3rem;
+		padding: 0 0.5rem;
 		font-size: 0.875rem;
 
-		// The printed line the name is written on.
-		&::after {
-			content: '';
-			position: absolute;
-			inset: auto 0 0;
-			height: 1px;
-			background: var(--bracket-line);
+		+ .slot {
+			--side: var(--bracket-p2, var(--bracket-ink));
+			border-top: 1px solid var(--bracket-border);
 		}
 
-		&.winner::after {
-			height: 2px;
-			background: var(--bracket-ink);
+		&:first-of-type {
+			border-radius: 5px 5px 0 0;
+		}
+
+		&:last-of-type {
+			border-radius: 0 0 5px 5px;
+		}
+
+		// The side's tick, slanted like the cut on a versus screen.
+		&::before {
+			content: '';
+			flex: none;
+			width: 3px;
+			height: 12px;
+			border-radius: 1px;
+			background: var(--side);
+			transform: skewX(-10deg);
 		}
 
 		&.winner {
-			.who {
-				font-weight: 650;
+			background: var(--side);
+
+			&::before {
+				background: var(--bracket-on-side, var(--bracket-background));
 			}
 
+			.who,
 			.score {
-				color: var(--bracket-text);
+				color: var(--bracket-on-side, var(--bracket-background));
+			}
+
+			.who {
 				font-weight: 700;
 			}
 		}
@@ -181,8 +181,12 @@
 			color: var(--bracket-muted);
 		}
 
-		&.highlighted .who {
-			color: var(--bracket-highlight);
+		&.highlighted {
+			box-shadow: inset 0 0 0 2px var(--bracket-highlight);
+
+			&:not(.winner) .who {
+				color: var(--bracket-highlight);
+			}
 		}
 	}
 
@@ -192,14 +196,12 @@
 		align-items: center;
 		min-width: 0;
 		overflow: hidden;
-		font-stretch: 88%;
-		font-weight: 550;
+		font-weight: 600;
 	}
 
 	.placeholder {
 		color: var(--bracket-muted);
 		font-size: 0.8125rem;
-		font-stretch: 100%;
 		font-weight: 400;
 		white-space: nowrap;
 	}
@@ -209,7 +211,7 @@
 		min-width: 1.25rem;
 		text-align: right;
 		color: var(--bracket-text);
+		font-family: var(--font-display);
 		font-variant-numeric: tabular-nums;
-		font-weight: 600;
 	}
 </style>

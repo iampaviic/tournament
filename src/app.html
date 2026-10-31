@@ -4,9 +4,14 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
-		<!-- Entrances only hide content once scripts can show it again. -->
+		<!-- Entrances only hide content once scripts can show it again. The light look, if this browser
+		     chose it, is set before the page paints; dark is the default. -->
 		<script>
 			document.documentElement.classList.add('js');
+			try {
+				if (localStorage.getItem('theme') === 'light')
+					document.documentElement.dataset.theme = 'light';
+			} catch {}
 		</script>
 		%sveltekit.head%
 	</head>

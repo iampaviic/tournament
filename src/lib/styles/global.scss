@@ -1,45 +1,57 @@
 @use 'tokens' as *;
 
 :root {
-	@include tokens-light;
-	--radius: 8px; // cards and panels
+	@include tokens-dark;
+	--radius: 12px; // panels
 	--radius-sm: 6px; // controls
-	--radius-tag: 4px; // status tags
-	--font: 'Archivo Variable', 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--radius-tag: 4px; // state chips
+	--font: 'Onest Variable', 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	// Arcade weight for titles, names and scores. It has one weight, so it is never set bold.
+	--font-display: 'Dela Gothic One', 'Onest Variable', system-ui, sans-serif;
 	--content-width: 1152px;
-	--control-height: 32px;
-	--field-height: 40px;
+	--control-height: 34px;
+	--field-height: 42px;
 	--gap: 24px;
 	--pad: 24px;
-	// Type: the scale of the sheet. Names are set semi-condensed and bold, like names on a draw.
-	--fs-title: 2rem;
-	--fs-section: 1.125rem;
-	--fs-body: 0.875rem;
-	--fs-small: 0.75rem;
-	--name-stretch: 88%;
+	// Type: a quiet sans for reading, the display face for what you look for first.
+	--fs-title: 2.25rem;
+	--fs-section: 1.25rem;
+	--fs-body: 0.9375rem;
+	--fs-small: 0.8125rem;
 	// The home page's three larger steps.
-	--fs-display: clamp(2.75rem, 4.8vw, 4.5rem);
-	--fs-statement: clamp(1.75rem, 2.9vw, 2.75rem);
+	--fs-display: clamp(2.75rem, 5vw, 4.5rem);
+	--fs-statement: clamp(1.75rem, 3vw, 2.75rem);
 	--fs-lead: 1.125rem;
 	@media (max-width: 639.98px) {
-		--fs-title: 1.5rem;
+		--fs-title: 1.625rem;
 	}
+	// Character tiles: a player without a picture gets one of these, picked from their name.
+	--tile-1: #ff7a45;
+	--tile-2: #2fb8ff;
+	--tile-3: #ffd23f;
+	--tile-4: #34e08b;
+	--tile-5: #b48cff;
+	--tile-6: #ff7ac8;
+	--tile-7: #ff9f1c;
+	--tile-8: #5ee7df;
+	// The slant of a state chip and the primary plate, as on a versus screen.
+	--slant: -10deg;
 	// Motion: quick and exact under the hand, slower only for things arriving.
 	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 	--ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
 	--ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+	--ease-slam: cubic-bezier(0.2, 0.9, 0.3, 1.25);
 	--t-press: 140ms;
 	--t-hover: 180ms;
 	--t-ui: 240ms;
 	--t-reveal: 800ms;
-	color-scheme: light;
+	color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		@include tokens-dark;
-		color-scheme: dark;
-	}
+// Dark is the default; the theme switch in the footer sets the light look.
+:root[data-theme='light'] {
+	@include tokens-light;
+	color-scheme: light;
 }
 
 *,
@@ -71,12 +83,12 @@ body {
 }
 
 ::selection {
-	background: var(--accent-track);
+	background: color-mix(in srgb, var(--accent) 38%, transparent);
 	color: var(--text);
 }
 
 :focus-visible {
-	outline: 2px solid var(--accent);
+	outline: 2px solid var(--focus);
 	outline-offset: 2px;
 }
 
@@ -89,25 +101,30 @@ h4 {
 	text-wrap: balance;
 }
 
+// Titles and section heads in the display face, which has one weight.
+h1,
+h2 {
+	font-family: var(--font-display);
+	font-weight: 400;
+	line-height: 1.12;
+}
+
 h1 {
 	font-size: var(--fs-title);
-	font-weight: 700;
-	letter-spacing: -0.02em;
 }
 
 h2 {
 	font-size: var(--fs-section);
-	font-weight: 600;
 }
 
 h3 {
-	font-size: 1rem;
-	font-weight: 600;
+	font-size: 1.0625rem;
+	font-weight: 650;
 }
 
 h4 {
 	font-size: var(--fs-body);
-	font-weight: 600;
+	font-weight: 650;
 }
 
 p {
@@ -116,13 +133,13 @@ p {
 }
 
 a {
-	color: var(--accent);
+	color: var(--link);
 	text-decoration-thickness: 1px;
 	text-underline-offset: 0.2em;
 	transition: color var(--t-hover) ease;
 
 	&:hover {
-		color: var(--accent-hover);
+		color: var(--text);
 	}
 }
 
@@ -184,13 +201,12 @@ table,
 	white-space: nowrap;
 }
 
-/** A player's or entrant's name, set the way names are written on a draw sheet. */
+/** A player's or entrant's name: bold, so it is the first thing found in a row. */
 .name {
-	font-stretch: var(--name-stretch);
-	font-weight: 650;
+	font-weight: 700;
 }
 
-// A sheet: white stock on the wall, edged, never shadowed.
+// A panel on the stage: edged, never shadowed at rest.
 .card {
 	background: var(--surface);
 	border: 1px solid var(--border);
@@ -199,18 +215,20 @@ table,
 }
 
 .btn {
+	position: relative;
+	isolation: isolate;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 0.4rem;
 	min-height: var(--control-height);
-	padding: 0 0.85rem;
+	padding: 0 0.9rem;
 	border-radius: var(--radius-sm);
 	border: 1px solid var(--control);
-	background: var(--surface);
+	background: var(--surface-2);
 	color: var(--text);
 	font: inherit;
-	font-weight: 550;
+	font-weight: 600;
 	line-height: 1.2;
 	text-decoration: none;
 	white-space: nowrap;
@@ -221,7 +239,8 @@ table,
 		transform var(--t-press) var(--ease-out);
 
 	&:hover {
-		background: var(--surface-2);
+		border-color: var(--line);
+		background: var(--border);
 		color: var(--text);
 	}
 
@@ -234,20 +253,38 @@ table,
 		cursor: not-allowed;
 	}
 
+	// The one primary action: a gold plate slanted like a versus screen's cut, the label upright.
 	&.primary {
-		background: var(--accent);
-		border-color: var(--accent);
+		border-color: transparent;
+		background: none;
 		color: var(--accent-text);
+		font-family: var(--font-display);
+		font-weight: 400;
+		letter-spacing: 0.01em;
 
-		&:hover {
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: var(--radius-sm);
+			background: var(--accent);
+			transform: skewX(var(--slant));
+			transition: background-color 120ms ease-out;
+		}
+
+		&:hover::before {
 			background: var(--accent-hover);
-			border-color: var(--accent-hover);
+		}
+
+		&:disabled::before {
+			background: var(--control);
 		}
 	}
 
 	&.danger {
 		color: var(--danger);
-		border-color: color-mix(in srgb, var(--danger) 40%, var(--control));
+		border-color: color-mix(in srgb, var(--danger) 55%, var(--control));
 
 		&:hover {
 			background: var(--danger-soft);
@@ -256,7 +293,7 @@ table,
 
 	&.small {
 		min-height: 28px;
-		padding: 0 0.65rem;
+		padding: 0 0.7rem;
 		font-size: var(--fs-small);
 	}
 
@@ -301,7 +338,7 @@ select {
 	padding: 0.5rem 0.75rem;
 	border: 1px solid var(--control);
 	border-radius: var(--radius-sm);
-	background: var(--surface);
+	background: var(--bg);
 	color: var(--text);
 	font: inherit;
 	transition: border-color 120ms ease-out;
@@ -315,9 +352,9 @@ select {
 	}
 
 	&:focus-visible {
-		outline: 2px solid var(--accent);
+		outline: 2px solid var(--focus);
 		outline-offset: -1px;
-		border-color: var(--accent);
+		border-color: var(--focus);
 	}
 
 	// Phones zoom into fields set below 16px.
@@ -367,11 +404,11 @@ legend {
 	}
 
 	&.success {
-		background: var(--accent-soft);
-		color: var(--accent-ink);
+		background: var(--success-soft);
+		color: var(--success-ink);
 	}
 
-	// A caution in the organizer's red pen: ringed, not filled, so it reads apart from an error.
+	// A caution: ringed, not filled, so it reads apart from an error.
 	&.warning {
 		background: var(--surface);
 		color: var(--text);
@@ -379,34 +416,55 @@ legend {
 	}
 }
 
-// A status tag: a pale tint with dark ink of the same hue.
+// A state chip, slanted like the tags on a versus screen; the label stays upright.
 .badge {
+	position: relative;
+	isolation: isolate;
 	display: inline-flex;
 	flex: none;
 	align-items: center;
-	min-height: 20px;
-	padding: 0 0.4rem;
-	border-radius: var(--radius-tag);
+	min-height: 22px;
+	padding: 0 0.55rem;
 	font-size: var(--fs-small);
-	font-weight: 550;
+	font-weight: 650;
 	line-height: 1;
 	white-space: nowrap;
-	background: var(--surface-2);
 	color: var(--text-muted);
 
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		border-radius: var(--radius-tag);
+		box-shadow: inset 0 0 0 1.5px var(--control);
+		transform: skewX(var(--slant));
+	}
+
 	&.success {
-		background: var(--success-soft);
-		color: var(--success-ink);
+		color: var(--on-side);
+
+		&::before {
+			background: var(--success);
+			box-shadow: none;
+		}
 	}
 
 	&.danger {
-		background: var(--danger-soft);
-		color: var(--danger-ink);
+		color: var(--danger);
+
+		&::before {
+			box-shadow: inset 0 0 0 1.5px var(--danger);
+		}
 	}
 
 	&.accent {
-		background: var(--accent-soft);
-		color: var(--accent-ink);
+		color: var(--accent-text);
+
+		&::before {
+			background: var(--accent);
+			box-shadow: none;
+		}
 	}
 }
 
@@ -424,7 +482,7 @@ legend {
 		color: var(--text-muted);
 		font-weight: 550;
 		text-decoration: none;
-		border-bottom: 2px solid transparent;
+		border-bottom: 3px solid transparent;
 		margin-bottom: -1px;
 		white-space: nowrap;
 
