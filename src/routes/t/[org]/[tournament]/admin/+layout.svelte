@@ -5,6 +5,7 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import { statusLabel, statusTone } from '#lib/labels.ts';
+	import BackLink from '#lib/components/BackLink.svelte';
 	import type { SubmitFunction } from '$app/forms';
 	import type { LayoutProps } from './$types';
 
@@ -97,6 +98,13 @@
 <svelte:head>
 	<title>{current ? `${current.label()} · ` : ''}{data.tournament.name} · {m.app_name()}</title>
 </svelte:head>
+
+<!-- Leaves the tournament's admin: back to where you came from, or to the organization's list. -->
+<BackLink
+	within={resolve('/t/[org]/[tournament]/admin', params)}
+	fallback={resolve('/o/[org]/admin/tournaments', { org: data.org.slug })}
+	fallbackName={data.org.name}
+/>
 
 <div class="title">
 	<div>
