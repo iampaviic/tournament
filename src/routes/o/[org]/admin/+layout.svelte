@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
+	import BackLink from '#lib/components/BackLink.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -34,6 +35,14 @@
 <svelte:head>
 	<title>{current ? `${current.label()} · ` : ''}{data.org.name} · {m.app_name()}</title>
 </svelte:head>
+
+<!-- Leaves the organization's admin: back to where you came from, or to the dashboard. The public
+     page has its own link beside the title. -->
+<BackLink
+	within={resolve('/o/[org]/admin', { org: data.org.slug })}
+	fallback={resolve('/dashboard')}
+	fallbackName={m.nav_dashboard()}
+/>
 
 <div class="title">
 	<h1>{data.org.name}</h1>
