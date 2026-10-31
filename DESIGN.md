@@ -125,6 +125,9 @@ typography:
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: '0.08em'
+  code:
+    fontFamily: 'ui-monospace, SF Mono, Menlo, Consolas, monospace'
+    fontSize: '0.8125rem'
 rounded:
   panel: '12px'
   control: '6px'
