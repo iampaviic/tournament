@@ -136,7 +136,7 @@
 		text-decoration: none;
 
 		&:hover {
-			color: var(--accent);
+			color: var(--accent-ink);
 		}
 	}
 

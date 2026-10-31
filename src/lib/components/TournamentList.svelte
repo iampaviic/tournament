@@ -81,8 +81,13 @@
 	}
 
 	a {
-		font-weight: 600;
+		color: var(--text);
+		font-weight: 650;
 		text-decoration: none;
+
+		&:hover {
+			color: var(--accent-ink);
+		}
 	}
 
 	.small {

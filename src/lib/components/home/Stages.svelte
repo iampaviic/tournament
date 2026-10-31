@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
+	import Avatar from '#lib/components/Avatar.svelte';
 	import BracketCanvas from '#lib/components/bracket/BracketCanvas.svelte';
 	import Icon from '#lib/components/Icon.svelte';
 	import { miniDraw, NAMES, placings, players } from '#lib/home/demo.ts';
@@ -54,6 +55,11 @@
 	<div class="picture" data-reveal="settle" style:--d="200ms">
 		<div class="fragment sheet" class:shown={step === 0} data-ui inert>
 			<h3>{m.t_registration()}</h3>
+			<!-- The select screen filling up: taken places as tiles, open ones still empty. -->
+			<div class="tiles" aria-hidden="true">
+				{#each NAMES.slice(0, 5) as name (name)}<Avatar {name} size={40} />{/each}
+				<span class="open"></span><span class="open"></span><span class="open"></span>
+			</div>
 			<div class="track"><span style:width="{(11 / 32) * 100}%"></span></div>
 			<p class="muted">{m.t_capacity({ count: 11, limit: 32 })}</p>
 			<span class="btn primary">{m.t_register()}</span>
@@ -63,6 +69,7 @@
 			<ul class="names">
 				{#each NAMES.slice(0, 6) as name, i (name)}
 					<li>
+						<Avatar {name} size={28} />
 						<span class="name">{name}</span>
 						{#if checked[i]}<Icon name="check" />{/if}
 					</li>
@@ -363,17 +370,40 @@
 		}
 
 		.name {
+			flex: 1;
 			color: var(--text);
 		}
+	}
+
+	.names li {
+		justify-content: flex-start;
 	}
 
 	.places li {
 		justify-content: flex-start;
 
 		.rank {
-			width: 1.5rem;
+			width: 1.75rem;
 			color: var(--text-muted);
+			font-family: var(--font-display);
 			font-variant-numeric: tabular-nums;
+		}
+
+		&:first-child .rank {
+			color: var(--accent-ink);
+		}
+	}
+
+	.tiles {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+
+		.open {
+			width: 40px;
+			height: 40px;
+			border: 1.5px dashed var(--control);
+			border-radius: 9px;
 		}
 	}
 </style>

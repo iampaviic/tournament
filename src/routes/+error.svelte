@@ -9,7 +9,10 @@
 </svelte:head>
 
 <section class="card error-page">
-	<p class="status">{page.status}</p>
+	<!-- The status set like a versus score: player one's colour, gold, player two's. -->
+	<p class="status">
+		{#each String(page.status) as digit, i (i)}<span>{digit}</span>{/each}
+	</p>
 	<h1>{page.error?.message ?? m.error_title()}</h1>
 	<a class="btn" href={resolve('/')}>{m.error_home()}</a>
 </section>
@@ -22,10 +25,22 @@
 	}
 
 	.status {
-		margin: 0;
-		font-size: 3rem;
-		font-weight: 700;
-		color: var(--text-muted);
+		margin: 0 0 0.5rem;
+		font-family: var(--font-display);
+		font-size: clamp(4rem, 14vw, 6rem);
+		line-height: 1;
+
+		span:nth-child(1) {
+			color: var(--p1);
+		}
+
+		span:nth-child(2) {
+			color: var(--accent);
+		}
+
+		span:nth-child(3) {
+			color: var(--p2);
+		}
 	}
 
 	h1 {

@@ -268,7 +268,7 @@
 		padding: 0.1rem 0.45rem;
 		border-radius: var(--radius-sm);
 		background: var(--surface-2);
-		color: var(--accent);
+		color: var(--link);
 		font-size: var(--fs-small);
 		font-weight: 700;
 	}

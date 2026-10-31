@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
+	import Mark from '#lib/components/Mark.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -13,6 +14,7 @@
 </svelte:head>
 
 <div class="card login">
+	<Mark size={40} />
 	<h1>{m.login_title()}</h1>
 	<p class="muted">{m.login_lead()}</p>
 
@@ -48,8 +50,15 @@
 
 <style lang="scss">
 	.login {
+		display: flex;
+		flex-direction: column;
 		max-width: 26rem;
 		margin: 3rem auto;
+		padding: 2rem;
+
+		h1 {
+			margin: 1rem 0 0.35rem;
+		}
 	}
 
 	ul {

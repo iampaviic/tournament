@@ -6,6 +6,7 @@
 	import BracketView from '#lib/components/bracket/BracketView.svelte';
 	import Avatar from '#lib/components/Avatar.svelte';
 	import Icon from '#lib/components/Icon.svelte';
+	import Podium from '#lib/components/Podium.svelte';
 	import Versus from '#lib/components/Versus.svelte';
 	import {
 		formatLabel,
@@ -71,6 +72,10 @@
 			</div>
 		</div>
 	</section>
+{/if}
+
+{#if status === 'completed' && ranked}
+	<Podium {participants} />
 {/if}
 
 {#if data.sheet && stage && theme}
@@ -147,7 +152,12 @@
 					<button class="btn primary" type="submit">{m.t_check_in()}</button>
 				</form>
 			{:else}
-				<p>{data.me.checkedIn ? m.t_checked_in() : m.t_registered()}</p>
+				{#if data.me.checkedIn}
+					<!-- Ready to play: the same green as a finished match, landing like a select-screen lock-in. -->
+					<p class="locked"><Icon name="check" />{m.t_checked_in()}</p>
+				{:else}
+					<p>{m.t_registered()}</p>
+				{/if}
 			{/if}
 			{#if status === 'registration' || status === 'check_in'}
 				<form method="POST" action="?/leave" use:enhance>
@@ -320,6 +330,39 @@
 		h2,
 		p {
 			margin: 0;
+		}
+	}
+
+	.locked {
+		position: relative;
+		isolation: isolate;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.35rem 0.85rem;
+		color: var(--on-side);
+		font-weight: 700;
+
+		// The chip is slanted like every state chip; the label stays upright.
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: var(--radius-sm);
+			background: var(--success);
+			transform: skewX(var(--slant));
+		}
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation: lock-in 520ms var(--ease-slam) both;
+		}
+	}
+
+	@keyframes lock-in {
+		from {
+			opacity: 0;
+			transform: scale(1.6);
 		}
 	}
 

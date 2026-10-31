@@ -138,10 +138,8 @@
 			min-width: 0;
 		}
 
-		// A person's name, so it is set the way names are written on the draw.
 		h1 {
 			margin: 0 0 0.15rem;
-			font-stretch: var(--name-stretch);
 			overflow-wrap: anywhere;
 		}
 
@@ -220,7 +218,7 @@
 			text-decoration: none;
 
 			&:hover {
-				color: var(--accent);
+				color: var(--accent-ink);
 			}
 		}
 	}

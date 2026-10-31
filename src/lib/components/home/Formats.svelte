@@ -141,7 +141,6 @@
 			inset: 0;
 			z-index: -1;
 			border-radius: var(--radius-sm);
-			background: var(--accent);
 			transform: skewX(var(--slant)) scaleX(0);
 			transform-origin: left;
 			transition: transform 260ms var(--ease-expo);
@@ -155,6 +154,7 @@
 			color: var(--accent-text);
 
 			&::before {
+				background: var(--accent);
 				transform: skewX(var(--slant));
 			}
 		}

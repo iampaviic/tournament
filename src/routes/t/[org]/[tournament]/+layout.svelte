@@ -44,6 +44,10 @@
 	{@render children()}
 {:else}
 	<header class="tournament">
+		<!-- The game's own art as the stage behind the title, faded into the page. -->
+		{#if data.tournament.game?.headerImage}
+			<img class="stage" src={data.tournament.game.headerImage} alt="" aria-hidden="true" />
+		{/if}
 		<div>
 			<a class="muted org" href={resolve('/o/[org]', { org: data.org.slug })}>{data.org.name}</a>
 			<h1>{data.tournament.name}</h1>
@@ -78,6 +82,8 @@
 	@use 'tokens' as *;
 
 	.tournament {
+		position: relative;
+		isolation: isolate;
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
@@ -85,13 +91,36 @@
 
 		h1 {
 			margin: 0.15rem 0 0.5rem;
-			font-size: 1.5rem;
+			font-size: 1.625rem;
 
 			@include up($bp-sm) {
-				font-size: var(--fs-title);
+				font-size: clamp(2rem, 4vw, 2.75rem);
 			}
 		}
+	}
 
+	.stage {
+		position: absolute;
+		z-index: -1;
+		top: -2rem;
+		right: 0;
+		width: min(36rem, 60%);
+		height: calc(100% + 2rem);
+		object-fit: cover;
+		opacity: 0.38;
+		// Faded into the page on the left and at the foot, so only the art's middle shows.
+		mask-image:
+			linear-gradient(to right, transparent, #000 60%),
+			linear-gradient(to bottom, #000 45%, transparent);
+		mask-composite: intersect;
+		pointer-events: none;
+
+		@media (max-width: 639.98px) {
+			display: none;
+		}
+	}
+
+	.tournament {
 		.org {
 			color: var(--text-muted);
 			font-weight: 550;
