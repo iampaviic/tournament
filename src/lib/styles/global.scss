@@ -53,7 +53,12 @@ html {
 	scrollbar-color: var(--control) transparent;
 }
 
+// A column the height of the window at least, so on a short page the footer sits at its foot.
 body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	min-height: 100dvh;
 	margin: 0;
 	overflow-x: clip;
 	background: var(--bg);
@@ -119,6 +124,11 @@ a {
 	&:hover {
 		color: var(--accent-hover);
 	}
+}
+
+// Browsers give buttons the system sans; every button here is set in the page's face.
+button {
+	font-family: inherit;
 }
 
 code,

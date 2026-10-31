@@ -14,17 +14,20 @@
 		sides,
 		winner = null,
 		me = null,
+		disputed = false,
 		size = 'md'
 	}: {
 		sides: [MatchSide, MatchSide];
 		winner?: 0 | 1 | null;
 		/** The side the viewer plays on. */
 		me?: 0 | 1 | null;
+		/** The players' reports disagree: the joint is redrawn in the organizer's red pen. */
+		disputed?: boolean;
 		size?: 'md' | 'lg';
 	} = $props();
 </script>
 
-<div class="lines {size}" class:decided={winner !== null}>
+<div class="lines {size}" class:decided={winner !== null} class:disputed>
 	{#each [0, 1] as const as i (i)}
 		{@const side = sides[i]}
 		<div
@@ -69,6 +72,14 @@
 		&.decided::before {
 			border-top: 2px solid var(--text);
 			margin-top: -0.5px;
+		}
+
+		&.disputed::after {
+			border-right: 2px solid var(--danger);
+		}
+
+		&.disputed::before {
+			border-top-color: var(--danger);
 		}
 	}
 

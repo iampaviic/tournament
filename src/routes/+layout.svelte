@@ -138,11 +138,14 @@
 	}
 
 	main {
+		flex: 1 0 auto;
 		padding-bottom: 4rem;
 	}
 
+	// The foot of the sheet: on a short page it sits at the window's foot, under a printed rule.
 	footer {
-		padding: 2rem 0 3rem;
+		padding: 1.5rem 0 2.5rem;
+		border-top: 1px solid var(--border);
 	}
 
 	.close {

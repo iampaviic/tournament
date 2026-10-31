@@ -1,23 +1,11 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { m } from '#lib/paraglide/messages.js';
-	import BracketCanvas from '#lib/components/bracket/BracketCanvas.svelte';
 	import Mark from '#lib/components/Mark.svelte';
-	import { formats, players } from '#lib/home/demo.ts';
-	import { themes, themeStyle } from '#lib/themes/index.ts';
-
-	const draw = formats[1].layout;
 </script>
 
 <section class="close" aria-labelledby="close-title">
-	<div class="tile side" data-reveal data-ui inert style={themeStyle(themes[0].style)}>
-		<div class="crop">
-			<div style:width="{draw.width}px" style:height="{draw.height}px">
-				<BracketCanvas layout={draw} participants={players} theme={themes[0]} elimination />
-			</div>
-		</div>
-	</div>
-	<div class="tile main" data-reveal style:--d="70ms">
+	<div class="tile" data-reveal>
 		<h2 id="close-title">{m.home_close_title()}</h2>
 		<p>{m.home_close_lead()}</p>
 		<form method="GET" action={resolve('/organizations/new')}>
@@ -35,76 +23,41 @@
 	</div>
 </section>
 
+<!-- The brand mark at the scale of the page: one bracket stroke, open on the left, and the
+	 blue line that leaves its bar. -->
 <div class="mark" aria-hidden="true">
-	<!-- The joint, built large from flat blocks with 4px gaps. -->
-	<svg viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">
-		<rect class="ink arm" x="0" y="0" width="596" height="64" />
-		<rect class="ink arm" x="0" y="156" width="596" height="64" />
-		<rect class="ink bar" x="600" y="0" width="64" height="220" />
-		<rect class="blue carry" x="668" y="78" width="332" height="64" />
-	</svg>
+	<span class="bracket"></span>
+	<span class="carry"></span>
 </div>
 
 <style lang="scss">
 	@use 'tokens' as *;
 
-	// One row of the board, cropped at both window edges.
+	// The closing row starts at the column and runs off the window's right edge, as the hero's joint.
 	.close {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: 12px;
+		grid-template-columns:
+			[full-start] minmax(1rem, 1fr)
+			[content-start] minmax(0, 72rem)
+			minmax(1rem, 1fr) [full-end];
 		width: 100vw;
 		margin-inline: calc(50% - 50vw);
-
-		@include up($bp-md) {
-			grid-template-columns: minmax(0, 2fr) minmax(0, 10fr);
-			height: 22.5rem;
-		}
 	}
 
 	.tile {
-		border-radius: var(--radius);
-		overflow: hidden;
-	}
-
-	.side {
-		display: none;
-
-		@include up($bp-md) {
-			display: block;
-			border-radius: 0 var(--radius) var(--radius) 0;
-		}
-	}
-
-	.side {
-		background: var(--surface);
-	}
-
-	// Only the lines: round names cut off at the tile's edge read as a mistake, not a crop.
-	.crop {
-		padding: 1.5rem 0 0;
-		transform: translateX(-38%);
-
-		:global(.header) {
-			visibility: hidden;
-		}
-	}
-
-	.main {
-		@include up($bp-md) {
-			border-radius: var(--radius) 0 0 var(--radius);
-		}
-
+		grid-column: content-start / full-end;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		gap: 1rem;
 		padding: 2.5rem 1.5rem;
+		border-radius: var(--radius) 0 0 var(--radius);
 		background: var(--accent);
 		color: var(--accent-text);
 
 		@include up($bp-md) {
-			padding: 2.5rem;
+			min-height: 20rem;
+			padding: 3rem;
 		}
 
 		h2 {
@@ -144,62 +97,64 @@
 		}
 	}
 
+	// Every stroke the same weight at any width, as in the 20px mark in the header.
 	.mark {
+		--stroke: clamp(0.875rem, 2.2vw, 1.75rem);
 		display: flex;
-		flex-direction: column;
-		gap: 2rem;
-		padding-block: 5rem 1rem;
-
-		svg {
-			width: 100%;
-			height: clamp(4.5rem, 14vw, 10rem);
-		}
-
-		.ink {
-			fill: var(--text);
-		}
-
-		.blue {
-			fill: var(--accent);
-		}
+		align-items: center;
+		height: clamp(4.5rem, 14vw, 10rem);
+		margin-block: 5rem 1rem;
 	}
 
-	// Scrolling the mark into view draws it: the two arms, the bar that joins them, then the line that
-	// carries on. Without scroll timelines it is simply there.
+	.bracket {
+		flex: 0 0 58%;
+		align-self: stretch;
+		border: var(--stroke) solid var(--text);
+		border-left: 0;
+	}
+
+	.carry {
+		flex: 1;
+		height: var(--stroke);
+		background: var(--accent);
+	}
+
+	// Scrolling the mark into view draws it the way the line runs: the bracket from its open end to
+	// the bar, then the line that carries on. Without scroll timelines it is simply there.
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: view()) {
-			.mark rect {
-				transform-box: fill-box;
-				transform-origin: left center;
-				animation: grow linear both;
+			.bracket,
+			.carry {
+				animation: linear both;
 				animation-timeline: view();
 			}
 
-			.mark .arm {
-				animation-range: entry 0% entry 100%;
+			.bracket {
+				animation-name: draw;
+				animation-range: entry 0% entry 80%;
 			}
 
-			.mark .bar {
-				transform-origin: center top;
-				animation-name: drop;
-				animation-range: entry 40% entry 100%;
-			}
-
-			.mark .carry {
+			.carry {
+				transform-origin: left center;
+				animation-name: carry;
 				animation-range: entry 60% entry 100%;
 			}
 		}
 	}
 
-	@keyframes grow {
+	@keyframes draw {
 		from {
-			transform: scaleX(0.04);
+			clip-path: inset(0 100% 0 0);
+		}
+
+		to {
+			clip-path: inset(0);
 		}
 	}
 
-	@keyframes drop {
+	@keyframes carry {
 		from {
-			transform: scaleY(0.04);
+			transform: scaleX(0);
 		}
 	}
 </style>

@@ -21,7 +21,7 @@ THESIS: The bracket joint (two players' lines meeting, one carrying on) is the p
 
 OWN-WORLD: The app's world at poster scale: the cool wall-grey ground, white sheets, ballpoint blue as the one hue and as flat colour fields, the organizer's red pen only on the dispute. Archivo condensed to 72% for display, 80% for statements. Pictures are the product's own interface fragments; nothing else.
 
-STORY: The upper arm is "If you play": report the example match and the winner's name runs out along the line that carries on. The lower arm is "If you run it": a disputed match goes to the organizer. Then the four formats, the switches that say what it does, the four stages of an event, and the closing row with the same start form.
+STORY: The upper arm is "If you play": report the example match and the winner's name runs out along the line that carries on. The lower arm is "If you run it": a disputed match goes to the organizer. Then the four formats, what it does written on printed lines (each claim and how it works, all stated as facts: switches with some set "off" made shipped features read as missing, against PRODUCT.md principle 3), the four stages of an event (the clause and its slider in one blue band, the stage's sheet below), and the closing row with the same start form, signed off by the brand mark at scale.
 
 FIRST VIEWPORT: The 48px bar. Left: the two-line display headline, one lead sentence and the organization-name field with "Start a tournament" as the primary. Right: the joint in flat blue running off the window's right edge, its two arms holding white match sheets, the carried line between them.
 

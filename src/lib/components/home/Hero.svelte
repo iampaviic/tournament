@@ -3,14 +3,16 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import Mark from '#lib/components/Mark.svelte';
 	import MatchLines from '#lib/components/MatchLines.svelte';
+	import ScoreLines from '#lib/components/ScoreLines.svelte';
 	import { formatScore } from '#lib/format.ts';
 	import { matchStatusLabel } from '#lib/labels.ts';
 
 	// The live thing: report the example match and the winner's line carries on to the right.
-	let scores = $state<[number, number]>([2, 1]);
+	let scores = $state<[number | null, number | null]>([2, 1]);
 	let reported = $state<0 | 1 | null>(null);
-	const winner = $derived(scores[0] === scores[1] ? null : scores[0] > scores[1] ? 0 : 1);
-	const names = ['Aiko', 'Bram'] as const;
+	const [a, b] = $derived(scores);
+	const winner = $derived(a === null || b === null || a === b ? null : a > b ? 0 : 1);
+	const names: [string, string] = ['Aiko', 'Bram'];
 </script>
 
 <section class="hero" aria-labelledby="home-title">
@@ -47,35 +49,27 @@
 					<span>{m.home_play_match()}</span>
 					<span class="badge">{m.home_example()}</span>
 				</p>
-				<MatchLines
-					sides={[
-						{ name: names[0], score: reported === null ? null : scores[0] },
-						{ name: names[1], score: reported === null ? null : scores[1] }
-					]}
-					winner={reported}
-					me={0}
-				/>
 				{#if reported === null}
 					<div class="report">
-						{#each [0, 1] as const as i (i)}
-							<input
-								type="number"
-								min="0"
-								max="9"
-								bind:value={scores[i]}
-								aria-label={m.matches_score({ name: names[i] })}
-							/>
-						{/each}
+						<ScoreLines {names} {scores} onscores={(next) => (scores = next)} />
 						<button
 							class="btn primary small"
 							type="button"
 							disabled={winner === null}
 							onclick={() => (reported = winner)}
 						>
-							{m.home_report({ score: formatScore(scores) })}
+							{m.home_report({ score: a === null || b === null ? '–' : formatScore([a, b]) })}
 						</button>
 					</div>
 				{:else}
+					<MatchLines
+						sides={[
+							{ name: names[0], score: a },
+							{ name: names[1], score: b }
+						]}
+						winner={reported}
+						me={0}
+					/>
 					<p class="note">
 						{reported === 0 ? m.home_reported() : m.home_reported_other()}
 						<button class="again" type="button" onclick={() => (reported = null)}>
@@ -93,7 +87,7 @@
 					<span>{m.home_run_match()}</span>
 					<span class="badge danger">{matchStatusLabel('disputed')}</span>
 				</p>
-				<MatchLines sides={[{ name: 'Cleo' }, { name: 'Dario' }]} />
+				<MatchLines sides={[{ name: 'Cleo' }, { name: 'Dario' }]} disputed />
 				<p class="reports">
 					<span>{m.room_reported({ name: 'Cleo', score: '2–1' })}</span>
 					<span>{m.room_reported({ name: 'Dario', score: '1–2' })}</span>
@@ -329,17 +323,11 @@
 		font-size: 0.875rem;
 	}
 
+	// Laid out as the match room's score form: the lines, then the button at their foot.
 	.report {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-
-		input {
-			width: 3.5rem;
-			min-height: 36px;
-			text-align: center;
-			font-variant-numeric: tabular-nums;
-		}
+		align-items: flex-end;
+		gap: 1.25rem;
 
 		.btn {
 			margin-left: auto;

@@ -286,7 +286,7 @@ A cool, near-neutral paper palette with one ballpoint blue, a red pen, and a qui
 
 ## Layout
 
-A no-sidebar shell: a 48px top bar with the wordmark at the left edge of a 1152px column (plus 1rem side padding), the page title and status under it, then underline tabs on one full-width rule. Content sits in that column with a 24px gap and 24px sheet padding. The bracket canvas is allowed to break wider than the column so the tree has room.
+A no-sidebar shell: a 48px top bar with the wordmark at the left edge of a 1152px column (plus 1rem side padding), the page title and status under it, then underline tabs on one full-width rule. Content sits in that column with a 24px gap and 24px sheet padding. The bracket canvas is allowed to break wider than the column so the tree has room. A footer under a sheet-edge rule closes every page; the page is at least the window's height, so on a short page the footer rests at the window's foot instead of floating under the content.
 
 Breakpoints are 640px (`sm`, secondary nav links appear, title steps up from 1.5rem to 2rem) and 900px (`md`, two-column compositions such as the home hero and formats). Controls are 32px tall (28px small) and grow to 44px (36px small) on coarse pointers; fields are 40px.
 

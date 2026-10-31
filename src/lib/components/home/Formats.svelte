@@ -12,13 +12,13 @@
 		round_robin: m.home_format_round_robin,
 		swiss: m.home_format_swiss
 	};
-	// One hue at four strengths, one per format.
-	const tints = [12, 20, 28, 36].map(
-		(share) => `color-mix(in srgb, var(--accent) ${share}%, var(--bg))`
-	);
-	/** The sheet fits the stage; larger brackets are shown smaller. */
+	/**
+	 * The sheet fits the stage, but never below a readable size: on a phone, where that would take
+	 * more shrinking, it scrolls sideways instead.
+	 */
 	let stageWidth = $state(560);
-	const scale = (width: number) => Math.min(1, Math.min(stageWidth - 48, 560) / (width + 16));
+	const scale = (width: number) =>
+		Math.max(stageWidth < 600 ? 0.75 : 0.6, Math.min(1, (stageWidth - 34) / (width + 16)));
 
 	let selected = $state(0);
 </script>
@@ -49,27 +49,25 @@
 		class="stage"
 		data-reveal="settle"
 		style:--d="150ms"
-		style:--tint={tints[selected]}
 		aria-live="polite"
 		bind:clientWidth={stageWidth}
 	>
-		<svg class="shape" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-			<path d="M0 14H78V86H0M78 50H100" />
-		</svg>
 		{#each formats as format, i (format.type)}
 			<figure class="sheet" class:shown={selected === i} style={themeStyle(theme.style)} data-ui>
-				<div
-					class="scaled"
-					style:width="{format.layout.width * scale(format.layout.width)}px"
-					style:height="{format.layout.height * scale(format.layout.width)}px"
-				>
-					<div style:transform="scale({scale(format.layout.width)})" class="inner">
-						<BracketCanvas
-							layout={format.layout}
-							participants={players}
-							{theme}
-							elimination={format.type.endsWith('elimination')}
-						/>
+				<div class="scroll">
+					<div
+						class="scaled"
+						style:width="{format.layout.width * scale(format.layout.width)}px"
+						style:height="{format.layout.height * scale(format.layout.width)}px"
+					>
+						<div style:transform="scale({scale(format.layout.width)})" class="inner">
+							<BracketCanvas
+								layout={format.layout}
+								participants={players}
+								{theme}
+								elimination={format.type.endsWith('elimination')}
+							/>
+						</div>
 					</div>
 				</div>
 				<figcaption class="muted">{m.home_example()} · {formatLabel(format.type)}</figcaption>
@@ -125,13 +123,6 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
-
-		@media (max-width: $bp-md) {
-			flex-direction: row;
-			gap: 1.5rem;
-			overflow-x: auto;
-			scrollbar-width: none;
-		}
 	}
 
 	button {
@@ -161,39 +152,25 @@
 		font-size: 1rem;
 	}
 
-	// The joint, drawn large behind the bracket; its colour follows the chosen format.
+	// One column no wider than the stage, so a wide bracket scrolls inside its sheet, not off it.
 	.stage {
-		position: relative;
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		place-items: center;
 		min-width: 0;
-		min-height: 18rem;
-		overflow: hidden;
 
 		@include up($bp-md) {
 			min-height: 26rem;
 		}
 	}
 
-	.shape {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-
-		path {
-			fill: none;
-			stroke: var(--tint);
-			stroke-width: 14;
-			transition: stroke 300ms ease-out;
-		}
-	}
-
 	.sheet {
 		grid-area: 1 / 1;
 		position: relative;
+		max-width: 100%;
 		margin: 0;
 		padding: 1rem 1rem 0.75rem;
+		border: 1px solid var(--border); /* taste-skill-ignore: a product fragment (data-ui) */
 		border-radius: var(--radius);
 		background: var(--surface);
 		opacity: 0;
@@ -207,6 +184,11 @@
 			visibility: visible;
 			transition: opacity 240ms ease-out;
 		}
+	}
+
+	.scroll {
+		overflow-x: auto;
+		scrollbar-width: thin;
 	}
 
 	.scaled {
