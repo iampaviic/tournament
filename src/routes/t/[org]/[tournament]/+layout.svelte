@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import Icon from '#lib/components/Icon.svelte';
 	import { m } from '#lib/paraglide/messages.js';
 	import { formatDateTime } from '#lib/format.ts';
 	import { statusLabel, statusTone } from '#lib/labels.ts';
@@ -28,6 +30,19 @@
 			label: m.t_matches
 		}
 	]);
+	// Back goes to wherever the visitor came from before this tournament's pages (a dashboard, a
+	// profile, the organization); arriving directly, it goes to the organization's page. Moving
+	// between this tournament's own tabs and rooms doesn't count as where they came from.
+	const base = $derived(resolve('/t/[org]/[tournament]', params));
+	let previous = $state<string | null>(null);
+	afterNavigate(({ from }) => {
+		const path = from?.url.pathname;
+		if (path && path !== base && !path.startsWith(`${base}/`)) {
+			previous = from!.url.pathname + from!.url.search;
+		}
+	});
+	const orgHref = $derived(resolve('/o/[org]', { org: data.org.slug }));
+
 	/** The Overview keeps the tournament's name as its title. */
 	const section = $derived(
 		tabs.find((tab) => tab.route === page.route.id && tab.route !== '/t/[org]/[tournament]')
@@ -43,6 +58,12 @@
 {#if isAdmin}
 	{@render children()}
 {:else}
+	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a path this app served -->
+	<a class="back" href={previous ?? orgHref}>
+		<Icon name="back" />
+		{previous ? m.t_back() : m.t_back_to({ name: data.org.name })}
+	</a>
+
 	<header class="tournament">
 		<!-- The game's own art as the stage behind the title, faded into the page. -->
 		{#if data.tournament.game?.headerImage}
@@ -80,6 +101,32 @@
 
 <style lang="scss">
 	@use 'tokens' as *;
+
+	// Plain enough to read as navigation, with the same press as every control.
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		min-height: 32px;
+		margin: -0.75rem 0 0.75rem -0.5rem;
+		padding: 0 0.6rem 0 0.4rem;
+		border-radius: var(--radius-sm);
+		color: var(--text-muted);
+		font-weight: 600;
+		text-decoration: none;
+		transition:
+			color var(--t-hover) ease,
+			background-color var(--t-hover) ease;
+
+		&:hover {
+			background: var(--surface-2);
+			color: var(--text);
+		}
+
+		@media (pointer: coarse) {
+			min-height: 44px;
+		}
+	}
 
 	.tournament {
 		position: relative;

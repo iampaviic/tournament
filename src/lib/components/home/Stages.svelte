@@ -5,6 +5,8 @@
 	import Icon from '#lib/components/Icon.svelte';
 	import { miniDraw, NAMES, placings, players } from '#lib/home/demo.ts';
 	import { themes, themeStyle } from '#lib/themes/index.ts';
+	import { Tour } from '#lib/home/tour.svelte.ts';
+	import TourControls from './TourControls.svelte';
 
 	const clauses = [m.home_stage_1, m.home_stage_2, m.home_stage_3, m.home_stage_4];
 	const names = [
@@ -14,15 +16,17 @@
 		m.home_stage_name_4
 	];
 	const checked = [true, true, false, true, true, false];
-	let step = $state(0);
+	// The four stages play through on their own; using the slider holds the one you are on.
+	const tour = new Tour(4);
+	const step = $derived(tour.step);
 </script>
 
-<section class="stages" aria-labelledby="stage-title">
+<section class="stages" aria-labelledby="stage-title" {@attach tour.section}>
 	<!-- The clause and the slider that changes it share one gold band; the stage's panel follows. -->
 	<div class="band" data-reveal="open">
 		<div class="band-inner">
 			{#key step}<h2 id="stage-title">{clauses[step]()}</h2>{/key}
-			<div class="slider">
+			<div class="slider" {@attach tour.controls}>
 				<div class="rail" style:--passed={step / 3}>
 					<span class="passed" aria-hidden="true"></span>
 					<input
@@ -30,7 +34,7 @@
 						min="0"
 						max="3"
 						step="1"
-						bind:value={step}
+						bind:value={tour.step}
 						aria-label={m.home_stage_slider()}
 						aria-valuetext={names[step]()}
 					/>
@@ -43,11 +47,12 @@
 								type="button"
 								tabindex="-1"
 								aria-current={step === i ? 'step' : undefined}
-								onclick={() => (step = i)}>{name()}</button
+								onclick={() => (tour.step = i)}>{name()}</button
 							>
 						</li>
 					{/each}
 				</ol>
+				<div class="tourbar"><TourControls {tour} /></div>
 			</div>
 		</div>
 	</div>
@@ -220,6 +225,10 @@
 		&:active::-webkit-slider-thumb {
 			transform: scale(1.1);
 		}
+	}
+
+	.tourbar {
+		margin-top: 0.5rem;
 	}
 
 	// Stops at 0, ⅓, ⅔ and 1: the outer names hang from the ends, the inner ones centre on theirs.

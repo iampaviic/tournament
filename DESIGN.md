@@ -325,13 +325,13 @@ Eight tile colours (`tile-1` to `tile-8`), four families (pink, lime, teal, lila
 
 A centred column of 1152px plus 1rem gutters (`.container`). Two breakpoints: 640px (`sm`) and 900px (`md`). The shell is a 56px bar on the stage under a panel-edge rule, with the mark and wordmark on the left and text navigation on the right (nav links collapse below 640px, leaving the account and actions); main content grows so a short page's footer sits at the window's foot; the footer holds the wordmark, a sentence, links and the theme switch.
 
-Tournament pages open with the organization, the tournament name in the display face, its status chip, start time and game, then underline tabs on a full-width rule. The game's art sits behind the title, right-aligned, at 38% opacity, masked to transparent towards the left and the foot; it is hidden under 640px. The overview runs 2fr / 1fr from 900px with registration in the side column; the match room runs 3fr / 2fr (versus plate and result left, chat right). Blocks start on a 1px rule with 0.75rem above their heading. Gaps and panel padding are 24px; list rows are at least 44px; controls are 34px (44px on coarse pointers) and fields 42px.
+Tournament pages open with a back link (to the page the visitor came from before the tournament, or to its organization when they arrived directly), the organization, the tournament name in the display face, its status chip, start time and game, then underline tabs on a full-width rule. The game's art sits behind the title, right-aligned, at 38% opacity, masked to transparent towards the left and the foot; it is hidden under 640px. The overview summarises the bracket rather than drawing it: the stage and format, a gold progress track of matches played, up to six matches being played now (disputes first) as linked plates, and a Full bracket button; only the Bracket tab draws the bracket. It runs 2fr / 1fr from 900px with registration in the side column; the match room runs 3fr / 2fr (versus plate and result left, chat right). Blocks start on a 1px rule with 0.75rem above their heading. Gaps and panel padding are 24px; list rows are at least 44px; controls are 34px (44px on coarse pointers) and fields 42px.
 
 The home page alternates asymmetric 5fr/7fr and 4fr/8fr splits and one full-bleed band.
 
 ## Elevation & Depth
 
-Flat and edged. Panels sit on the stage with a 1px `panel-edge` border and no shadow (`--shadow: none` in both looks). Depth comes from three tonal steps (stage, panel, raised panel) and from colour taking a slot. Rings are used for meaning, not lift: the viewer's slot is inset-ringed 2px gold, a disputed plate is ringed 1px pink-red outside its border, a select-screen cursor is a 3px outline offset 2px.
+Flat and edged. Panels sit on the stage with a 1px `panel-edge` border and no shadow (`--shadow: none` in both looks). Depth comes from three tonal steps (stage, panel, raised panel) and from colour taking a slot. Rings are used for meaning, not lift: the viewer's slot is inset-ringed 2px gold, a disputed plate is ringed 1px pink-red outside its border, a select-screen cursor is a solid 3px ring around the tile.
 
 ### Shadow Vocabulary
 
@@ -400,7 +400,7 @@ Each bracket node is a list plate drawn by the bracket theme: two slots with 3px
 
 ### Roster (signature)
 
-Registration as a character-select grid of tiles (6.5rem minimum, 7.75rem from 640px, 1:1.08, 6px radius): picture or a character tile with the initial, the name on a stage-coloured strip. Cursor frames are 3px outlines offset 2px in P1, P2 or gold for the viewer, labelled by a tag in the corner; a final rank sits top-left on a stage tag in the display face. Open places are drawn as dashed tiles, up to six, then counted in one dashed tile.
+Registration as a character-select grid of tiles (6.5rem minimum, 7.75rem from 640px, 1:1.1): each tile is a panel with a 1px panel edge and 6px radius, its picture area in the player's tile colour (or their picture) with the initial, the name below on the panel itself, so no colour sits behind the name. Every tile keeps 3px of frame room around it; a cursor fills that room as a solid ring in P1, P2 or gold for the viewer, labelled by a tag in the corner; a final rank sits top-left on a stage tag in the display face. Open places are drawn as dashed tiles, up to six, then counted in one dashed tile.
 
 ### Podium
 
@@ -412,7 +412,7 @@ A muted label with a dot: control-coloured while connecting or off, green with a
 
 ### Motion
 
-Quick under the hand, slower only for things arriving: press 140ms, hover 180ms, UI 240ms, reveal 800ms. Easings: out `cubic-bezier(0.22, 1, 0.36, 1)`, expo `cubic-bezier(0.16, 1, 0.3, 1)`, in-out `cubic-bezier(0.76, 0, 0.24, 1)`, and slam `cubic-bezier(0.2, 0.9, 0.3, 1.25)` for things landing (the VS, the knockout banner, the registration lock). A result arriving live surges the winner's side and slams the banner down once; a page opened on a decided match shows it already taken. All motion collapses under reduced motion.
+Quick under the hand, slower only for things arriving: press 140ms, hover 180ms, UI 240ms, reveal 800ms. Easings: out `cubic-bezier(0.22, 1, 0.36, 1)`, expo `cubic-bezier(0.16, 1, 0.3, 1)`, in-out `cubic-bezier(0.76, 0, 0.24, 1)`, and slam `cubic-bezier(0.2, 0.9, 0.3, 1.25)` for things landing (the VS, the knockout banner, the registration lock). A result arriving live surges the winner's side and slams the banner down once; a page opened on a decided match shows it already taken. The home page's formats and event stages step through on their own every 3.8s, like a game's attract screen, while the section is on screen; using their controls holds the current step, a Pause button stops the tour, and a thin track shows the time to the next step. All motion collapses under reduced motion, and the tours then don't run.
 
 ## Do's and Don'ts
 

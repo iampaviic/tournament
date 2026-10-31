@@ -30,21 +30,25 @@ export const load: PageServerLoad = async (event) => {
 				status: 'missing' as const
 			}));
 
-	// Once play starts the bracket sheet is the page.
+	// Once play starts, the Overview summarises the bracket; the Bracket tab draws it.
 	const sheet =
 		tournament.status === 'running' || tournament.status === 'completed'
 			? await loadSheet(tournament, user?.id)
 			: null;
+	const items = sheet ? await listMatches(sheet.stages) : [];
+	const names = new Map(participants.map((p) => [p.id, p.displayName]));
+	const entrantNames = (entrants: (string | null | undefined)[]) =>
+		entrants.map((id) => (id ? (names.get(id) ?? '?') : id)) as [
+			string | null | undefined,
+			string | null | undefined
+		];
 
 	// The viewer's next match: one to play now, else the next one they wait for.
 	let next = null;
 	if (me && sheet && tournament.status === 'running') {
-		const mine = (await listMatches(sheet.stages)).filter((match) =>
-			match.entrants.includes(me.id)
-		);
+		const mine = items.filter((match) => match.entrants.includes(me.id));
 		const now = mine.find((match) => ['ready', 'reported', 'disputed'].includes(match.progress));
 		const match = now ?? mine.find((match) => match.progress === 'waiting');
-		const names = new Map(participants.map((p) => [p.id, p.displayName]));
 		if (match) {
 			next = {
 				id: match.id,
@@ -55,19 +59,48 @@ export const load: PageServerLoad = async (event) => {
 				// A single report shows on the plate as pending pips, as in the match room.
 				reported: match.reports.length === 1 ? match.reports[0].scores : null,
 				side: match.entrants.indexOf(me.id) as 0 | 1,
-				entrants: match.entrants.map((id) => (id ? (names.get(id) ?? '?') : id)) as [
-					string | null | undefined,
-					string | null | undefined
-				]
+				entrants: entrantNames(match.entrants)
 			};
 		}
+	}
+
+	// The stage being played (or the last one played): how far it is, and what is being played now,
+	// disputes first. Byes and skipped matches are not games, so they are not counted.
+	const stage =
+		sheet &&
+		(sheet.stages.find((s) => s.status === 'running') ??
+			sheet.stages.findLast((s) => s.status !== 'pending'));
+	let bracket = null;
+	if (sheet && stage) {
+		const played = items.filter(
+			(item) => item.stageIndex === stage.index && !['bye', 'skipped'].includes(item.status)
+		);
+		const order: Record<string, number> = { disputed: 0, reported: 1, ready: 2 };
+		const live = played
+			.filter((item) => item.progress in order)
+			.sort((a, b) => order[a.progress] - order[b.progress] || a.number - b.number);
+		bracket = {
+			stageIndex: stage.index,
+			stageCount: sheet.stages.length,
+			type: stage.type,
+			done: played.filter((item) => item.status === 'completed').length,
+			total: played.length,
+			liveCount: live.length,
+			live: live.slice(0, 6).map((item) => ({
+				id: item.id,
+				number: item.number,
+				progress: item.progress,
+				entrants: entrantNames(item.entrants),
+				me: sheet.me ? item.entrants.indexOf(sheet.me) : -1
+			}))
+		};
 	}
 
 	return {
 		description: tournament.description,
 		limit: tournament.participantLimit,
 		next,
-		sheet,
+		bracket,
 		full:
 			tournament.participantLimit !== null && participants.length >= tournament.participantLimit,
 		me: me && { checkedIn: Boolean(me.checkedInAt), finalRank: me.finalRank },

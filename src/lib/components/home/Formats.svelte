@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
 	import BracketCanvas from '#lib/components/bracket/BracketCanvas.svelte';
+	import TourControls from './TourControls.svelte';
 	import { formats, players } from '#lib/home/demo.ts';
+	import { Tour } from '#lib/home/tour.svelte.ts';
 	import { formatLabel } from '#lib/labels.ts';
 	import { themes, themeStyle } from '#lib/themes/index.ts';
 
@@ -20,40 +22,42 @@
 	const scale = (width: number) =>
 		Math.max(stageWidth < 600 ? 0.75 : 0.6, Math.min(1, (stageWidth - 34) / (width + 16)));
 
-	let selected = $state(0);
+	// The formats take turns on their own; hovering or focusing the list holds the one you are on.
+	const tour = new Tour(formats.length);
 </script>
 
-<section class="formats" aria-labelledby="formats-title">
+<section class="formats" aria-labelledby="formats-title" {@attach tour.section}>
 	<div class="index">
 		<h2 id="formats-title" data-reveal>{m.home_formats()}</h2>
-		<ul>
+		<ul {@attach tour.controls}>
 			{#each formats as format, i (format.type)}
 				<li data-reveal style:--d="{90 + i * 70}ms">
 					<button
 						type="button"
-						aria-pressed={selected === i}
-						onpointerenter={() => (selected = i)}
-						onfocus={() => (selected = i)}
-						onclick={() => (selected = i)}
+						aria-pressed={tour.step === i}
+						onpointerenter={() => (tour.step = i)}
+						onfocus={() => (tour.step = i)}
+						onclick={() => (tour.step = i)}
 					>
 						{formatLabel(format.type)}
 					</button>
 				</li>
 			{/each}
 		</ul>
-		<p class="fact" data-reveal style:--d="380ms">{facts[formats[selected].type]()}</p>
+		<p class="fact" data-reveal style:--d="380ms">{facts[formats[tour.step].type]()}</p>
 		<p class="stages muted" data-reveal style:--d="380ms">{m.home_formats_stages()}</p>
+		<div class="controls" data-reveal style:--d="420ms"><TourControls {tour} /></div>
 	</div>
 
 	<div
 		class="stage"
 		data-reveal="settle"
 		style:--d="150ms"
-		aria-live="polite"
+		aria-live={tour.running ? 'off' : 'polite'}
 		bind:clientWidth={stageWidth}
 	>
 		{#each formats as format, i (format.type)}
-			<figure class="sheet" class:shown={selected === i} style={themeStyle(theme.style)} data-ui>
+			<figure class="sheet" class:shown={tour.step === i} style={themeStyle(theme.style)} data-ui>
 				<div class="scroll">
 					<div
 						class="scaled"
@@ -169,6 +173,11 @@
 	.stages {
 		margin: 0.25rem 0 0;
 		font-size: 1rem;
+	}
+
+	.controls {
+		margin-top: 1rem;
+		color: var(--text-muted);
 	}
 
 	// One column no wider than the stage, so a wide bracket scrolls inside its sheet, not off it.

@@ -3,19 +3,12 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
-	import BracketView from '#lib/components/bracket/BracketView.svelte';
 	import Icon from '#lib/components/Icon.svelte';
+	import MatchLines from '#lib/components/MatchLines.svelte';
 	import Podium from '#lib/components/Podium.svelte';
 	import Roster from '#lib/components/Roster.svelte';
 	import Versus from '#lib/components/Versus.svelte';
-	import {
-		formatLabel,
-		groupName,
-		matchStatusLabel,
-		progressTone,
-		stageLabel
-	} from '#lib/labels.ts';
-	import { themeById } from '#lib/themes/index.ts';
+	import { formatLabel, matchStatusLabel, progressTone, stageLabel } from '#lib/labels.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
@@ -31,17 +24,13 @@
 	);
 	const linkHref = (moduleId: string) =>
 		`/auth/${moduleId}/login?intent=link&next=${encodeURIComponent(here)}`;
+	const side = (entrant: string | null | undefined) =>
+		entrant
+			? { name: entrant }
+			: { name: entrant === null ? m.match_bye() : m.match_tbd(), placeholder: true };
 	const sideName = (entrant: string | null | undefined) =>
 		entrant ?? (entrant === null ? m.match_bye() : m.match_tbd());
 	const params = $derived({ org: data.org.slug, tournament: data.tournament.slug });
-
-	// The stage being played, or the last one once the tournament is over.
-	const stage = $derived(
-		data.sheet &&
-			(data.sheet.stages.find((s) => s.status === 'running') ??
-				data.sheet.stages.findLast((s) => s.status !== 'pending'))
-	);
-	const theme = $derived(data.sheet && themeById(data.sheet.themeId));
 </script>
 
 {#if data.next}
@@ -80,35 +69,60 @@
 	<Podium {participants} />
 {/if}
 
-{#if data.sheet && stage && theme}
-	{@const sheet = data.sheet}
-	<section class="sheet" aria-labelledby="sheet-title">
+<!-- The bracket in brief: how far the stage is and what is being played now. The Bracket tab
+     draws it in full. -->
+{#if data.bracket}
+	{@const bracket = data.bracket}
+	<section class="summary" aria-labelledby="sheet-title">
 		<header>
 			<h2 id="sheet-title">
-				{stageLabel(stage.index, sheet.stages.length)}
-				<span class="muted format">{formatLabel(stage.type)}</span>
+				{stageLabel(bracket.stageIndex, bracket.stageCount)}
+				<span class="muted format">{formatLabel(bracket.type)}</span>
 			</h2>
-			<a href={resolve('/t/[org]/[tournament]/bracket', params)}>{m.t_full_bracket()}</a>
+			<a class="btn" href={resolve('/t/[org]/[tournament]/bracket', params)}>
+				{m.t_full_bracket()}
+			</a>
 		</header>
-		{#each stage.groups as group, groupIndex (groupIndex)}
-			{#if group.matches.length}
-				{#if stage.groups.length > 1}<h3>{groupName(groupIndex)}</h3>{/if}
-				<BracketView
-					matches={group.matches}
-					participants={sheet.participants}
-					{theme}
-					type={stage.type}
-					me={sheet.me}
-					disputed={sheet.disputed}
-					label={m.bracket_label({
-						name:
-							stage.groups.length > 1
-								? `${stageLabel(stage.index, sheet.stages.length)}, ${groupName(groupIndex)}`
-								: stageLabel(stage.index, sheet.stages.length)
-					})}
-				/>
+		<div class="progress">
+			<div
+				class="track"
+				role="meter"
+				aria-valuemin={0}
+				aria-valuemax={bracket.total}
+				aria-valuenow={bracket.done}
+				aria-label={m.t_matches_played({ done: bracket.done, total: bracket.total })}
+			>
+				<span style:width="{bracket.total ? (bracket.done / bracket.total) * 100 : 0}%"></span>
+			</div>
+			<span class="muted num">
+				{m.t_matches_played({ done: bracket.done, total: bracket.total })}
+			</span>
+		</div>
+		{#if bracket.live.length}
+			<h3>{m.t_playing_now()}</h3>
+			<ul class="live">
+				{#each bracket.live as match (match.id)}
+					<li>
+						<a href={resolve('/t/[org]/[tournament]/matches/[id]', { ...params, id: match.id })}>
+							<span class="number">#{match.number}</span>
+							<MatchLines
+								sides={[side(match.entrants[0]), side(match.entrants[1])]}
+								me={match.me === 0 || match.me === 1 ? match.me : null}
+								disputed={match.progress === 'disputed'}
+							/>
+							<span class="badge {progressTone(match.progress)}"
+								>{matchStatusLabel(match.progress)}</span
+							>
+						</a>
+					</li>
+				{/each}
+			</ul>
+			{#if bracket.liveCount > bracket.live.length}
+				<a class="more" href={resolve('/t/[org]/[tournament]/matches', params)}>
+					{m.t_more_playing({ count: bracket.liveCount - bracket.live.length })}
+				</a>
 			{/if}
-		{/each}
+		{/if}
 	</section>
 {/if}
 
@@ -264,16 +278,18 @@
 		gap: 0.75rem;
 	}
 
-	.sheet {
+	.summary {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
 		margin-bottom: 2.5rem;
 
 		header {
 			display: flex;
 			flex-wrap: wrap;
-			align-items: baseline;
+			align-items: center;
 			justify-content: space-between;
-			gap: 0.25rem 1rem;
-			margin-bottom: 0.75rem;
+			gap: 0.5rem 1rem;
 		}
 
 		h2 {
@@ -281,15 +297,66 @@
 		}
 
 		h3 {
-			margin: 1rem 0 0.5rem;
+			margin: 0.5rem 0 0;
 			font-size: 1rem;
 		}
 
 		.format {
 			margin-left: 0.5rem;
+			font-family: var(--font);
 			font-size: var(--fs-body);
 			font-weight: 400;
 		}
+	}
+
+	.progress {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 1rem;
+
+		.track {
+			flex: 1 1 12rem;
+			max-width: 28rem;
+		}
+	}
+
+	// What is being played now, each plate a way into its room.
+	.live {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+
+		a {
+			display: grid;
+			grid-template-columns: auto minmax(0, 1fr) auto;
+			align-items: center;
+			gap: 0.75rem;
+			padding: 0.6rem 0.75rem;
+			border: 1px solid var(--border);
+			border-radius: var(--radius-sm);
+			background: var(--surface);
+			color: var(--text);
+			text-decoration: none;
+			transition: border-color var(--t-hover) ease;
+
+			&:hover {
+				border-color: var(--line);
+			}
+		}
+
+		.number {
+			min-width: 2rem;
+			color: var(--text-muted);
+			font-variant-numeric: tabular-nums;
+		}
+	}
+
+	.more {
+		align-self: flex-start;
 	}
 
 	.layout {

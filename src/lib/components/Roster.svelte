@@ -77,10 +77,15 @@
 		}
 	}
 
+	// A tile is a panel with a clear edge; only its picture area carries the player's colour, so no
+	// colour sits behind the name and leaks at the corners. The 3px around the panel is the cursor
+	// frame's room: transparent, or a solid ring in the cursor's colour, never an outline that a
+	// neighbour or the page could clip.
 	.tile {
 		position: relative;
-		aspect-ratio: 1 / 1.08;
-		border-radius: var(--radius-sm);
+		aspect-ratio: 1 / 1.1;
+		padding: 3px;
+		border-radius: calc(var(--radius-sm) + 3px);
 	}
 
 	.face {
@@ -88,11 +93,14 @@
 		grid-template-rows: minmax(0, 1fr) auto;
 		height: 100%;
 		overflow: hidden;
-		border-radius: inherit;
-		background: var(--tile);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		background: var(--surface);
 		color: var(--accent-text);
 		text-decoration: none;
-		transition: transform var(--t-press) var(--ease-out);
+		transition:
+			transform var(--t-press) var(--ease-out),
+			border-color var(--t-hover) ease;
 
 		img {
 			width: 100%;
@@ -103,21 +111,22 @@
 	}
 
 	a.face:hover {
+		border-color: var(--line);
 		transform: translateY(-2px);
 	}
 
 	.letter {
 		display: grid;
 		place-items: center;
+		background: var(--tile);
 		font-family: var(--font-display);
 		font-size: clamp(1.75rem, 4vw, 2.5rem);
 		line-height: 1;
 	}
 
 	.name {
-		padding: 0.3rem 0.55rem;
+		padding: 0.35rem 0.55rem;
 		overflow: hidden;
-		background: var(--bg);
 		color: var(--text);
 		font-weight: 700;
 		text-overflow: ellipsis;
@@ -129,8 +138,7 @@
 	.p2,
 	.you {
 		--frame: var(--p1);
-		outline: 3px solid var(--frame);
-		outline-offset: 2px;
+		background: var(--frame);
 	}
 
 	.p2 {
@@ -144,7 +152,7 @@
 	.cursor,
 	.rank {
 		position: absolute;
-		top: 0.35rem;
+		top: calc(3px + 0.35rem);
 		padding: 0.05rem 0.4rem;
 		border-radius: var(--radius-tag);
 		font-size: 0.75rem;
@@ -153,7 +161,7 @@
 	}
 
 	.cursor {
-		right: 0.35rem;
+		right: calc(3px + 0.35rem);
 		background: var(--frame);
 		color: var(--on-side);
 	}
@@ -163,23 +171,27 @@
 	}
 
 	.rank {
-		left: 0.35rem;
+		left: calc(3px + 0.35rem);
 		background: var(--bg);
 		color: var(--text);
 		font-family: var(--font-display);
 		font-weight: 400;
 	}
 
-	// A place nobody has taken yet: drawn, not left out.
-	.empty {
+	// A place nobody has taken yet: drawn inside the same frame room as a face, so it lines up.
+	.empty::before,
+	.more::before {
+		content: '';
+		position: absolute;
+		inset: 3px;
 		border: 2px dashed var(--control);
+		border-radius: var(--radius-sm);
 	}
 
 	.more {
 		display: grid;
 		place-items: center;
 		padding: 0.5rem;
-		border: 2px dashed var(--control);
 		color: var(--text-muted);
 		font-weight: 600;
 		text-align: center;

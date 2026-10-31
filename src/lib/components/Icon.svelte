@@ -8,7 +8,10 @@
 		collapse: 'M13 6.5H9.5V3M9.5 6.5 13 3M3 9.5h3.5V13M6.5 9.5 3 13',
 		check: 'M3.5 8.5 6.5 11.5 12.5 4.5',
 		cross: 'M4.5 4.5l7 7M11.5 4.5l-7 7',
-		alert: 'M8 2.5 14 13H2L8 2.5ZM8 6.5v3M8 11.25v.25'
+		alert: 'M8 2.5 14 13H2L8 2.5ZM8 6.5v3M8 11.25v.25',
+		back: 'M10 3.5 5.5 8l4.5 4.5',
+		pause: 'M5.5 3.5v9M10.5 3.5v9',
+		play: 'M5 3.5v9l7.5-4.5L5 3.5Z'
 	} as const;
 	export type IconName = keyof typeof paths;
 </script>
