@@ -82,7 +82,8 @@
 
 	a {
 		color: var(--text);
-		font-weight: 650;
+		font-family: var(--font-display);
+		font-size: 1rem;
 		text-decoration: none;
 
 		&:hover {

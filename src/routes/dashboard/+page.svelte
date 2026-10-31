@@ -128,11 +128,12 @@
 		}
 	}
 
+	// A tournament's name, in the display face like every title and name you look for first.
 	.event {
 		color: var(--text);
-		font-size: 1.5rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
+		font-family: var(--font-display);
+		font-size: 1.375rem;
+		line-height: 1.15;
 		text-decoration: none;
 
 		&:hover {

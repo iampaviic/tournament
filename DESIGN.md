@@ -388,7 +388,7 @@ Tactile and exact: a 1px press on `:active`, 120ms colour changes.
 
 ### Versus Plate (signature)
 
-Two sides meeting at a slanted cut: P1 fills the left, P2 the right, each with a P1/P2 tag (16% of its own ink), the name in the display face, the score in the display face at the outer top, and round pips beneath (one per game the leader has won, lit for each side's wins; half lit and without numbers while reported but undecided). The gold VS, stroked 4px in on-gold, sits in the cut and fades once decided. The viewer's side carries a gold "You" tag. **The winner takes the plate:** the winner's side widens to 1.5 shares and gains the WINNER stamp (on-side tag with the side colour as text, display face, uppercase); the loser drains to 22% of its colour on the panel in muted ink. An unreached side is a raised panel in muted Onest. Sizes: large (168px, 210px from 900px) in the match room and on the home page; medium (128px, 148px) for the next-match plate.
+Two sides meeting at a slanted cut: P1 fills the left, P2 the right, each with a P1/P2 tag (16% of its own ink), the name in the display face, the score in the display face at the outer top, and round pips beneath (one per game the leader has won, lit for each side's wins; half lit and without numbers while reported but undecided). The gold VS, stroked 4px in on-gold, sits in the cut and fades once decided. The viewer's side carries a gold "You" tag. **The winner takes the plate:** the winner's side widens to 1.5 shares and a gold knockout banner crosses the whole plate ("Name wins", display face, uppercase, edged top and bottom in on-gold, with the decided plate grown to 200px, 256px from 900px, so it sits between scores and names); the loser drains to 22% of its colour on the panel in muted ink. An unreached side is a raised panel in muted Onest. Sizes: large (168px, 210px from 900px) in the match room and on the home page; medium (128px, 148px) for the next-match plate.
 
 ### List Plate (signature)
 
@@ -412,7 +412,7 @@ A muted label with a dot: control-coloured while connecting or off, green with a
 
 ### Motion
 
-Quick under the hand, slower only for things arriving: press 140ms, hover 180ms, UI 240ms, reveal 800ms. Easings: out `cubic-bezier(0.22, 1, 0.36, 1)`, expo `cubic-bezier(0.16, 1, 0.3, 1)`, in-out `cubic-bezier(0.76, 0, 0.24, 1)`, and slam `cubic-bezier(0.2, 0.9, 0.3, 1.25)` for things landing (the VS, the WINNER stamp, the registration lock). A result arriving live surges the winner's side and slams the stamp once; a page opened on a decided match shows it already taken. All motion collapses under reduced motion.
+Quick under the hand, slower only for things arriving: press 140ms, hover 180ms, UI 240ms, reveal 800ms. Easings: out `cubic-bezier(0.22, 1, 0.36, 1)`, expo `cubic-bezier(0.16, 1, 0.3, 1)`, in-out `cubic-bezier(0.76, 0, 0.24, 1)`, and slam `cubic-bezier(0.2, 0.9, 0.3, 1.25)` for things landing (the VS, the knockout banner, the registration lock). A result arriving live surges the winner's side and slams the banner down once; a page opened on a decided match shows it already taken. All motion collapses under reduced motion.
 
 ## Do's and Don'ts
 
@@ -436,7 +436,3 @@ Quick under the hand, slower only for things arriving: press 140ms, hover 180ms,
 - **Don't** add shadows to panels at rest.
 - **Don't** let character peak anywhere a result, a final or a champion is not arriving, and never let it hide state or slow a task.
 - **Don't** borrow any single game's art, logo or style into the site's chrome; game art appears only as a tournament's own image, faded behind its title.
-
-### Known Gaps
-
-Left open by the finish review (verdict: ship): dashboard tournament names are set in Onest rather than the display face, and the WINNER stamp is a small on-side tag rather than a gold banner.

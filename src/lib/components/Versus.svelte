@@ -55,7 +55,6 @@
 			<div class="tags">
 				<span class="tag" aria-hidden="true">{m.versus_side({ side: i + 1 })}</span>
 				{#if me === i}<span class="you">{m.versus_you()}</span>{/if}
-				{#if winner === i}<span class="stamp">{m.versus_winner()}</span>{/if}
 			</div>
 			<span class="who">{names[i]}</span>
 			<span class="score">{pending ? '' : (scores?.[i] ?? '')}</span>
@@ -69,6 +68,8 @@
 		</div>
 	{/each}
 	<span class="vs" aria-hidden="true">{m.versus_vs()}</span>
+	<!-- The knockout banner: across the whole plate, in gold, once the match is decided. -->
+	{#if winner !== null}<span class="banner">{m.versus_wins({ name: names[winner] })}</span>{/if}
 </div>
 
 <style lang="scss">
@@ -96,6 +97,23 @@
 			@include up($bp-md) {
 				--cut: 36px;
 				min-height: 148px;
+			}
+		}
+
+		// A decided plate makes room in its middle for the banner, between scores and names.
+		&.decided {
+			min-height: 200px;
+
+			@include up($bp-md) {
+				min-height: 256px;
+			}
+		}
+
+		&.md.decided {
+			min-height: 164px;
+
+			@include up($bp-md) {
+				min-height: 188px;
 			}
 		}
 	}
@@ -171,8 +189,7 @@
 	}
 
 	.tag,
-	.you,
-	.stamp {
+	.you {
 		padding: 0.15rem 0.45rem;
 		border-radius: var(--radius-tag);
 		font-size: 0.75rem;
@@ -189,16 +206,6 @@
 		background: var(--accent);
 		color: var(--accent-text);
 		letter-spacing: 0.02em;
-	}
-
-	.stamp {
-		background: var(--on-side);
-		color: var(--side);
-		font-family: var(--font-display);
-		font-weight: 400;
-		font-size: 0.875rem;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
 	}
 
 	.who {
@@ -279,7 +286,34 @@
 		}
 	}
 
-	// A result arriving live: the winner's side surges and the stamp slams down.
+	// Gold edged in the stage's ink, straight across both sides and the cut.
+	.banner {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 50%;
+		z-index: 3;
+		padding: 0.45rem 1rem;
+		overflow: hidden;
+		border-block: 3px solid var(--accent-text);
+		background: var(--accent);
+		color: var(--accent-text);
+		font-family: var(--font-display);
+		font-size: clamp(1.25rem, 3vw, 2rem);
+		line-height: 1.1;
+		letter-spacing: 0.02em;
+		text-align: center;
+		text-overflow: ellipsis;
+		text-transform: uppercase;
+		white-space: nowrap;
+		transform: translateY(-50%);
+
+		.md & {
+			font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+		}
+	}
+
+	// A result arriving live: the winner's side surges and the banner slams down.
 	@media (prefers-reduced-motion: no-preference) {
 		:global(.js) .intro {
 			.s0 {
@@ -299,8 +333,8 @@
 			animation: surge 700ms var(--ease-expo);
 		}
 
-		.slam .stamp {
-			animation: stamp 520ms var(--ease-slam) 180ms both;
+		.slam .banner {
+			animation: banner 520ms var(--ease-slam) 180ms both;
 		}
 	}
 
@@ -332,14 +366,14 @@
 		}
 	}
 
-	@keyframes stamp {
+	@keyframes banner {
 		0% {
 			opacity: 0;
-			transform: scale(2.4) rotate(-6deg);
+			transform: translateY(-50%) scale(1.35, 0);
 		}
 		100% {
 			opacity: 1;
-			transform: none;
+			transform: translateY(-50%);
 		}
 	}
 </style>

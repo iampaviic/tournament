@@ -519,11 +519,11 @@
 	"home_reported_other": "Aiko confirmed. Bram plays match #11.",
 	"theme_light": "Light look",
 	"versus_you": "You",
-	"versus_winner": "Winner",
 	"theme_dark": "Dark look",
 	"versus_vs": "VS",
 	"versus_side": "P{side}",
 	"roster_more_open": "+{count} open",
 	"home_roster_title": "Registration fills the roster",
-	"home_roster_lead": "Players register themselves. Set a limit, require a linked game account, and watch the open places fill."
+	"home_roster_lead": "Players register themselves. Set a limit, require a linked game account, and watch the open places fill.",
+	"versus_wins": "{name} wins"
 }
