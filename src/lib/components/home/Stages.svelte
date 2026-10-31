@@ -18,7 +18,7 @@
 </script>
 
 <section class="stages" aria-labelledby="stage-title">
-	<!-- The clause and the slider that changes it share one blue band; the stage's sheet follows. -->
+	<!-- The clause and the slider that changes it share one gold band; the stage's panel follows. -->
 	<div class="band" data-reveal="open">
 		<div class="band-inner">
 			{#key step}<h2 id="stage-title">{clauses[step]()}</h2>{/key}
@@ -107,12 +107,12 @@
 		}
 	}
 
-	// The pen's flat field, only as tall as the clause and its control.
+	// A gold field, only as tall as the clause and its control.
 	.band {
 		background: var(--accent);
 		color: var(--accent-text);
 
-		// The site's focus ring is blue; on the blue band it is drawn in the band's text colour.
+		// The site's focus ring is gold; on the gold band it is drawn in the band's text colour.
 		:focus-visible {
 			outline-color: var(--accent-text);
 		}
@@ -196,7 +196,7 @@
 			background: transparent;
 		}
 
-		// A round knob, as on a switch, ringed in the band's blue so it sits on the track.
+		// A round knob, as on a switch, ringed in the band's gold so it sits on the track.
 		&::-webkit-slider-thumb {
 			width: 1.5rem;
 			height: 1.5rem;

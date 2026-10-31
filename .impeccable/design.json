@@ -1,715 +1,1225 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-30T00:00:00Z",
+  "generatedAt": "2026-10-31T09:35:11.749Z",
   "title": "Design System: Tournament Manager",
   "extensions": {
+    "themes": {
+      "default": "dark",
+      "dark": {
+        "selector": ":root",
+        "source": "src/lib/styles/_tokens.scss @mixin tokens-dark"
+      },
+      "light": {
+        "selector": ":root[data-theme='light']",
+        "source": "src/lib/styles/_tokens.scss @mixin tokens-light",
+        "switch": "Footer theme switch (src/lib/components/ThemeSwitch.svelte); stored in localStorage \"theme\" and applied before paint by src/app.html."
+      },
+      "note": "Frontmatter keys without a prefix are the dark (default) values; light-* keys are the light look of the same role. Tile colours are shared."
+    },
     "colorMeta": {
-      "wall": {
+      "stage": {
         "role": "neutral",
-        "displayName": "The Wall",
+        "displayName": "The Stage",
+        "canonical": "#0f0b22",
+        "cssVar": "--bg",
         "tonalRamp": [
-          "oklch(15% 0.001 255)",
-          "oklch(25% 0.003 255)",
-          "oklch(35% 0.006 255)",
-          "oklch(45% 0.008 255)",
-          "oklch(58% 0.008 255)",
-          "oklch(70% 0.008 255)",
-          "oklch(82% 0.005 255)",
-          "oklch(95% 0.001 255)"
+          "oklch(15% 0.014 288.4)",
+          "oklch(26% 0.024 288.4)",
+          "oklch(37% 0.034 288.4)",
+          "oklch(48% 0.045 288.4)",
+          "oklch(60% 0.037 288.4)",
+          "oklch(72% 0.026 288.4)",
+          "oklch(84% 0.015 288.4)",
+          "oklch(95% 0.012 288.4)"
         ]
       },
-      "dark-wall": {
+      "panel": {
         "role": "neutral",
-        "displayName": "The Wall (dark)",
+        "displayName": "Panel",
+        "canonical": "#1a1535",
+        "cssVar": "--surface",
         "tonalRamp": [
-          "oklch(15% 0.001 255)",
-          "oklch(25% 0.003 255)",
-          "oklch(35% 0.006 255)",
-          "oklch(45% 0.008 255)",
-          "oklch(58% 0.008 255)",
-          "oklch(70% 0.008 255)",
-          "oklch(82% 0.005 255)",
-          "oklch(95% 0.001 255)"
+          "oklch(15% 0.018 287.6)",
+          "oklch(26% 0.031 287.6)",
+          "oklch(37% 0.045 287.6)",
+          "oklch(48% 0.058 287.6)",
+          "oklch(60% 0.048 287.6)",
+          "oklch(72% 0.034 287.6)",
+          "oklch(84% 0.019 287.6)",
+          "oklch(95% 0.015 287.6)"
         ]
       },
-      "sheet": {
+      "panel-raised": {
         "role": "neutral",
-        "displayName": "The Sheet",
+        "displayName": "Raised Panel",
+        "canonical": "#221c45",
+        "cssVar": "--surface-2",
         "tonalRamp": [
-          "oklch(15% 0.000 255)",
-          "oklch(25% 0.000 255)",
-          "oklch(35% 0.000 255)",
-          "oklch(45% 0.000 255)",
-          "oklch(58% 0.000 255)",
-          "oklch(70% 0.000 255)",
-          "oklch(82% 0.000 255)",
-          "oklch(95% 0.000 255)"
+          "oklch(15% 0.022 286.7)",
+          "oklch(26% 0.039 286.7)",
+          "oklch(37% 0.055 286.7)",
+          "oklch(48% 0.071 286.7)",
+          "oklch(60% 0.059 286.7)",
+          "oklch(72% 0.042 286.7)",
+          "oklch(84% 0.024 286.7)",
+          "oklch(95% 0.019 286.7)"
         ]
       },
-      "dark-sheet": {
+      "panel-edge": {
         "role": "neutral",
-        "displayName": "The Sheet (dark)",
+        "displayName": "Panel Edge",
+        "canonical": "#2e2858",
+        "cssVar": "--border",
         "tonalRamp": [
-          "oklch(15% 0.000 255)",
-          "oklch(25% 0.000 255)",
-          "oklch(35% 0.000 255)",
-          "oklch(45% 0.000 255)",
-          "oklch(58% 0.000 255)",
-          "oklch(70% 0.000 255)",
-          "oklch(82% 0.000 255)",
-          "oklch(95% 0.000 255)"
-        ]
-      },
-      "sheet-fill": {
-        "role": "neutral",
-        "displayName": "Sheet Fill",
-        "tonalRamp": [
-          "oklch(15% 0.001 255)",
-          "oklch(25% 0.003 255)",
-          "oklch(35% 0.004 255)",
-          "oklch(45% 0.006 255)",
-          "oklch(58% 0.006 255)",
-          "oklch(70% 0.006 255)",
-          "oklch(82% 0.004 255)",
-          "oklch(95% 0.001 255)"
-        ]
-      },
-      "dark-sheet-fill": {
-        "role": "neutral",
-        "displayName": "Sheet Fill (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.001 255)",
-          "oklch(25% 0.003 255)",
-          "oklch(35% 0.004 255)",
-          "oklch(45% 0.006 255)",
-          "oklch(58% 0.006 255)",
-          "oklch(70% 0.006 255)",
-          "oklch(82% 0.004 255)",
-          "oklch(95% 0.001 255)"
-        ]
-      },
-      "sheet-edge": {
-        "role": "neutral",
-        "displayName": "Sheet Edge",
-        "tonalRamp": [
-          "oklch(15% 0.001 260)",
-          "oklch(25% 0.004 260)",
-          "oklch(35% 0.007 260)",
-          "oklch(45% 0.010 260)",
-          "oklch(58% 0.010 260)",
-          "oklch(70% 0.010 260)",
-          "oklch(82% 0.006 260)",
-          "oklch(95% 0.002 260)"
-        ]
-      },
-      "dark-sheet-edge": {
-        "role": "neutral",
-        "displayName": "Sheet Edge (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.001 260)",
-          "oklch(25% 0.004 260)",
-          "oklch(35% 0.007 260)",
-          "oklch(45% 0.010 260)",
-          "oklch(58% 0.010 260)",
-          "oklch(70% 0.010 260)",
-          "oklch(82% 0.006 260)",
-          "oklch(95% 0.002 260)"
+          "oklch(15% 0.025 286.2)",
+          "oklch(26% 0.043 286.2)",
+          "oklch(37% 0.062 286.2)",
+          "oklch(48% 0.08 286.2)",
+          "oklch(60% 0.067 286.2)",
+          "oklch(72% 0.047 286.2)",
+          "oklch(84% 0.027 286.2)",
+          "oklch(95% 0.021 286.2)"
         ]
       },
       "row-rule": {
         "role": "neutral",
         "displayName": "Row Rule",
+        "canonical": "#262050",
+        "cssVar": "--rule",
         "tonalRamp": [
-          "oklch(15% 0.001 260)",
-          "oklch(25% 0.003 260)",
-          "oklch(35% 0.006 260)",
-          "oklch(45% 0.008 260)",
-          "oklch(58% 0.008 260)",
-          "oklch(70% 0.008 260)",
-          "oklch(82% 0.005 260)",
-          "oklch(95% 0.001 260)"
-        ]
-      },
-      "dark-row-rule": {
-        "role": "neutral",
-        "displayName": "Row Rule (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.001 260)",
-          "oklch(25% 0.003 260)",
-          "oklch(35% 0.006 260)",
-          "oklch(45% 0.008 260)",
-          "oklch(58% 0.008 260)",
-          "oklch(70% 0.008 260)",
-          "oklch(82% 0.005 260)",
-          "oklch(95% 0.001 260)"
+          "oklch(15% 0.025 285.2)",
+          "oklch(26% 0.044 285.2)",
+          "oklch(37% 0.063 285.2)",
+          "oklch(48% 0.081 285.2)",
+          "oklch(60% 0.068 285.2)",
+          "oklch(72% 0.047 285.2)",
+          "oklch(84% 0.027 285.2)",
+          "oklch(95% 0.021 285.2)"
         ]
       },
       "control-outline": {
         "role": "neutral",
         "displayName": "Control Outline",
+        "canonical": "#6a62b4",
+        "cssVar": "--control",
         "tonalRamp": [
-          "oklch(15% 0.002 260)",
-          "oklch(25% 0.006 260)",
-          "oklch(35% 0.011 260)",
-          "oklch(45% 0.015 260)",
-          "oklch(58% 0.015 260)",
-          "oklch(70% 0.015 260)",
-          "oklch(82% 0.009 260)",
-          "oklch(95% 0.002 260)"
+          "oklch(15% 0.038 285.9)",
+          "oklch(26% 0.065 285.9)",
+          "oklch(37% 0.093 285.9)",
+          "oklch(48% 0.12 285.9)",
+          "oklch(60% 0.1 285.9)",
+          "oklch(72% 0.07 285.9)",
+          "oklch(84% 0.04 285.9)",
+          "oklch(95% 0.031 285.9)"
         ]
       },
-      "dark-control-outline": {
+      "joint-line": {
         "role": "neutral",
-        "displayName": "Control Outline (dark)",
+        "displayName": "Joint Line",
+        "canonical": "#7d75bb",
+        "cssVar": "--line",
         "tonalRamp": [
-          "oklch(15% 0.002 260)",
-          "oklch(25% 0.006 260)",
-          "oklch(35% 0.011 260)",
-          "oklch(45% 0.015 260)",
-          "oklch(58% 0.015 260)",
-          "oklch(70% 0.015 260)",
-          "oklch(82% 0.009 260)",
-          "oklch(95% 0.002 260)"
+          "oklch(15% 0.032 288)",
+          "oklch(26% 0.055 288)",
+          "oklch(37% 0.078 288)",
+          "oklch(48% 0.101 288)",
+          "oklch(60% 0.084 288)",
+          "oklch(72% 0.059 288)",
+          "oklch(84% 0.034 288)",
+          "oklch(95% 0.026 288)"
         ]
       },
-      "printed-line": {
+      "ink": {
         "role": "neutral",
-        "displayName": "Printed Line",
+        "displayName": "Ink",
+        "canonical": "#f6f3ff",
+        "cssVar": "--text",
         "tonalRamp": [
-          "oklch(15% 0.003 260)",
-          "oklch(25% 0.009 260)",
-          "oklch(35% 0.014 260)",
-          "oklch(45% 0.020 260)",
-          "oklch(58% 0.020 260)",
-          "oklch(70% 0.020 260)",
-          "oklch(82% 0.012 260)",
-          "oklch(95% 0.003 260)"
-        ]
-      },
-      "dark-printed-line": {
-        "role": "neutral",
-        "displayName": "Printed Line (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.003 260)",
-          "oklch(25% 0.009 260)",
-          "oklch(35% 0.014 260)",
-          "oklch(45% 0.020 260)",
-          "oklch(58% 0.020 260)",
-          "oklch(70% 0.020 260)",
-          "oklch(82% 0.012 260)",
-          "oklch(95% 0.003 260)"
-        ]
-      },
-      "print-ink": {
-        "role": "neutral",
-        "displayName": "Print Ink",
-        "tonalRamp": [
-          "oklch(15% 0.001 260)",
-          "oklch(25% 0.003 260)",
-          "oklch(35% 0.004 260)",
-          "oklch(45% 0.006 260)",
-          "oklch(58% 0.006 260)",
-          "oklch(70% 0.006 260)",
-          "oklch(82% 0.004 260)",
-          "oklch(95% 0.001 260)"
-        ]
-      },
-      "dark-print-ink": {
-        "role": "neutral",
-        "displayName": "Print Ink (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.001 260)",
-          "oklch(25% 0.003 260)",
-          "oklch(35% 0.004 260)",
-          "oklch(45% 0.006 260)",
-          "oklch(58% 0.006 260)",
-          "oklch(70% 0.006 260)",
-          "oklch(82% 0.004 260)",
-          "oklch(95% 0.001 260)"
+          "oklch(15% 0.005 297.5)",
+          "oklch(26% 0.008 297.5)",
+          "oklch(37% 0.012 297.5)",
+          "oklch(48% 0.016 297.5)",
+          "oklch(60% 0.013 297.5)",
+          "oklch(72% 0.009 297.5)",
+          "oklch(84% 0.005 297.5)",
+          "oklch(95% 0.004 297.5)"
         ]
       },
       "ink-muted": {
         "role": "neutral",
         "displayName": "Muted Ink",
+        "canonical": "#bdb6dd",
+        "cssVar": "--text-muted",
         "tonalRamp": [
-          "oklch(15% 0.003 260)",
-          "oklch(25% 0.009 260)",
-          "oklch(35% 0.014 260)",
-          "oklch(45% 0.020 260)",
-          "oklch(58% 0.020 260)",
-          "oklch(70% 0.020 260)",
-          "oklch(82% 0.012 260)",
-          "oklch(95% 0.003 260)"
-        ]
-      },
-      "dark-ink-muted": {
-        "role": "neutral",
-        "displayName": "Muted Ink (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.003 260)",
-          "oklch(25% 0.009 260)",
-          "oklch(35% 0.014 260)",
-          "oklch(45% 0.020 260)",
-          "oklch(58% 0.020 260)",
-          "oklch(70% 0.020 260)",
-          "oklch(82% 0.012 260)",
-          "oklch(95% 0.003 260)"
+          "oklch(15% 0.017 293.3)",
+          "oklch(26% 0.029 293.3)",
+          "oklch(37% 0.041 293.3)",
+          "oklch(48% 0.053 293.3)",
+          "oklch(60% 0.044 293.3)",
+          "oklch(72% 0.031 293.3)",
+          "oklch(84% 0.018 293.3)",
+          "oklch(95% 0.014 293.3)"
         ]
       },
       "ink-faint": {
         "role": "neutral",
         "displayName": "Faint Ink",
+        "canonical": "#9d96c6",
+        "cssVar": "--text-faint",
         "tonalRamp": [
-          "oklch(15% 0.004 260)",
-          "oklch(25% 0.011 260)",
-          "oklch(35% 0.018 260)",
-          "oklch(45% 0.025 260)",
-          "oklch(58% 0.025 260)",
-          "oklch(70% 0.025 260)",
-          "oklch(82% 0.015 260)",
-          "oklch(95% 0.004 260)"
+          "oklch(15% 0.021 291.1)",
+          "oklch(26% 0.036 291.1)",
+          "oklch(37% 0.052 291.1)",
+          "oklch(48% 0.067 291.1)",
+          "oklch(60% 0.056 291.1)",
+          "oklch(72% 0.039 291.1)",
+          "oklch(84% 0.022 291.1)",
+          "oklch(95% 0.017 291.1)"
         ]
       },
-      "dark-ink-faint": {
-        "role": "neutral",
-        "displayName": "Faint Ink (dark)",
+      "link-cyan": {
+        "role": "tertiary",
+        "displayName": "Link Cyan",
+        "canonical": "#6fd0ff",
+        "cssVar": "--link",
         "tonalRamp": [
-          "oklch(15% 0.004 260)",
-          "oklch(25% 0.011 260)",
-          "oklch(35% 0.018 260)",
-          "oklch(45% 0.025 260)",
-          "oklch(58% 0.025 260)",
-          "oklch(70% 0.025 260)",
-          "oklch(82% 0.015 260)",
-          "oklch(95% 0.004 260)"
+          "oklch(15% 0.034 231.4)",
+          "oklch(26% 0.059 231.4)",
+          "oklch(37% 0.084 231.4)",
+          "oklch(48% 0.108 231.4)",
+          "oklch(60% 0.09 231.4)",
+          "oklch(72% 0.063 231.4)",
+          "oklch(84% 0.036 231.4)",
+          "oklch(95% 0.028 231.4)"
         ]
       },
-      "ballpoint": {
+      "focus-gold": {
         "role": "primary",
-        "displayName": "Ballpoint Blue",
+        "displayName": "Focus Gold",
+        "canonical": "#ffd23f",
+        "cssVar": "--focus",
         "tonalRamp": [
-          "#0f2363",
-          "#173a9e",
-          "#1f49c7",
-          "#3f65d8",
-          "#85a1f4",
-          "#b4c6f8",
-          "#d7e0f9",
-          "#eef2fd"
+          "oklch(15% 0.049 90.9)",
+          "oklch(26% 0.084 90.9)",
+          "oklch(37% 0.12 90.9)",
+          "oklch(48% 0.155 90.9)",
+          "oklch(60% 0.129 90.9)",
+          "oklch(72% 0.091 90.9)",
+          "oklch(84% 0.052 90.9)",
+          "oklch(95% 0.04 90.9)"
         ]
       },
-      "dark-ballpoint": {
+      "winner-gold": {
         "role": "primary",
-        "displayName": "Ballpoint Blue (dark)",
+        "displayName": "Winner Gold",
+        "canonical": "#ffd23f",
+        "cssVar": "--accent",
         "tonalRamp": [
-          "oklch(15% 0.027 264)",
-          "oklch(25% 0.081 264)",
-          "oklch(35% 0.136 264)",
-          "oklch(45% 0.190 264)",
-          "oklch(58% 0.190 264)",
-          "oklch(70% 0.190 264)",
-          "oklch(82% 0.114 264)",
-          "oklch(95% 0.032 264)"
+          "oklch(15% 0.049 90.9)",
+          "oklch(26% 0.084 90.9)",
+          "oklch(37% 0.12 90.9)",
+          "oklch(48% 0.155 90.9)",
+          "oklch(60% 0.129 90.9)",
+          "oklch(72% 0.091 90.9)",
+          "oklch(84% 0.052 90.9)",
+          "oklch(95% 0.04 90.9)"
         ]
       },
-      "ballpoint-pressed": {
+      "winner-gold-hover": {
         "role": "primary",
-        "displayName": "Pressed Ballpoint",
+        "displayName": "Winner Gold, Hover",
+        "canonical": "#ffe07a",
+        "cssVar": "--accent-hover",
         "tonalRamp": [
-          "oklch(15% 0.023 264)",
-          "oklch(25% 0.069 264)",
-          "oklch(35% 0.114 264)",
-          "oklch(45% 0.160 264)",
-          "oklch(58% 0.160 264)",
-          "oklch(70% 0.160 264)",
-          "oklch(82% 0.096 264)",
-          "oklch(95% 0.027 264)"
+          "oklch(15% 0.038 92.8)",
+          "oklch(26% 0.066 92.8)",
+          "oklch(37% 0.094 92.8)",
+          "oklch(48% 0.121 92.8)",
+          "oklch(60% 0.101 92.8)",
+          "oklch(72% 0.071 92.8)",
+          "oklch(84% 0.04 92.8)",
+          "oklch(95% 0.032 92.8)"
         ]
       },
-      "dark-ballpoint-pressed": {
+      "on-gold": {
         "role": "primary",
-        "displayName": "Pressed Ballpoint (dark)",
+        "displayName": "On Gold",
+        "canonical": "#1d1500",
+        "cssVar": "--accent-text",
         "tonalRamp": [
-          "oklch(15% 0.023 264)",
-          "oklch(25% 0.069 264)",
-          "oklch(35% 0.114 264)",
-          "oklch(45% 0.160 264)",
-          "oklch(58% 0.160 264)",
-          "oklch(70% 0.160 264)",
-          "oklch(82% 0.096 264)",
-          "oklch(95% 0.027 264)"
+          "oklch(15% 0.012 90.8)",
+          "oklch(26% 0.021 90.8)",
+          "oklch(37% 0.03 90.8)",
+          "oklch(48% 0.039 90.8)",
+          "oklch(60% 0.033 90.8)",
+          "oklch(72% 0.023 90.8)",
+          "oklch(84% 0.013 90.8)",
+          "oklch(95% 0.01 90.8)"
         ]
       },
-      "ballpoint-on": {
+      "gold-soft": {
         "role": "primary",
-        "displayName": "On Ballpoint",
+        "displayName": "Gold Soft",
+        "canonical": "#2b2350",
+        "cssVar": "--accent-soft",
         "tonalRamp": [
-          "oklch(15% 0.000 264)",
-          "oklch(25% 0.000 264)",
-          "oklch(35% 0.000 264)",
-          "oklch(45% 0.000 264)",
-          "oklch(58% 0.000 264)",
-          "oklch(70% 0.000 264)",
-          "oklch(82% 0.000 264)",
-          "oklch(95% 0.000 264)"
+          "oklch(15% 0.024 288.7)",
+          "oklch(26% 0.041 288.7)",
+          "oklch(37% 0.059 288.7)",
+          "oklch(48% 0.076 288.7)",
+          "oklch(60% 0.063 288.7)",
+          "oklch(72% 0.044 288.7)",
+          "oklch(84% 0.025 288.7)",
+          "oklch(95% 0.02 288.7)"
         ]
       },
-      "dark-ballpoint-on": {
+      "gold-track": {
         "role": "primary",
-        "displayName": "On Ballpoint (dark)",
+        "displayName": "Gold Track",
+        "canonical": "#342c66",
+        "cssVar": "--accent-track",
         "tonalRamp": [
-          "oklch(15% 0.000 264)",
-          "oklch(25% 0.000 264)",
-          "oklch(35% 0.000 264)",
-          "oklch(45% 0.000 264)",
-          "oklch(58% 0.000 264)",
-          "oklch(70% 0.000 264)",
-          "oklch(82% 0.000 264)",
-          "oklch(95% 0.000 264)"
+          "oklch(15% 0.029 286.1)",
+          "oklch(26% 0.051 286.1)",
+          "oklch(37% 0.073 286.1)",
+          "oklch(48% 0.094 286.1)",
+          "oklch(60% 0.079 286.1)",
+          "oklch(72% 0.055 286.1)",
+          "oklch(84% 0.031 286.1)",
+          "oklch(95% 0.025 286.1)"
         ]
       },
-      "ballpoint-tint": {
+      "gold-ink": {
         "role": "primary",
-        "displayName": "Ballpoint Tint",
+        "displayName": "Gold Ink",
+        "canonical": "#ffe07a",
+        "cssVar": "--accent-ink",
         "tonalRamp": [
-          "oklch(15% 0.004 264)",
-          "oklch(25% 0.013 264)",
-          "oklch(35% 0.021 264)",
-          "oklch(45% 0.030 264)",
-          "oklch(58% 0.030 264)",
-          "oklch(70% 0.030 264)",
-          "oklch(82% 0.018 264)",
-          "oklch(95% 0.005 264)"
+          "oklch(15% 0.038 92.8)",
+          "oklch(26% 0.066 92.8)",
+          "oklch(37% 0.094 92.8)",
+          "oklch(48% 0.121 92.8)",
+          "oklch(60% 0.101 92.8)",
+          "oklch(72% 0.071 92.8)",
+          "oklch(84% 0.04 92.8)",
+          "oklch(95% 0.032 92.8)"
         ]
       },
-      "dark-ballpoint-tint": {
+      "gold-display": {
         "role": "primary",
-        "displayName": "Ballpoint Tint (dark)",
+        "displayName": "Display Gold",
+        "canonical": "#ffd23f",
+        "cssVar": "--accent-display",
         "tonalRamp": [
-          "oklch(15% 0.004 264)",
-          "oklch(25% 0.013 264)",
-          "oklch(35% 0.021 264)",
-          "oklch(45% 0.030 264)",
-          "oklch(58% 0.030 264)",
-          "oklch(70% 0.030 264)",
-          "oklch(82% 0.018 264)",
-          "oklch(95% 0.005 264)"
+          "oklch(15% 0.049 90.9)",
+          "oklch(26% 0.084 90.9)",
+          "oklch(37% 0.12 90.9)",
+          "oklch(48% 0.155 90.9)",
+          "oklch(60% 0.129 90.9)",
+          "oklch(72% 0.091 90.9)",
+          "oklch(84% 0.052 90.9)",
+          "oklch(95% 0.04 90.9)"
         ]
       },
-      "ballpoint-track": {
-        "role": "primary",
-        "displayName": "Ballpoint Track",
-        "tonalRamp": [
-          "oklch(15% 0.009 264)",
-          "oklch(25% 0.026 264)",
-          "oklch(35% 0.043 264)",
-          "oklch(45% 0.060 264)",
-          "oklch(58% 0.060 264)",
-          "oklch(70% 0.060 264)",
-          "oklch(82% 0.036 264)",
-          "oklch(95% 0.010 264)"
-        ]
-      },
-      "dark-ballpoint-track": {
-        "role": "primary",
-        "displayName": "Ballpoint Track (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.009 264)",
-          "oklch(25% 0.026 264)",
-          "oklch(35% 0.043 264)",
-          "oklch(45% 0.060 264)",
-          "oklch(58% 0.060 264)",
-          "oklch(70% 0.060 264)",
-          "oklch(82% 0.036 264)",
-          "oklch(95% 0.010 264)"
-        ]
-      },
-      "ballpoint-ink": {
-        "role": "primary",
-        "displayName": "Ballpoint Ink",
-        "tonalRamp": [
-          "oklch(15% 0.023 264)",
-          "oklch(25% 0.069 264)",
-          "oklch(35% 0.114 264)",
-          "oklch(45% 0.160 264)",
-          "oklch(58% 0.160 264)",
-          "oklch(70% 0.160 264)",
-          "oklch(82% 0.096 264)",
-          "oklch(95% 0.027 264)"
-        ]
-      },
-      "dark-ballpoint-ink": {
-        "role": "primary",
-        "displayName": "Ballpoint Ink (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.023 264)",
-          "oklch(25% 0.069 264)",
-          "oklch(35% 0.114 264)",
-          "oklch(45% 0.160 264)",
-          "oklch(58% 0.160 264)",
-          "oklch(70% 0.160 264)",
-          "oklch(82% 0.096 264)",
-          "oklch(95% 0.027 264)"
-        ]
-      },
-      "red-pen": {
+      "p1-red-orange": {
         "role": "secondary",
-        "displayName": "Organizer's Red Pen",
+        "displayName": "Player One Red-Orange",
+        "canonical": "#ff5a2c",
+        "cssVar": "--p1",
         "tonalRamp": [
-          "#4a0f11",
-          "#831c1e",
-          "#c4242a",
-          "#e0474c",
-          "#f0696d",
-          "#f6a7a9",
-          "#fbd3d2",
-          "#ffedea"
+          "oklch(15% 0.063 35.8)",
+          "oklch(26% 0.109 35.8)",
+          "oklch(37% 0.154 35.8)",
+          "oklch(48% 0.2 35.8)",
+          "oklch(60% 0.167 35.8)",
+          "oklch(72% 0.117 35.8)",
+          "oklch(84% 0.067 35.8)",
+          "oklch(95% 0.052 35.8)"
         ]
       },
-      "dark-red-pen": {
+      "p2-blue": {
         "role": "secondary",
-        "displayName": "Organizer's Red Pen (dark)",
+        "displayName": "Player Two Blue",
+        "canonical": "#25b9ff",
+        "cssVar": "--p2",
         "tonalRamp": [
-          "oklch(15% 0.027 25)",
-          "oklch(25% 0.081 25)",
-          "oklch(35% 0.136 25)",
-          "oklch(45% 0.190 25)",
-          "oklch(58% 0.190 25)",
-          "oklch(70% 0.190 25)",
-          "oklch(82% 0.114 25)",
-          "oklch(95% 0.032 25)"
+          "oklch(15% 0.046 236.3)",
+          "oklch(26% 0.079 236.3)",
+          "oklch(37% 0.113 236.3)",
+          "oklch(48% 0.146 236.3)",
+          "oklch(60% 0.122 236.3)",
+          "oklch(72% 0.085 236.3)",
+          "oklch(84% 0.049 236.3)",
+          "oklch(95% 0.038 236.3)"
         ]
       },
-      "red-pen-tint": {
+      "on-side": {
         "role": "secondary",
-        "displayName": "Red Pen Tint",
+        "displayName": "On Side",
+        "canonical": "#140a24",
+        "cssVar": "--on-side",
         "tonalRamp": [
-          "oklch(15% 0.006 25)",
-          "oklch(25% 0.017 25)",
-          "oklch(35% 0.029 25)",
-          "oklch(45% 0.040 25)",
-          "oklch(58% 0.040 25)",
-          "oklch(70% 0.040 25)",
-          "oklch(82% 0.024 25)",
-          "oklch(95% 0.007 25)"
+          "oklch(15% 0.016 298.6)",
+          "oklch(26% 0.027 298.6)",
+          "oklch(37% 0.039 298.6)",
+          "oklch(48% 0.05 298.6)",
+          "oklch(60% 0.042 298.6)",
+          "oklch(72% 0.029 298.6)",
+          "oklch(84% 0.017 298.6)",
+          "oklch(95% 0.013 298.6)"
         ]
       },
-      "dark-red-pen-tint": {
-        "role": "secondary",
-        "displayName": "Red Pen Tint (dark)",
+      "open-violet": {
+        "role": "tertiary",
+        "displayName": "Open Violet",
+        "canonical": "#b18cff",
+        "cssVar": "--play",
         "tonalRamp": [
-          "oklch(15% 0.006 25)",
-          "oklch(25% 0.017 25)",
-          "oklch(35% 0.029 25)",
-          "oklch(45% 0.040 25)",
-          "oklch(58% 0.040 25)",
-          "oklch(70% 0.040 25)",
-          "oklch(82% 0.024 25)",
-          "oklch(95% 0.007 25)"
+          "oklch(15% 0.05 296.9)",
+          "oklch(26% 0.086 296.9)",
+          "oklch(37% 0.122 296.9)",
+          "oklch(48% 0.158 296.9)",
+          "oklch(60% 0.132 296.9)",
+          "oklch(72% 0.092 296.9)",
+          "oklch(84% 0.053 296.9)",
+          "oklch(95% 0.041 296.9)"
         ]
       },
-      "red-pen-ink": {
-        "role": "secondary",
-        "displayName": "Red Pen Ink",
+      "on-violet": {
+        "role": "tertiary",
+        "displayName": "On Violet",
+        "canonical": "#140a24",
+        "cssVar": "--on-play",
         "tonalRamp": [
-          "oklch(15% 0.019 25)",
-          "oklch(25% 0.056 25)",
-          "oklch(35% 0.093 25)",
-          "oklch(45% 0.130 25)",
-          "oklch(58% 0.130 25)",
-          "oklch(70% 0.130 25)",
-          "oklch(82% 0.078 25)",
-          "oklch(95% 0.022 25)"
+          "oklch(15% 0.016 298.6)",
+          "oklch(26% 0.027 298.6)",
+          "oklch(37% 0.039 298.6)",
+          "oklch(48% 0.05 298.6)",
+          "oklch(60% 0.042 298.6)",
+          "oklch(72% 0.029 298.6)",
+          "oklch(84% 0.017 298.6)",
+          "oklch(95% 0.013 298.6)"
         ]
       },
-      "dark-red-pen-ink": {
-        "role": "secondary",
-        "displayName": "Red Pen Ink (dark)",
+      "decision-pink": {
+        "role": "tertiary",
+        "displayName": "Decision Pink",
+        "canonical": "#ff4d82",
+        "cssVar": "--danger",
         "tonalRamp": [
-          "oklch(15% 0.019 25)",
-          "oklch(25% 0.056 25)",
-          "oklch(35% 0.093 25)",
-          "oklch(45% 0.130 25)",
-          "oklch(58% 0.130 25)",
-          "oklch(70% 0.130 25)",
-          "oklch(82% 0.078 25)",
-          "oklch(95% 0.022 25)"
+          "oklch(15% 0.065 7.1)",
+          "oklch(26% 0.112 7.1)",
+          "oklch(37% 0.159 7.1)",
+          "oklch(48% 0.207 7.1)",
+          "oklch(60% 0.172 7.1)",
+          "oklch(72% 0.121 7.1)",
+          "oklch(84% 0.069 7.1)",
+          "oklch(95% 0.054 7.1)"
+        ]
+      },
+      "decision-pink-soft": {
+        "role": "tertiary",
+        "displayName": "Decision Pink Soft",
+        "canonical": "#3a1533",
+        "cssVar": "--danger-soft",
+        "tonalRamp": [
+          "oklch(15% 0.022 335.3)",
+          "oklch(26% 0.038 335.3)",
+          "oklch(37% 0.054 335.3)",
+          "oklch(48% 0.07 335.3)",
+          "oklch(60% 0.059 335.3)",
+          "oklch(72% 0.041 335.3)",
+          "oklch(84% 0.023 335.3)",
+          "oklch(95% 0.018 335.3)"
+        ]
+      },
+      "decision-pink-ink": {
+        "role": "tertiary",
+        "displayName": "Decision Pink Ink",
+        "canonical": "#ffa6c2",
+        "cssVar": "--danger-ink",
+        "tonalRamp": [
+          "oklch(15% 0.033 359.4)",
+          "oklch(26% 0.057 359.4)",
+          "oklch(37% 0.081 359.4)",
+          "oklch(48% 0.105 359.4)",
+          "oklch(60% 0.088 359.4)",
+          "oklch(72% 0.062 359.4)",
+          "oklch(84% 0.035 359.4)",
+          "oklch(95% 0.027 359.4)"
         ]
       },
       "done-green": {
         "role": "tertiary",
         "displayName": "Done Green",
+        "canonical": "#34e08b",
+        "cssVar": "--success",
         "tonalRamp": [
-          "#04250e",
-          "#0f4a2b",
-          "#247b50",
-          "#3aa56e",
-          "#4cc285",
-          "#8fe0b5",
-          "#bff0d3",
-          "#dcfae5"
+          "oklch(15% 0.054 155.8)",
+          "oklch(26% 0.094 155.8)",
+          "oklch(37% 0.134 155.8)",
+          "oklch(48% 0.174 155.8)",
+          "oklch(60% 0.145 155.8)",
+          "oklch(72% 0.102 155.8)",
+          "oklch(84% 0.058 155.8)",
+          "oklch(95% 0.045 155.8)"
         ]
       },
-      "dark-done-green": {
+      "done-green-soft": {
         "role": "tertiary",
-        "displayName": "Done Green (dark)",
+        "displayName": "Done Green Soft",
+        "canonical": "#133229",
+        "cssVar": "--success-soft",
         "tonalRamp": [
-          "oklch(15% 0.017 155)",
-          "oklch(25% 0.051 155)",
-          "oklch(35% 0.086 155)",
-          "oklch(45% 0.120 155)",
-          "oklch(58% 0.120 155)",
-          "oklch(70% 0.120 155)",
-          "oklch(82% 0.072 155)",
-          "oklch(95% 0.020 155)"
-        ]
-      },
-      "done-green-tint": {
-        "role": "tertiary",
-        "displayName": "Done Green Tint",
-        "tonalRamp": [
-          "oklch(15% 0.007 155)",
-          "oklch(25% 0.021 155)",
-          "oklch(35% 0.036 155)",
-          "oklch(45% 0.050 155)",
-          "oklch(58% 0.050 155)",
-          "oklch(70% 0.050 155)",
-          "oklch(82% 0.030 155)",
-          "oklch(95% 0.008 155)"
-        ]
-      },
-      "dark-done-green-tint": {
-        "role": "tertiary",
-        "displayName": "Done Green Tint (dark)",
-        "tonalRamp": [
-          "oklch(15% 0.007 155)",
-          "oklch(25% 0.021 155)",
-          "oklch(35% 0.036 155)",
-          "oklch(45% 0.050 155)",
-          "oklch(58% 0.050 155)",
-          "oklch(70% 0.050 155)",
-          "oklch(82% 0.030 155)",
-          "oklch(95% 0.008 155)"
+          "oklch(15% 0.012 171.9)",
+          "oklch(26% 0.021 171.9)",
+          "oklch(37% 0.03 171.9)",
+          "oklch(48% 0.039 171.9)",
+          "oklch(60% 0.033 171.9)",
+          "oklch(72% 0.023 171.9)",
+          "oklch(84% 0.013 171.9)",
+          "oklch(95% 0.01 171.9)"
         ]
       },
       "done-green-ink": {
         "role": "tertiary",
         "displayName": "Done Green Ink",
+        "canonical": "#8ef0bf",
+        "cssVar": "--success-ink",
         "tonalRamp": [
-          "oklch(15% 0.010 155)",
-          "oklch(25% 0.030 155)",
-          "oklch(35% 0.050 155)",
-          "oklch(45% 0.070 155)",
-          "oklch(58% 0.070 155)",
-          "oklch(70% 0.070 155)",
-          "oklch(82% 0.042 155)",
-          "oklch(95% 0.012 155)"
+          "oklch(15% 0.035 161)",
+          "oklch(26% 0.06 161)",
+          "oklch(37% 0.086 161)",
+          "oklch(48% 0.112 161)",
+          "oklch(60% 0.093 161)",
+          "oklch(72% 0.065 161)",
+          "oklch(84% 0.037 161)",
+          "oklch(95% 0.029 161)"
         ]
       },
-      "dark-done-green-ink": {
-        "role": "tertiary",
-        "displayName": "Done Green Ink (dark)",
+      "light-stage": {
+        "role": "neutral",
+        "displayName": "The Stage (light look)",
+        "canonical": "#f2f0fa",
+        "cssVar": "--bg",
         "tonalRamp": [
-          "oklch(15% 0.010 155)",
-          "oklch(25% 0.030 155)",
-          "oklch(35% 0.050 155)",
-          "oklch(45% 0.070 155)",
-          "oklch(58% 0.070 155)",
-          "oklch(70% 0.070 155)",
-          "oklch(82% 0.042 155)",
-          "oklch(95% 0.012 155)"
+          "oklch(15% 0.004 295.3)",
+          "oklch(26% 0.007 295.3)",
+          "oklch(37% 0.01 295.3)",
+          "oklch(48% 0.013 295.3)",
+          "oklch(60% 0.011 295.3)",
+          "oklch(72% 0.008 295.3)",
+          "oklch(84% 0.004 295.3)",
+          "oklch(95% 0.003 295.3)"
+        ]
+      },
+      "light-panel": {
+        "role": "neutral",
+        "displayName": "Panel (light look)",
+        "canonical": "#ffffff",
+        "cssVar": "--surface",
+        "tonalRamp": [
+          "oklch(15% 0 89.9)",
+          "oklch(26% 0 89.9)",
+          "oklch(37% 0 89.9)",
+          "oklch(48% 0 89.9)",
+          "oklch(60% 0 89.9)",
+          "oklch(72% 0 89.9)",
+          "oklch(84% 0 89.9)",
+          "oklch(95% 0 89.9)"
+        ]
+      },
+      "light-panel-raised": {
+        "role": "neutral",
+        "displayName": "Raised Panel (light look)",
+        "canonical": "#f6f4fd",
+        "cssVar": "--surface-2",
+        "tonalRamp": [
+          "oklch(15% 0.004 296.4)",
+          "oklch(26% 0.006 296.4)",
+          "oklch(37% 0.009 296.4)",
+          "oklch(48% 0.012 296.4)",
+          "oklch(60% 0.01 296.4)",
+          "oklch(72% 0.007 296.4)",
+          "oklch(84% 0.004 296.4)",
+          "oklch(95% 0.003 296.4)"
+        ]
+      },
+      "light-panel-edge": {
+        "role": "neutral",
+        "displayName": "Panel Edge (light look)",
+        "canonical": "#dfdbf0",
+        "cssVar": "--border",
+        "tonalRamp": [
+          "oklch(15% 0.009 294.6)",
+          "oklch(26% 0.015 294.6)",
+          "oklch(37% 0.021 294.6)",
+          "oklch(48% 0.028 294.6)",
+          "oklch(60% 0.023 294.6)",
+          "oklch(72% 0.016 294.6)",
+          "oklch(84% 0.009 294.6)",
+          "oklch(95% 0.007 294.6)"
+        ]
+      },
+      "light-row-rule": {
+        "role": "neutral",
+        "displayName": "Row Rule (light look)",
+        "canonical": "#ebe8f6",
+        "cssVar": "--rule",
+        "tonalRamp": [
+          "oklch(15% 0.006 295.9)",
+          "oklch(26% 0.01 295.9)",
+          "oklch(37% 0.014 295.9)",
+          "oklch(48% 0.018 295.9)",
+          "oklch(60% 0.015 295.9)",
+          "oklch(72% 0.011 295.9)",
+          "oklch(84% 0.006 295.9)",
+          "oklch(95% 0.005 295.9)"
+        ]
+      },
+      "light-control-outline": {
+        "role": "neutral",
+        "displayName": "Control Outline (light look)",
+        "canonical": "#8f87bb",
+        "cssVar": "--control",
+        "tonalRamp": [
+          "oklch(15% 0.023 291.1)",
+          "oklch(26% 0.04 291.1)",
+          "oklch(37% 0.057 291.1)",
+          "oklch(48% 0.074 291.1)",
+          "oklch(60% 0.062 291.1)",
+          "oklch(72% 0.043 291.1)",
+          "oklch(84% 0.025 291.1)",
+          "oklch(95% 0.019 291.1)"
+        ]
+      },
+      "light-joint-line": {
+        "role": "neutral",
+        "displayName": "Joint Line (light look)",
+        "canonical": "#8d86b3",
+        "cssVar": "--line",
+        "tonalRamp": [
+          "oklch(15% 0.02 291.5)",
+          "oklch(26% 0.035 291.5)",
+          "oklch(37% 0.05 291.5)",
+          "oklch(48% 0.064 291.5)",
+          "oklch(60% 0.054 291.5)",
+          "oklch(72% 0.038 291.5)",
+          "oklch(84% 0.021 291.5)",
+          "oklch(95% 0.017 291.5)"
+        ]
+      },
+      "light-ink": {
+        "role": "neutral",
+        "displayName": "Ink (light look)",
+        "canonical": "#160d2b",
+        "cssVar": "--text",
+        "tonalRamp": [
+          "oklch(15% 0.018 294)",
+          "oklch(26% 0.03 294)",
+          "oklch(37% 0.043 294)",
+          "oklch(48% 0.056 294)",
+          "oklch(60% 0.047 294)",
+          "oklch(72% 0.033 294)",
+          "oklch(84% 0.019 294)",
+          "oklch(95% 0.015 294)"
+        ]
+      },
+      "light-ink-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink (light look)",
+        "canonical": "#514873",
+        "cssVar": "--text-muted",
+        "tonalRamp": [
+          "oklch(15% 0.021 292.8)",
+          "oklch(26% 0.037 292.8)",
+          "oklch(37% 0.052 292.8)",
+          "oklch(48% 0.068 292.8)",
+          "oklch(60% 0.056 292.8)",
+          "oklch(72% 0.04 292.8)",
+          "oklch(84% 0.023 292.8)",
+          "oklch(95% 0.018 292.8)"
+        ]
+      },
+      "light-ink-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink (light look)",
+        "canonical": "#675f8c",
+        "cssVar": "--text-faint",
+        "tonalRamp": [
+          "oklch(15% 0.021 291.8)",
+          "oklch(26% 0.037 291.8)",
+          "oklch(37% 0.052 291.8)",
+          "oklch(48% 0.068 291.8)",
+          "oklch(60% 0.057 291.8)",
+          "oklch(72% 0.04 291.8)",
+          "oklch(84% 0.023 291.8)",
+          "oklch(95% 0.018 291.8)"
+        ]
+      },
+      "light-link": {
+        "role": "tertiary",
+        "displayName": "Link Cyan (light look)",
+        "canonical": "#0b6aa6",
+        "cssVar": "--link",
+        "tonalRamp": [
+          "oklch(15% 0.037 244.9)",
+          "oklch(26% 0.064 244.9)",
+          "oklch(37% 0.091 244.9)",
+          "oklch(48% 0.118 244.9)",
+          "oklch(60% 0.099 244.9)",
+          "oklch(72% 0.069 244.9)",
+          "oklch(84% 0.039 244.9)",
+          "oklch(95% 0.031 244.9)"
+        ]
+      },
+      "light-focus": {
+        "role": "primary",
+        "displayName": "Focus Gold (light look)",
+        "canonical": "#160d2b",
+        "cssVar": "--focus",
+        "tonalRamp": [
+          "oklch(15% 0.018 294)",
+          "oklch(26% 0.03 294)",
+          "oklch(37% 0.043 294)",
+          "oklch(48% 0.056 294)",
+          "oklch(60% 0.047 294)",
+          "oklch(72% 0.033 294)",
+          "oklch(84% 0.019 294)",
+          "oklch(95% 0.015 294)"
+        ]
+      },
+      "light-winner-gold": {
+        "role": "primary",
+        "displayName": "Winner Gold (light look)",
+        "canonical": "#ffc61a",
+        "cssVar": "--accent",
+        "tonalRamp": [
+          "oklch(15% 0.051 86.9)",
+          "oklch(26% 0.089 86.9)",
+          "oklch(37% 0.126 86.9)",
+          "oklch(48% 0.164 86.9)",
+          "oklch(60% 0.136 86.9)",
+          "oklch(72% 0.096 86.9)",
+          "oklch(84% 0.055 86.9)",
+          "oklch(95% 0.043 86.9)"
+        ]
+      },
+      "light-winner-gold-hover": {
+        "role": "primary",
+        "displayName": "Winner Gold, Hover (light look)",
+        "canonical": "#ffd34d",
+        "cssVar": "--accent-hover",
+        "tonalRamp": [
+          "oklch(15% 0.046 90.3)",
+          "oklch(26% 0.08 90.3)",
+          "oklch(37% 0.114 90.3)",
+          "oklch(48% 0.148 90.3)",
+          "oklch(60% 0.123 90.3)",
+          "oklch(72% 0.086 90.3)",
+          "oklch(84% 0.049 90.3)",
+          "oklch(95% 0.039 90.3)"
+        ]
+      },
+      "light-gold-soft": {
+        "role": "primary",
+        "displayName": "Gold Soft (light look)",
+        "canonical": "#fff4cc",
+        "cssVar": "--accent-soft",
+        "tonalRamp": [
+          "oklch(15% 0.016 94.4)",
+          "oklch(26% 0.028 94.4)",
+          "oklch(37% 0.039 94.4)",
+          "oklch(48% 0.051 94.4)",
+          "oklch(60% 0.042 94.4)",
+          "oklch(72% 0.03 94.4)",
+          "oklch(84% 0.017 94.4)",
+          "oklch(95% 0.013 94.4)"
+        ]
+      },
+      "light-gold-track": {
+        "role": "primary",
+        "displayName": "Gold Track (light look)",
+        "canonical": "#ece8f8",
+        "cssVar": "--accent-track",
+        "tonalRamp": [
+          "oklch(15% 0.007 297.4)",
+          "oklch(26% 0.011 297.4)",
+          "oklch(37% 0.016 297.4)",
+          "oklch(48% 0.021 297.4)",
+          "oklch(60% 0.017 297.4)",
+          "oklch(72% 0.012 297.4)",
+          "oklch(84% 0.007 297.4)",
+          "oklch(95% 0.005 297.4)"
+        ]
+      },
+      "light-gold-ink": {
+        "role": "primary",
+        "displayName": "Gold Ink (light look)",
+        "canonical": "#6b4d00",
+        "cssVar": "--accent-ink",
+        "tonalRamp": [
+          "oklch(15% 0.027 82.7)",
+          "oklch(26% 0.047 82.7)",
+          "oklch(37% 0.067 82.7)",
+          "oklch(48% 0.087 82.7)",
+          "oklch(60% 0.073 82.7)",
+          "oklch(72% 0.051 82.7)",
+          "oklch(84% 0.029 82.7)",
+          "oklch(95% 0.023 82.7)"
+        ]
+      },
+      "light-gold-display": {
+        "role": "primary",
+        "displayName": "Display Gold (light look)",
+        "canonical": "#a87000",
+        "cssVar": "--accent-display",
+        "tonalRamp": [
+          "oklch(15% 0.037 74.4)",
+          "oklch(26% 0.065 74.4)",
+          "oklch(37% 0.092 74.4)",
+          "oklch(48% 0.12 74.4)",
+          "oklch(60% 0.1 74.4)",
+          "oklch(72% 0.07 74.4)",
+          "oklch(84% 0.04 74.4)",
+          "oklch(95% 0.031 74.4)"
+        ]
+      },
+      "light-p1": {
+        "role": "secondary",
+        "displayName": "Player One Red-Orange (light look)",
+        "canonical": "#cc3a10",
+        "cssVar": "--p1",
+        "tonalRamp": [
+          "oklch(15% 0.057 35)",
+          "oklch(26% 0.098 35)",
+          "oklch(37% 0.14 35)",
+          "oklch(48% 0.181 35)",
+          "oklch(60% 0.151 35)",
+          "oklch(72% 0.106 35)",
+          "oklch(84% 0.06 35)",
+          "oklch(95% 0.047 35)"
+        ]
+      },
+      "light-p2": {
+        "role": "secondary",
+        "displayName": "Player Two Blue (light look)",
+        "canonical": "#0a72b0",
+        "cssVar": "--p2",
+        "tonalRamp": [
+          "oklch(15% 0.038 243.9)",
+          "oklch(26% 0.066 243.9)",
+          "oklch(37% 0.095 243.9)",
+          "oklch(48% 0.123 243.9)",
+          "oklch(60% 0.102 243.9)",
+          "oklch(72% 0.072 243.9)",
+          "oklch(84% 0.041 243.9)",
+          "oklch(95% 0.032 243.9)"
+        ]
+      },
+      "light-on-side": {
+        "role": "secondary",
+        "displayName": "On Side (light look)",
+        "canonical": "#ffffff",
+        "cssVar": "--on-side",
+        "tonalRamp": [
+          "oklch(15% 0 89.9)",
+          "oklch(26% 0 89.9)",
+          "oklch(37% 0 89.9)",
+          "oklch(48% 0 89.9)",
+          "oklch(60% 0 89.9)",
+          "oklch(72% 0 89.9)",
+          "oklch(84% 0 89.9)",
+          "oklch(95% 0 89.9)"
+        ]
+      },
+      "light-open-violet": {
+        "role": "tertiary",
+        "displayName": "Open Violet (light look)",
+        "canonical": "#6a45d1",
+        "cssVar": "--play",
+        "tonalRamp": [
+          "oklch(15% 0.061 289.4)",
+          "oklch(26% 0.106 289.4)",
+          "oklch(37% 0.151 289.4)",
+          "oklch(48% 0.195 289.4)",
+          "oklch(60% 0.163 289.4)",
+          "oklch(72% 0.114 289.4)",
+          "oklch(84% 0.065 289.4)",
+          "oklch(95% 0.051 289.4)"
+        ]
+      },
+      "light-on-violet": {
+        "role": "tertiary",
+        "displayName": "On Violet (light look)",
+        "canonical": "#ffffff",
+        "cssVar": "--on-play",
+        "tonalRamp": [
+          "oklch(15% 0 89.9)",
+          "oklch(26% 0 89.9)",
+          "oklch(37% 0 89.9)",
+          "oklch(48% 0 89.9)",
+          "oklch(60% 0 89.9)",
+          "oklch(72% 0 89.9)",
+          "oklch(84% 0 89.9)",
+          "oklch(95% 0 89.9)"
+        ]
+      },
+      "light-decision-pink": {
+        "role": "tertiary",
+        "displayName": "Decision Pink (light look)",
+        "canonical": "#c80f4a",
+        "cssVar": "--danger",
+        "tonalRamp": [
+          "oklch(15% 0.062 12.8)",
+          "oklch(26% 0.108 12.8)",
+          "oklch(37% 0.154 12.8)",
+          "oklch(48% 0.199 12.8)",
+          "oklch(60% 0.166 12.8)",
+          "oklch(72% 0.116 12.8)",
+          "oklch(84% 0.066 12.8)",
+          "oklch(95% 0.052 12.8)"
+        ]
+      },
+      "light-decision-pink-soft": {
+        "role": "tertiary",
+        "displayName": "Decision Pink Soft (light look)",
+        "canonical": "#ffe6ee",
+        "cssVar": "--danger-soft",
+        "tonalRamp": [
+          "oklch(15% 0.009 356.3)",
+          "oklch(26% 0.015 356.3)",
+          "oklch(37% 0.022 356.3)",
+          "oklch(48% 0.028 356.3)",
+          "oklch(60% 0.023 356.3)",
+          "oklch(72% 0.016 356.3)",
+          "oklch(84% 0.009 356.3)",
+          "oklch(95% 0.007 356.3)"
+        ]
+      },
+      "light-decision-pink-ink": {
+        "role": "tertiary",
+        "displayName": "Decision Pink Ink (light look)",
+        "canonical": "#85072f",
+        "cssVar": "--danger-ink",
+        "tonalRamp": [
+          "oklch(15% 0.046 12.6)",
+          "oklch(26% 0.08 12.6)",
+          "oklch(37% 0.114 12.6)",
+          "oklch(48% 0.147 12.6)",
+          "oklch(60% 0.123 12.6)",
+          "oklch(72% 0.086 12.6)",
+          "oklch(84% 0.049 12.6)",
+          "oklch(95% 0.038 12.6)"
+        ]
+      },
+      "light-done-green": {
+        "role": "tertiary",
+        "displayName": "Done Green (light look)",
+        "canonical": "#11804a",
+        "cssVar": "--success",
+        "tonalRamp": [
+          "oklch(15% 0.038 155.1)",
+          "oklch(26% 0.065 155.1)",
+          "oklch(37% 0.093 155.1)",
+          "oklch(48% 0.12 155.1)",
+          "oklch(60% 0.1 155.1)",
+          "oklch(72% 0.07 155.1)",
+          "oklch(84% 0.04 155.1)",
+          "oklch(95% 0.031 155.1)"
+        ]
+      },
+      "light-done-green-soft": {
+        "role": "tertiary",
+        "displayName": "Done Green Soft (light look)",
+        "canonical": "#ddf7e8",
+        "cssVar": "--success-soft",
+        "tonalRamp": [
+          "oklch(15% 0.01 160.4)",
+          "oklch(26% 0.018 160.4)",
+          "oklch(37% 0.025 160.4)",
+          "oklch(48% 0.032 160.4)",
+          "oklch(60% 0.027 160.4)",
+          "oklch(72% 0.019 160.4)",
+          "oklch(84% 0.011 160.4)",
+          "oklch(95% 0.008 160.4)"
+        ]
+      },
+      "light-done-green-ink": {
+        "role": "tertiary",
+        "displayName": "Done Green Ink (light look)",
+        "canonical": "#0a4a2b",
+        "cssVar": "--success-ink",
+        "tonalRamp": [
+          "oklch(15% 0.024 156.2)",
+          "oklch(26% 0.042 156.2)",
+          "oklch(37% 0.06 156.2)",
+          "oklch(48% 0.078 156.2)",
+          "oklch(60% 0.065 156.2)",
+          "oklch(72% 0.046 156.2)",
+          "oklch(84% 0.026 156.2)",
+          "oklch(95% 0.02 156.2)"
+        ]
+      },
+      "tile-1": {
+        "role": "tertiary",
+        "displayName": "Character Tile 1",
+        "canonical": "#ffb0dc",
+        "cssVar": "--tile-1",
+        "tonalRamp": [
+          "oklch(15% 0.032 345.1)",
+          "oklch(26% 0.056 345.1)",
+          "oklch(37% 0.079 345.1)",
+          "oklch(48% 0.103 345.1)",
+          "oklch(60% 0.085 345.1)",
+          "oklch(72% 0.06 345.1)",
+          "oklch(84% 0.034 345.1)",
+          "oklch(95% 0.027 345.1)"
+        ]
+      },
+      "tile-2": {
+        "role": "tertiary",
+        "displayName": "Character Tile 2",
+        "canonical": "#a8e03a",
+        "cssVar": "--tile-2",
+        "tonalRamp": [
+          "oklch(15% 0.059 126.9)",
+          "oklch(26% 0.102 126.9)",
+          "oklch(37% 0.145 126.9)",
+          "oklch(48% 0.188 126.9)",
+          "oklch(60% 0.156 126.9)",
+          "oklch(72% 0.109 126.9)",
+          "oklch(84% 0.063 126.9)",
+          "oklch(95% 0.049 126.9)"
+        ]
+      },
+      "tile-3": {
+        "role": "tertiary",
+        "displayName": "Character Tile 3",
+        "canonical": "#93f0dd",
+        "cssVar": "--tile-3",
+        "tonalRamp": [
+          "oklch(15% 0.028 179.5)",
+          "oklch(26% 0.048 179.5)",
+          "oklch(37% 0.069 179.5)",
+          "oklch(48% 0.09 179.5)",
+          "oklch(60% 0.075 179.5)",
+          "oklch(72% 0.052 179.5)",
+          "oklch(84% 0.03 179.5)",
+          "oklch(95% 0.023 179.5)"
+        ]
+      },
+      "tile-4": {
+        "role": "tertiary",
+        "displayName": "Character Tile 4",
+        "canonical": "#b964f2",
+        "cssVar": "--tile-4",
+        "tonalRamp": [
+          "oklch(15% 0.063 309.4)",
+          "oklch(26% 0.11 309.4)",
+          "oklch(37% 0.157 309.4)",
+          "oklch(48% 0.203 309.4)",
+          "oklch(60% 0.169 309.4)",
+          "oklch(72% 0.119 309.4)",
+          "oklch(84% 0.068 309.4)",
+          "oklch(95% 0.053 309.4)"
+        ]
+      },
+      "tile-5": {
+        "role": "tertiary",
+        "displayName": "Character Tile 5",
+        "canonical": "#ff6ec7",
+        "cssVar": "--tile-5",
+        "tonalRamp": [
+          "oklch(15% 0.06 345.3)",
+          "oklch(26% 0.104 345.3)",
+          "oklch(37% 0.148 345.3)",
+          "oklch(48% 0.192 345.3)",
+          "oklch(60% 0.16 345.3)",
+          "oklch(72% 0.112 345.3)",
+          "oklch(84% 0.064 345.3)",
+          "oklch(95% 0.05 345.3)"
+        ]
+      },
+      "tile-6": {
+        "role": "tertiary",
+        "displayName": "Character Tile 6",
+        "canonical": "#e3f88a",
+        "cssVar": "--tile-6",
+        "tonalRamp": [
+          "oklch(15% 0.041 118)",
+          "oklch(26% 0.071 118)",
+          "oklch(37% 0.102 118)",
+          "oklch(48% 0.132 118)",
+          "oklch(60% 0.11 118)",
+          "oklch(72% 0.077 118)",
+          "oklch(84% 0.044 118)",
+          "oklch(95% 0.034 118)"
+        ]
+      },
+      "tile-7": {
+        "role": "tertiary",
+        "displayName": "Character Tile 7",
+        "canonical": "#1ec9a7",
+        "cssVar": "--tile-7",
+        "tonalRamp": [
+          "oklch(15% 0.041 174.2)",
+          "oklch(26% 0.071 174.2)",
+          "oklch(37% 0.102 174.2)",
+          "oklch(48% 0.132 174.2)",
+          "oklch(60% 0.11 174.2)",
+          "oklch(72% 0.077 174.2)",
+          "oklch(84% 0.044 174.2)",
+          "oklch(95% 0.034 174.2)"
+        ]
+      },
+      "tile-8": {
+        "role": "tertiary",
+        "displayName": "Character Tile 8",
+        "canonical": "#e6c2ff",
+        "cssVar": "--tile-8",
+        "tonalRamp": [
+          "oklch(15% 0.027 311.2)",
+          "oklch(26% 0.047 311.2)",
+          "oklch(37% 0.067 311.2)",
+          "oklch(48% 0.087 311.2)",
+          "oklch(60% 0.073 311.2)",
+          "oklch(72% 0.051 311.2)",
+          "oklch(84% 0.029 311.2)",
+          "oklch(95% 0.023 311.2)"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Home hero headline only; Archivo at 72% width (font-stretch)."
+        "purpose": "The home headline only.",
+        "cssVar": "--fs-display"
       },
       "statement": {
         "displayName": "Statement",
-        "purpose": "Home section statements, formats index and feature rows; 80% width."
+        "purpose": "Home section heads and the closing panel.",
+        "cssVar": "--fs-statement"
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles (h1); 1.625rem under 640px.",
+        "cssVar": "--fs-title"
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Page h1; 1.5rem under 640px."
+        "purpose": "Section heads (h2), large list-plate names and scores, the primary plate label.",
+        "cssVar": "--fs-section"
       },
-      "section": {
-        "displayName": "Section",
-        "purpose": "h2 headings on working screens."
+      "versus-name": {
+        "displayName": "Versus Name",
+        "purpose": "The two names on a versus plate."
+      },
+      "versus-score": {
+        "displayName": "Versus Score",
+        "purpose": "The two scores on a versus plate, tabular."
+      },
+      "subhead": {
+        "displayName": "Subhead",
+        "purpose": "h3 panel heads, in Onest."
       },
       "lead": {
         "displayName": "Lead",
-        "purpose": "The one introductory sentence on the home page."
+        "purpose": "Home lead sentences.",
+        "cssVar": "--fs-lead"
       },
       "body": {
         "displayName": "Body",
-        "purpose": "All working-screen text; 1rem in fields on coarse pointers."
-      },
-      "name": {
-        "displayName": "Name",
-        "purpose": "Player and entrant names and the wordmark, set via font-stretch: var(--name-stretch) 88%."
+        "purpose": "Everything read; descriptions cap at 65ch.",
+        "cssVar": "--fs-body"
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Buttons, tabs, field labels, tags."
+        "purpose": "Chip labels, hints, small buttons, bracket round heads.",
+        "cssVar": "--fs-small"
       },
-      "small": {
-        "displayName": "Small",
-        "purpose": "Hints, errors, tags, toolbar hints."
-      },
-      "code": {
-        "displayName": "Code",
-        "purpose": "Code and the API reference only."
+      "tag": {
+        "displayName": "Tag",
+        "purpose": "P1/P2 and You tags, tile cursors."
       }
     },
     "shadows": [
       {
-        "name": "none",
+        "name": "rest",
         "value": "none",
-        "purpose": "Nothing at rest casts a shadow; depth is the sheet on the wall plus a 1px edge."
+        "purpose": "Every panel at rest (--shadow)."
       },
       {
         "name": "float",
-        "value": "0 8px 24px rgb(18 20 23 / 12%), 0 1px 3px rgb(18 20 23 / 8%)",
-        "purpose": "Only a layer that opens over content while in use: the game picker's suggestions."
+        "value": "0 12px 32px rgb(4 2 14 / 60%), 0 2px 6px rgb(4 2 14 / 40%)",
+        "purpose": "Something floating over the page, dark look (--shadow-float)."
+      },
+      {
+        "name": "float-light",
+        "value": "0 12px 32px rgb(22 13 43 / 14%), 0 2px 6px rgb(22 13 43 / 8%)",
+        "purpose": "Something floating over the page, light look (--shadow-float)."
+      },
+      {
+        "name": "ring-you",
+        "value": "inset 0 0 0 2px var(--accent)",
+        "purpose": "The viewer's slot on a list plate."
+      },
+      {
+        "name": "ring-dispute",
+        "value": "0 0 0 1px var(--danger)",
+        "purpose": "A disputed plate, outside its pink-red border."
+      },
+      {
+        "name": "chip-outline",
+        "value": "inset 0 0 0 1.5px var(--control)",
+        "purpose": "A neutral state chip (pink-red for danger)."
       }
     ],
     "motion": [
       {
         "name": "ease-out",
         "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Presses, hovers and UI state changes."
+        "purpose": "Presses, hovers and quick state changes (--ease-out)."
       },
       {
         "name": "ease-expo",
         "value": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Arrivals: reveal rise, headline lines."
+        "purpose": "Things arriving: versus intro, winner widening, podium rise, reveals (--ease-expo)."
       },
       {
         "name": "ease-in-out",
         "value": "cubic-bezier(0.76, 0, 0.24, 1)",
-        "purpose": "Colour fields opening and the hero joint drawing."
+        "purpose": "A colour field opening upward (--ease-in-out)."
+      },
+      {
+        "name": "ease-slam",
+        "value": "cubic-bezier(0.2, 0.9, 0.3, 1.25)",
+        "purpose": "Things landing: the VS, the WINNER stamp, the registration lock (--ease-slam)."
       },
       {
         "name": "t-press",
         "value": "140ms",
-        "purpose": "Button press (1px sink)."
+        "purpose": "Button press and tile lift (--t-press)."
       },
       {
         "name": "t-hover",
         "value": "180ms",
-        "purpose": "Link and hover colour."
+        "purpose": "Link colour (--t-hover)."
       },
       {
         "name": "t-ui",
         "value": "240ms",
-        "purpose": "UI state changes."
+        "purpose": "UI state changes (--t-ui)."
       },
       {
         "name": "t-reveal",
         "value": "800ms",
-        "purpose": "Scroll reveal (rise 24px, settle from 0.96, or clip open from the foot); reduced motion collapses all motion to 1ms."
+        "purpose": "Scroll reveals (--t-reveal)."
+      },
+      {
+        "name": "slant",
+        "value": "-10deg",
+        "purpose": "Skew of the primary plate, state chips and side ticks (--slant)."
       }
     ],
     "breakpoints": [
@@ -721,28 +1231,6 @@
         "name": "md",
         "value": "900px"
       }
-    ],
-    "bracketGeometry": {
-      "cardWidth": "184px",
-      "slotHeight": "30px",
-      "headerHeight": "36px",
-      "columnGap": "48px",
-      "rowGap": "16px",
-      "sectionGap": "48px",
-      "gutter": "36px",
-      "numberOffset": "4px"
-    },
-    "bracketThemeTokens": [
-      "background",
-      "card",
-      "border",
-      "text",
-      "muted",
-      "line",
-      "ink",
-      "ready",
-      "highlight",
-      "font"
     ]
   },
   "components": [
@@ -750,135 +1238,154 @@
       "name": "Default Button",
       "kind": "button",
       "refersTo": "button",
-      "description": "Every secondary action: sheet stock, control outline, sinks 1px on press.",
-      "html": "<button class=\"ds-btn\">Sign out</button>",
-      "css": ".ds-btn{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-height:32px;padding:0 .85rem;border-radius:6px;border:1px solid var(--control,#c3c9d3);background:var(--surface,#fff);color:var(--text,#121417);font-size:.875rem;font-weight:550;line-height:1.2;cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,transform 140ms cubic-bezier(.22,1,.36,1)}.ds-btn:hover{background:var(--surface-2,#f3f5f8)}.ds-btn:active{transform:translateY(1px)}.ds-btn:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}"
+      "description": "Any action that is not the one primary action.",
+      "html": "<button class=\"ds-btn\">Light look</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 0.9rem; border: 1px solid var(--control, #6a62b4); border-radius: 6px; background: var(--surface-2, #221c45); color: var(--text, #f6f3ff); font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; font-size: 0.9375rem; font-weight: 600; line-height: 1.2; cursor: pointer; transition: background-color 120ms ease-out, border-color 120ms ease-out, transform 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn:hover { background: var(--border, #2e2858); border-color: var(--line, #7d75bb); } .ds-btn:active { transform: translateY(1px); } .ds-btn:focus-visible { outline: 2px solid var(--focus, #ffd23f); outline-offset: 2px; }"
     },
     {
-      "name": "Primary Button",
+      "name": "Primary Plate",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one primary action in a view, in full ballpoint.",
+      "description": "The one primary action per view: a gold plate slanted -10deg behind an upright display-face label.",
       "html": "<button class=\"ds-btn-primary\">Open match room</button>",
-      "css": ".ds-btn-primary{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 .85rem;border-radius:6px;border:1px solid var(--accent,#1f49c7);background:var(--accent,#1f49c7);color:var(--accent-text,#fff);font-size:.875rem;font-weight:550;line-height:1.2;cursor:pointer;transition:background-color 120ms ease-out,border-color 120ms ease-out,transform 140ms cubic-bezier(.22,1,.36,1)}.ds-btn-primary:hover{background:var(--accent-hover,#173a9e);border-color:var(--accent-hover,#173a9e)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}"
+      "css": ".ds-btn-primary { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 0.9rem; border: 1px solid transparent; border-radius: 6px; background: none; color: var(--accent-text, #1d1500); font-family: Dela Gothic One, Onest Variable, system-ui, sans-serif; font-size: 0.9375rem; font-weight: 400; letter-spacing: 0.01em; line-height: 1.2; cursor: pointer; transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 6px; background: var(--accent, #ffd23f); transform: skewX(-10deg); transition: background-color 120ms ease-out; } .ds-btn-primary:hover::before { background: var(--accent-hover, #ffe07a); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid var(--focus, #ffd23f); outline-offset: 2px; }"
     },
     {
       "name": "Danger Button",
       "kind": "button",
       "refersTo": "button-danger",
-      "description": "A destructive or deciding organizer action, in red pen.",
-      "html": "<button class=\"ds-btn-danger\">Remove participant</button>",
-      "css": ".ds-btn-danger{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;min-height:32px;padding:0 .85rem;border-radius:6px;border:1px solid color-mix(in srgb,var(--danger,#c4242a) 40%,var(--control,#c3c9d3));background:var(--surface,#fff);color:var(--danger,#c4242a);font-size:.875rem;font-weight:550;cursor:pointer;transition:background-color 120ms ease-out}.ds-btn-danger:hover{background:var(--danger-soft,#ffedea)}.ds-btn-danger:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}"
+      "description": "Destructive and organizer-decision actions.",
+      "html": "<button class=\"ds-btn-danger\">Remove</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; min-height: 34px; padding: 0 0.9rem; border: 1px solid color-mix(in srgb, var(--danger, #ff4d82) 55%, var(--control, #6a62b4)); border-radius: 6px; background: var(--surface-2, #221c45); color: var(--danger, #ff4d82); font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; font-weight: 600; cursor: pointer; transition: background-color 120ms ease-out; } .ds-btn-danger:hover { background: var(--danger-soft, #3a1533); } .ds-btn-danger:focus-visible { outline: 2px solid var(--focus, #ffd23f); outline-offset: 2px; }"
     },
     {
       "name": "Text Field",
       "kind": "input",
       "refersTo": "input",
-      "description": "Label above, 40px field, ballpoint focus.",
-      "html": "<label class=\"ds-field\"><span>Your club or community</span><input class=\"ds-input\" type=\"text\" placeholder=\"Kvart Gaming Club\"></label>",
-      "css": ".ds-field{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:flex;flex-direction:column;gap:.5rem;font-size:.875rem;color:var(--text,#121417)}.ds-field span{font-weight:550}.ds-input{min-height:40px;padding:.5rem .75rem;border:1px solid var(--control,#c3c9d3);border-radius:6px;background:var(--surface,#fff);color:var(--text,#121417);font:inherit;transition:border-color 120ms ease-out}.ds-input::placeholder{color:var(--text-faint,#626c7c)}.ds-input:hover{border-color:var(--line,#8a93a2)}.ds-input:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:-1px;border-color:var(--accent,#1f49c7)}"
+      "description": "A 42px stage-coloured field with a control outline and the focus colour on focus.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Organization name\">",
+      "css": ".ds-input { width: 100%; min-height: 42px; padding: 0.5rem 0.75rem; border: 1px solid var(--control, #6a62b4); border-radius: 6px; background: var(--bg, #0f0b22); color: var(--text, #f6f3ff); font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; font-size: 0.9375rem; transition: border-color 120ms ease-out; } .ds-input::placeholder { color: var(--text-faint, #9d96c6); } .ds-input:hover { border-color: var(--line, #7d75bb); } .ds-input:focus-visible { outline: 2px solid var(--focus, #ffd23f); outline-offset: -1px; border-color: var(--focus, #ffd23f); }"
     },
     {
-      "name": "Status Tags",
+      "name": "State Chips",
       "kind": "chip",
-      "refersTo": "badge",
-      "description": "A pale tint with dark ink of the same hue; tone follows the match or tournament state.",
-      "html": "<span class=\"ds-badge\">Draft</span> <span class=\"ds-badge ds-accent\">In progress</span> <span class=\"ds-badge ds-danger\">Disputed</span> <span class=\"ds-badge ds-success\">Checked in</span>",
-      "css": ".ds-badge{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:inline-flex;align-items:center;min-height:20px;padding:0 .4rem;border-radius:4px;font-size:.75rem;font-weight:550;line-height:1;background:var(--surface-2,#f3f5f8);color:var(--text-muted,#535b68)}.ds-accent{background:var(--accent-soft,#eef2fd);color:var(--accent-ink,#173a9e)}.ds-danger{background:var(--danger-soft,#ffedea);color:var(--danger-ink,#831c1e)}.ds-success{background:var(--success-soft,#dcfae5);color:var(--success-ink,#04250e)}"
+      "refersTo": "chip",
+      "description": "Slanted state chips: neutral outlined, play violet, success green, danger pink-red ring. Never gold.",
+      "html": "<span class=\"ds-chip\">Draft</span> <span class=\"ds-chip ds-play\">Ready</span> <span class=\"ds-chip ds-success\">Done</span> <span class=\"ds-chip ds-danger\">Disputed</span>",
+      "css": ".ds-chip { position: relative; isolation: isolate; display: inline-flex; align-items: center; min-height: 22px; padding: 0 0.55rem; margin-right: 0.4rem; color: var(--text-muted, #bdb6dd); font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; font-size: 0.8125rem; font-weight: 650; line-height: 1; white-space: nowrap; } .ds-chip::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 4px; box-shadow: inset 0 0 0 1.5px var(--control, #6a62b4); transform: skewX(-10deg); } .ds-play { color: var(--on-play, #140a24); } .ds-play::before { background: var(--play, #b18cff); box-shadow: none; } .ds-success { color: var(--on-side, #140a24); } .ds-success::before { background: var(--success, #34e08b); box-shadow: none; } .ds-danger { color: var(--danger, #ff4d82); } .ds-danger::before { box-shadow: inset 0 0 0 1.5px var(--danger, #ff4d82); }"
     },
     {
-      "name": "Sheet",
+      "name": "Panel",
       "kind": "card",
       "refersTo": "card",
-      "description": "White stock on the wall, edged, never shadowed.",
-      "html": "<div class=\"ds-wall\"><div class=\"ds-card\"><h2>Registration</h2><p>11 of 32 places taken</p></div></div>",
-      "css": ".ds-wall{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);padding:24px;background:var(--bg,#edf0f4)}.ds-card{background:var(--surface,#fff);border:1px solid var(--border,#dde1e8);border-radius:8px;padding:24px;color:var(--text,#121417);font-size:.875rem;line-height:1.43}.ds-card h2{margin:0 0 .5em;font-size:1.125rem;font-weight:600;line-height:1.2}.ds-card p{margin:0;color:var(--text-muted,#535b68)}"
+      "description": "An edged panel on the stage, never shadowed at rest.",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-h\">Result</h3><p class=\"ds-card-p\">This result was set through the API.</p></div>",
+      "css": ".ds-card { background: var(--surface, #1a1535); border: 1px solid var(--border, #2e2858); border-radius: 12px; padding: 24px; color: var(--text, #f6f3ff); font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.43; } .ds-card-h { margin: 0 0 0.75rem; font-size: 1.0625rem; font-weight: 650; } .ds-card-p { margin: 0; }"
     },
     {
-      "name": "Underline Tabs",
+      "name": "Tabs",
       "kind": "nav",
-      "refersTo": "tab",
-      "description": "Page tabs on one full-width rule; the current tab underlined in ballpoint.",
-      "html": "<nav class=\"ds-tabs\"><a href=\"#\">Overview</a><a href=\"#\" aria-current=\"page\">Bracket</a><a href=\"#\">Matches</a></nav>",
-      "css": ".ds-tabs{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);display:flex;gap:1.25rem;border-bottom:1px solid var(--border,#dde1e8);font-size:.875rem}.ds-tabs a{padding:.6rem 0;margin-bottom:-1px;color:var(--text-muted,#535b68);font-weight:550;text-decoration:none;border-bottom:2px solid transparent;transition:color 180ms ease}.ds-tabs a:hover{color:var(--text,#121417)}.ds-tabs a:focus-visible{outline:2px solid var(--accent,#1f49c7);outline-offset:2px}.ds-tabs a[aria-current=page]{color:var(--text,#121417);border-bottom-color:var(--accent,#1f49c7)}"
+      "refersTo": "tabs",
+      "description": "Underline tabs on a full-width rule; the current tab is underlined in gold.",
+      "html": "<nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">Overview</a><a href=\"#\">Bracket</a><a href=\"#\">Matches</a></nav>",
+      "css": ".ds-tabs { display: flex; gap: 1.25rem; border-bottom: 1px solid var(--border, #2e2858); font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; } .ds-tabs a { padding: 0.6rem 0; margin-bottom: -1px; border-bottom: 3px solid transparent; color: var(--text-muted, #bdb6dd); font-weight: 550; text-decoration: none; } .ds-tabs a:hover { color: var(--text, #f6f3ff); } .ds-tabs a[aria-current='page'] { color: var(--text, #f6f3ff); border-bottom-color: var(--accent, #ffd23f); } .ds-tabs a:focus-visible { outline: 2px solid var(--focus, #ffd23f); outline-offset: 2px; }"
     },
     {
-      "name": "Match Lines",
+      "name": "Versus Plate",
       "kind": "custom",
-      "refersTo": "match-line",
-      "description": "The signature: two names on printed lines, a joint, the winner's line in ink, your own line in blue.",
-      "html": "<div class=\"ds-lines\"><div class=\"ds-line ds-me ds-win\"><span class=\"ds-who\">kestrel</span><span class=\"ds-score\">2</span></div><div class=\"ds-line ds-lose\"><span class=\"ds-who\">juno</span><span class=\"ds-score\">1</span></div></div>",
-      "css": ".ds-lines{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);position:relative;display:flex;flex-direction:column;width:14rem;margin-right:.75rem;font-size:.875rem;color:var(--text,#121417)}.ds-lines::after{content:'';position:absolute;right:0;top:calc(50% - 1px);height:50%;border-right:1px solid var(--line,#8a93a2)}.ds-lines::before{content:'';position:absolute;right:-.75rem;top:75%;margin-top:-.5px;width:.75rem;border-top:2px solid var(--text,#121417)}.ds-line{position:relative;display:flex;align-items:flex-end;gap:.75rem;min-height:30px;padding:0 .5rem .3rem .1rem}.ds-line::after{content:'';position:absolute;inset:auto 0 0;height:1px;background:var(--line,#8a93a2)}.ds-who{flex:1;font-stretch:88%;font-weight:600}.ds-score{min-width:1.25rem;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}.ds-win .ds-who,.ds-win .ds-score{font-weight:700}.ds-win::after{height:2px;background:var(--text,#121417)}.ds-me::after{height:2px;background:var(--accent,#1f49c7)}.ds-me .ds-who{color:var(--accent,#1f49c7)}.ds-lose .ds-who,.ds-lose .ds-score{color:var(--text-muted,#535b68)}"
+      "refersTo": "versus-side-p1",
+      "description": "Two sides meeting at a slanted cut; decided, the winner widens and takes the stamp while the loser drains.",
+      "html": "<div class=\"ds-vs\"><div class=\"ds-vs-side ds-vs-p1 ds-won\"><span class=\"ds-vs-tags\"><span class=\"ds-vs-tag\">P1</span><span class=\"ds-vs-you\">You</span><span class=\"ds-vs-stamp\">Winner</span></span><span class=\"ds-vs-score\">2</span><span class=\"ds-vs-who\">kestrel</span></div><div class=\"ds-vs-side ds-vs-p2 ds-lost\"><span class=\"ds-vs-tags\"><span class=\"ds-vs-tag\">P2</span></span><span class=\"ds-vs-score\">1</span><span class=\"ds-vs-who\">juno</span></div></div>",
+      "css": ".ds-vs { --cut: 36px; display: flex; min-height: 148px; overflow: hidden; border-radius: 12px; background: var(--surface, #1a1535); isolation: isolate; font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; } .ds-vs-side { --side: var(--p1, #ff5a2c); flex: 1 1 0; display: grid; grid-template: 'tags score' auto '. score' 1fr 'who who' auto / 1fr auto; gap: 0.35rem 0.75rem; min-width: 0; padding: 1rem calc(var(--cut) / 2 + 1rem) 1.1rem 1.1rem; background: var(--side); color: var(--on-side, #140a24); clip-path: polygon(0 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%); margin-right: calc(var(--cut) / -2); transition: flex-grow 480ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-vs-p2 { --side: var(--p2, #25b9ff); grid-template: 'score tags' auto 'score .' 1fr 'who who' auto / auto 1fr; padding: 1rem 1.1rem 1.1rem calc(var(--cut) / 2 + 1rem); clip-path: polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%); margin: 0 0 0 calc(var(--cut) / -2); text-align: right; } .ds-won { flex-grow: 1.5; } .ds-lost { background: color-mix(in srgb, var(--side) 22%, var(--surface, #1a1535)); color: var(--text-muted, #bdb6dd); } .ds-vs-tags { grid-area: tags; display: flex; gap: 0.4rem; align-items: center; } .ds-vs-p2 .ds-vs-tags { justify-content: flex-end; } .ds-vs-tag, .ds-vs-you, .ds-vs-stamp { padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.2; } .ds-vs-tag { background: color-mix(in srgb, currentColor 16%, transparent); } .ds-vs-you { background: var(--accent, #ffd23f); color: var(--accent-text, #1d1500); letter-spacing: 0.02em; } .ds-vs-stamp { background: var(--on-side, #140a24); color: var(--side); font-family: Dela Gothic One, Onest Variable, system-ui, sans-serif; font-weight: 400; font-size: 0.875rem; letter-spacing: 0.04em; text-transform: uppercase; } .ds-vs-who { grid-area: who; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: Dela Gothic One, Onest Variable, system-ui, sans-serif; font-size: 2rem; line-height: 1.05; } .ds-vs-score { grid-area: score; font-family: Dela Gothic One, Onest Variable, system-ui, sans-serif; font-size: 2.5rem; line-height: 1; font-variant-numeric: tabular-nums; }"
     },
     {
-      "name": "Alerts",
+      "name": "List Plate",
       "kind": "custom",
-      "refersTo": "alert",
-      "description": "A message inside the block it concerns; warnings ringed in red, not filled.",
-      "html": "<p class=\"ds-alert ds-error\">Reports disagree.</p><p class=\"ds-alert ds-ok\">Score reported.</p><p class=\"ds-alert ds-warn\">Check-in closes in 10 minutes.</p>",
-      "css": ".ds-alert{font-family: var(--font, 'Archivo Variable', Archivo, system-ui, sans-serif);margin:0 0 .75rem;padding:.65rem .9rem;border-radius:6px;font-size:.875rem;background:var(--surface-2,#f3f5f8);color:var(--text,#121417)}.ds-error{background:var(--danger-soft,#ffedea);color:var(--danger-ink,#831c1e)}.ds-ok{background:var(--accent-soft,#eef2fd);color:var(--accent-ink,#173a9e)}.ds-warn{background:var(--surface,#fff);border:1px solid var(--danger,#c4242a)}"
+      "refersTo": "match-plate",
+      "description": "A match as two slots with slanted side ticks; the winner's slot fills with its side colour, the viewer's is ringed gold.",
+      "html": "<div class=\"ds-plate\"><div class=\"ds-slot ds-p1 ds-winner\"><span class=\"ds-who\">Aiko</span><span class=\"ds-score\">2</span></div><div class=\"ds-slot ds-p2 ds-me\"><span class=\"ds-who\">Bram</span><span class=\"ds-score\">1</span></div></div>",
+      "css": ".ds-plate { display: flex; flex-direction: column; max-width: 18rem; overflow: hidden; border: 1px solid var(--border, #2e2858); border-radius: 6px; background: var(--surface-2, #221c45); color: var(--text, #f6f3ff); font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; font-size: 0.9375rem; } .ds-slot { --side: var(--p1, #ff5a2c); display: flex; align-items: center; gap: 0.6rem; min-height: 32px; padding: 0 0.65rem; } .ds-p2 { --side: var(--p2, #25b9ff); border-top: 1px solid var(--border, #2e2858); } .ds-slot::before { content: ''; flex: none; width: 4px; height: 14px; border-radius: 1px; background: var(--side); transform: skewX(-10deg); } .ds-winner { background: var(--side); color: var(--on-side, #140a24); } .ds-winner::before { background: var(--on-side, #140a24); } .ds-me { box-shadow: inset 0 0 0 2px var(--accent, #ffd23f); } .ds-me:not(.ds-winner) .ds-who { color: var(--accent-ink, #ffe07a); } .ds-who { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; } .ds-score { min-width: 1.5rem; text-align: right; font-family: Dela Gothic One, Onest Variable, system-ui, sans-serif; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Roster Tile",
+      "kind": "custom",
+      "refersTo": "roster-tile",
+      "description": "A character-select tile: character colour, initial in the display face, name strip; cursor frames in P1, P2 or gold for the viewer.",
+      "html": "<ol class=\"ds-roster\"><li class=\"ds-tile ds-you\" style=\"--tile: var(--tile-3, #93f0dd)\"><span class=\"ds-face\"><span class=\"ds-letter\">K</span><span class=\"ds-name\">kestrel</span></span><span class=\"ds-cursor\">You</span></li><li class=\"ds-tile\" style=\"--tile: var(--tile-1, #ffb0dc)\"><span class=\"ds-face\"><span class=\"ds-letter\">J</span><span class=\"ds-name\">juno</span></span></li><li class=\"ds-tile ds-empty\"></li></ol>",
+      "css": ".ds-roster { display: grid; grid-template-columns: repeat(3, 7.75rem); gap: 0.6rem; margin: 0; padding: 0; list-style: none; font-family: 'Onest Variable', 'Onest', system-ui, sans-serif; } .ds-tile { position: relative; aspect-ratio: 1 / 1.08; border-radius: 6px; } .ds-face { display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100%; overflow: hidden; border-radius: inherit; background: var(--tile); color: var(--accent-text, #1d1500); transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-face:hover { transform: translateY(-2px); } .ds-letter { display: grid; place-items: center; font-family: Dela Gothic One, Onest Variable, system-ui, sans-serif; font-size: 2.5rem; line-height: 1; } .ds-name { padding: 0.3rem 0.55rem; background: var(--bg, #0f0b22); color: var(--text, #f6f3ff); font-weight: 700; } .ds-you { outline: 3px solid var(--accent, #ffd23f); outline-offset: 2px; } .ds-cursor { position: absolute; top: 0.35rem; right: 0.35rem; padding: 0.05rem 0.4rem; border-radius: 4px; background: var(--accent, #ffd23f); color: var(--accent-text, #1d1500); font-size: 0.75rem; font-weight: 700; line-height: 1.4; } .ds-empty { border: 2px dashed var(--control, #6a62b4); }"
     }
   ],
   "narrative": {
-    "northStar": "The Wall Sheet",
-    "overview": "A tournament is the bracket sheet taped to the venue wall: one printed sheet that fills in as matches are played and that everyone reads the same way. Every screen is white sheet stock laid on a cool wall-grey ground, printed in near-black. Players write in ballpoint blue; the organizer's red pen marks only decisions, disputes and help. Nothing at rest is lifted off the wall; sheets are edged, not shadowed.\n\nThe working screens are dense and predictable: a 48px top bar, a 1152px column, underline tabs on one rule, and sheets of rows. The signature, used everywhere a match appears (bracket, match lists, match room, organizer queue, home page), is **names on printed lines**: each player's name sits on its own ruled line with the score at the line's end, the two lines meet in a joint at the right, and the winner's line carries on in 2px ink. Matches are not boxed. The brand mark is the same joint: two lines meeting and a blue line carrying on.\n\nThe home page is the same world at poster scale. The joint becomes a giant flat ballpoint field running off the window's right edge, the type condenses further (72% width for display, 80% for statements), and the pictures are the product's own interface fragments. Game flavour lives only in bracket themes (the TETR.IO theme is dark navy with a yellow ink); the site itself stays game-neutral.",
+    "northStar": "The Select Screen",
+    "overview": "**Creative North Star: \"The Select Screen\"**\n\nEvery match is a main event. The world is a fighting game's character-select and versus screens set on a deep indigo stage: player one in hot red-orange on the left, player two in electric blue on the right, a gold VS in the slanted cut between them. It is held to a working product. The shell, tabs, tables, forms and lists are ordinary and predictable; what the game lends is type, palette, density and one signature move, **the winner takes the plate**: once a match is decided the winner's slot fills with its side colour and the loser's drains to a shadow of it. That move is the same on the versus plate, the next-match plate, list rows, the organizer's queue and every bracket node.\n\nDark is the default look. A fully designed light look (a pale violet ground, white panels, deeper side colours, ink-coloured focus) sits behind the switch in the footer and is applied before first paint from the browser's stored choice. Both looks share every rule here; only the values change, and every text pair is tested to 4.5:1 in both. Players' pages peak where something happens (a result arriving, a podium, a registration locking in). Organizer screens wear the same tokens and plates, calmer: list plates instead of versus plates and no entrance or result motion.\n\nThe world refuses the category's two defaults: the near-black esports dashboard with one neon and angled panels everywhere, and the white SaaS card grid. Diagonals appear only where two sides meet or where a state is tagged, never as panel decoration.",
     "keyCharacteristics": [
-      "White sheets on a cool grey wall, near-black print, flat at rest.",
-      "One hue, ballpoint blue: full strength on small marks, pale tints for areas.",
-      "Red pen for disputes, help and organizer decisions only.",
-      "One variable grotesk (Archivo) with a width axis; names semi-condensed and bold.",
-      "Names on printed lines, joints, and a winner line that carries on in ink.",
-      "Light and dark themes from the same token names via `prefers-color-scheme`."
+      "A deep indigo stage with violet-tinted, edged panels; no shadows at rest.",
+      "Two side colours (P1 red-orange, P2 blue) that mean the two sides of a match and nothing else.",
+      "Gold as the one primary action, the focus ring in the dark look, the viewer's \"You\", and the winner.",
+      "Dela Gothic One for titles, names and scores; Onest for everything read.",
+      "State as slanted chips at a -10deg skew: violet open, green done, pink-red disputed or decided by an organizer.",
+      "Players without a picture get a character tile from an eight-colour palette that never collides with side, state or winner colours."
     ],
     "rules": [
       {
-        "name": "The One Pen Rule",
-        "body": "Blue is the only hue on working screens. At full strength it goes on small marks only: the one primary action, your own line, the highlighted path, a focus ring. Areas take its tints.",
+        "name": "The Two Sides Rule",
+        "body": "Red-orange and blue mean player one and player two of a match, nothing else. A slot no player has reached yet carries no side colour; it sits on `panel-raised` in muted ink. The mark and favicon are the one sanctioned exception: two slanted side panels are the versus screen in miniature.",
         "section": "colors"
       },
       {
-        "name": "The Red Pen Rule",
-        "body": "Red appears only where an organizer must decide: disputes, help requests, destructive actions, errors and unmet requirements. Never as decoration or emphasis.",
+        "name": "The Gold Is Earned Rule",
+        "body": "Gold marks the one primary action, focus in the dark look, the viewer, and the winner. A state chip is never gold: state is violet, green, pink-red or outlined.",
         "section": "colors"
       },
       {
-        "name": "The Poster Exception",
-        "body": "On the Persuade surface the pen may fill flat colour fields at poster scale (the hero joint, the closing row, the stage clause). This is the same pen drawn large, not a second palette; it does not carry over to working screens.",
+        "name": "The Tile Neutrality Rule",
+        "body": "Character tiles never use a side, state or winner colour, so a tile never reads as P1, P2, a state or the champion, and the gold \"You\" frame shows on every tile.",
         "section": "colors"
       },
       {
-        "name": "The Draw Sheet Rule",
-        "body": "Only names are condensed. If it is not a person, a team or the wordmark, it is set at full width.",
+        "name": "The Tested Pair Rule",
+        "body": "Every text colour ships only on backgrounds it is tested against at 4.5:1 in both looks: ink, muted ink and link on stage, panel and raised panel; pink and green on panels; each soft/ink pair; on-gold on gold and gold hover; on-side on both side colours and on green; on-violet on violet; faint ink on panel. A new pairing joins that list before it ships.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Weight Rule",
+        "body": "Dela Gothic One has one weight. It is always set at 400, never bolded, and never synthesised.",
         "section": "typography"
       },
       {
-        "name": "The Tabular Score Rule",
-        "body": "Scores, match numbers, tables and anything marked `.num` use tabular figures, right-aligned at the end of their line.",
+        "name": "The Display For Finding Rule",
+        "body": "The display face carries titles, names on plates, scores, ranks and the wordmark. Running text, labels, controls (other than the gold primary plate) and table cells stay in Onest. Scores are tabular in both faces.",
         "section": "typography"
       },
       {
-        "name": "The Taped Sheet Rule",
-        "body": "A sheet is edged, never shadowed. If something needs to read as separate, give it the sheet colour and a 1px edge on the wall, or a tint step inside a sheet.",
+        "name": "The Edged Panel Rule",
+        "body": "A panel is edged, never shadowed at rest.",
         "section": "elevation"
+      },
+      {
+        "name": "The Cut Where Sides Meet Rule",
+        "body": "Diagonals mark where two sides meet (the versus cut, the mark) or tag a state (chips, the primary plate, side ticks). Panels, sections and images are never angled.",
+        "section": "shapes"
       }
     ],
     "dos": [
-      "Do set every match as two names on printed lines with the score at the line's end, a joint at the right, and the winner's line carrying on in 2px ink.",
-      "Do keep ballpoint blue at full strength for small marks (one primary action per view, your own line, the highlighted path, focus) and use its tints (`ballpoint-tint`, `ballpoint-track`) for areas.",
-      "Do reserve the red pen for disputes, help, destructive actions, errors and unmet requirements.",
-      "Do lay sheets on the wall with a 1px sheet edge and 8px corners; separate rows with the row rule.",
-      "Do set player names at 88% width and 650 weight, and keep everything else at full width.",
-      "Do use tabular figures for every score, number and table.",
-      "Do keep game flavour inside bracket themes and their participant labels.",
-      "Do give controls 44px on coarse pointers and set fields to 1rem there."
+      "Do draw every match as two slots, player one then player two, and fill the winner's slot with its side colour once decided while the loser's drains.",
+      "Do keep exactly one gold primary plate per view, label upright on a -10deg plate.",
+      "Do set titles, names on plates, scores and ranks in Dela Gothic One at 400, and everything read in Onest.",
+      "Do mark state with a slanted chip toned by the shared progress and status maps: violet open, green done, pink-red disputed, outlined otherwise.",
+      "Do edge panels with a 1px panel-edge border on the stage and leave them unshadowed.",
+      "Do give organizer screens the same tokens and plates with list plates in place of versus plates and no entrance or result motion.",
+      "Do test every new text-on-colour pair at 4.5:1 in both looks before shipping it.",
+      "Do draw open places and unreached slots instead of leaving them out."
     ],
     "donts": [
-      "Don't put a shadow on anything at rest; there is no floating layer in the shipped system.",
-      "Don't box a match or a name; the printed line is the container.",
-      "Don't introduce a second accent hue on working screens, or use green beyond tags, dots and met-requirement marks.",
-      "Don't condense or embolden text that is not a name.",
-      "Don't bring a game's colours, ranks or uppercase styling into the site's own chrome; that belongs to the theme.",
-      "Don't invent photographs, logos, testimonials or user counts as imagery; pictures are the product's own interface fragments."
+      "Don't use red-orange or blue for anything but a match's two sides (the mark and favicon excepted).",
+      "Don't put gold on a state chip, or use side, state or winner colours for a character tile.",
+      "Don't bold Dela Gothic One or set running text, labels or table cells in it.",
+      "Don't angle panels, sections or images; diagonals belong to the cut between sides and to state tags.",
+      "Don't add shadows to panels at rest.",
+      "Don't let character peak anywhere a result, a final or a champion is not arriving, and never let it hide state or slow a task.",
+      "Don't borrow any single game's art, logo or style into the site's chrome; game art appears only as a tournament's own image, faded behind its title."
     ]
   }
 }

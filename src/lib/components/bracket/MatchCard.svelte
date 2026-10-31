@@ -90,7 +90,7 @@
 		box-sizing: border-box;
 		overflow: visible;
 		border: 1px solid var(--bracket-border);
-		border-radius: 6px;
+		border-radius: var(--radius-sm);
 		background: var(--bracket-card);
 
 		&.ready {
@@ -156,7 +156,7 @@
 			height: 12px;
 			border-radius: 1px;
 			background: var(--side);
-			transform: skewX(-10deg);
+			transform: skewX(var(--slant));
 		}
 
 		&.winner {
